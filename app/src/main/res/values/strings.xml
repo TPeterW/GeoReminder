@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">GeoReminder</string>
+
+    <!--Action Bar-->
+    <string name="action_settings">Settings</string>
+    
+    <!--Snack Bar-->
+    
+    
+    <!--Bundle Keys-->
+    <string name="bundle_with_map">withMap</string>
+
+
+    <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
+        A lot of words A lot of words A lot of words A lot of words
+</string>
+</resources>
