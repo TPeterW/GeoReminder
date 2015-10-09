@@ -41,6 +41,12 @@
             android:screenOrientation="portrait" >
         </activity>
 
+        <activity android:name=".SettingScreen"
+            android:label="@string/page_settings"
+            android:parentActivityName=".MainScreen"
+            android:screenOrientation="portrait">
+        </activity>
+
         <service
             android:name=".utils.BackgroundService"
             android:icon="@mipmap/ic_launcher" />
