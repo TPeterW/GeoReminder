@@ -132,7 +132,8 @@ public class MainScreen extends AppCompatActivity {
 
         switch (id){
             case R.id.action_settings:
-
+                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
+                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
                 return true;
         }
         return super.onOptionsItemSelected(item);

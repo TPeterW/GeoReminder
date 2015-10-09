@@ -18,6 +18,10 @@
         android:key="random"
         android:title="Random"/>
 
+    <SwitchPreference
+        android:key="fixed"
+        android:title="Fixed"/>
+
     <PreferenceCategory
         android:key="about"
         android:title="About">
