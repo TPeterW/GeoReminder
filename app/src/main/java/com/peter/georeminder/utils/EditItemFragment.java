@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.peter.georeminder.R;
 
@@ -18,14 +19,21 @@ public class EditItemFragment extends Fragment {
     private Bundle bundle;
 
     public EditItemFragment() {
-        bundle = getArguments();
-        withMap = bundle.getBoolean("withMap");
+        withMap = false;
         //TODO: and other specifications of the reminder to check
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        try{
+            bundle = getArguments();
+            withMap = bundle.getBoolean("withMap");
+        }
+        catch (Exception e){
+            Toast.makeText(getActivity(), e.getMessage().toString(), Toast.LENGTH_SHORT).show();
+        }
+
         View view;
         if(withMap){
             view = inflater.inflate(R.layout.geo_reminder_edit_screen, container, false);

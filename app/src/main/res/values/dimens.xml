@@ -2,7 +2,12 @@
     <!--Main Screen-->
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fam_margin">12dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="fading_edge">5dp</dimen>
+
+    <dimen name="fab_size_normal">56dp</dimen>
+    <dimen name="fab_size_mini">40dp</dimen>
+    <dimen name="labels_text_size">14sp</dimen>
 
 </resources>

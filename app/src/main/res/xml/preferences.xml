@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="general"
+        android:title="General">
+
+        <ListPreference
+            android:key="colorTheme"
+            android:title="@string/pref_theme"
+            android:dialogTitle="@string/pref_theme"
+            android:entries="@array/color_theme_entry"
+            android:entryValues="@array/color_theme_value"/>
+
+    </PreferenceCategory>
+
+    <CheckBoxPreference
+        android:key="random"
+        android:title="Random"/>
+
+    <PreferenceCategory
+        android:key="about"
+        android:title="About">
+
+        <Preference
+            android:key="rate"
+            android:title="@string/pref_rate">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://www.google.com" />
+
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
