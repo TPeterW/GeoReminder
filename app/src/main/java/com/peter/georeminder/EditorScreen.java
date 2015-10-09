@@ -2,40 +2,36 @@ package com.peter.georeminder;
 
 import android.app.ActionBar;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import com.peter.georeminder.utils.EditItemFragment;
 
 /**
- * Created by Peter on 10/6/15.
+ * Created by Peter on 10/8/15.
  */
-public class EditScreen extends AppCompatActivity {
+public class EditorScreen extends AppCompatActivity {
 
-    private Boolean withMap = true;
+    private boolean withMap;
     private Bundle reminderSpecs;
 
-    //TODO: Add a function that can add saved reminders from history/local storage
-
-
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_reminder);
 
-        generateActionBar();
-
-        getSpecifications();
+        initEvent();
 
         createFragment();
     }
 
-    private void generateActionBar() {
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    private void initEvent() {
+        getSpecifications();
+        //TODO:
     }
 
     private void createFragment() {
@@ -43,9 +39,6 @@ public class EditScreen extends AppCompatActivity {
 
         Bundle bundle = new Bundle();
         bundle.putBoolean(getResources().getString(R.string.bundle_with_map), withMap);
-        Toast.makeText(EditScreen.this, "Here", Toast.LENGTH_SHORT).show();
-
-        //TODO: Fragment doesn't load layout
 
         //TODO: and other specifications
         editItemFragment.setArguments(bundle);
@@ -60,6 +53,18 @@ public class EditScreen extends AppCompatActivity {
     private void getSpecifications() {
         //TODO:
         reminderSpecs = getIntent().getExtras();
+//        Toast.makeText(EditorScreen.this, reminderSpecs.getBoolean(getResources().getString(R.string.bundle_with_map)) + "", Toast.LENGTH_SHORT).show();
         withMap = reminderSpecs.getBoolean(getResources().getString(R.string.bundle_with_map));
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                //TODO: if doesn't have content
+                finish();
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 }

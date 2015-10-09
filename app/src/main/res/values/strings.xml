@@ -5,11 +5,32 @@
     <string name="action_settings">Settings</string>
     
     <!--Snack Bar-->
-    
+    <string name="press_again_exit">Press again to exit</string>
     
     <!--Bundle Keys-->
     <string name="bundle_with_map">withMap</string>
 
+    <!--Buttons-->
+    <string name="new_geo">Geo Reminder</string>
+    <string name="new_nor">Normal Reminder</string>
+
+    <!--Settings-->
+    <string name="cat_general">General</string>
+    <string name="cat_about">About</string>
+    <string name="pref_theme">Theme</string>
+    <string name="pref_rate">Rate this app</string>
+
+    <!--Color Themes-->
+    <string name="theme_green">Green</string>
+    <string name="theme_blue">Blue</string>
+    <string name="theme_yellow">Yellow</string>
+    <string name="theme_red">Red</string>
+    <string name="theme_black">Dark</string>
+
+    <!--Page Titles-->
+    <string name="page_create_new_title">New Reminder</string>
+    <string name="page_edit_existing_title">Edit</string>
+    <string name="page_settings">Preferences</string>
 
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
@@ -31,5 +52,6 @@
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words
-</string>
+    </string>
+
 </resources>
