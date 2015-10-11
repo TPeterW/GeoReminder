@@ -182,7 +182,7 @@ public class MainScreen extends AppCompatActivity {
                 long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                 if((currentBackPress - firstBackPress) > 2000){
                     Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null);
+                    .setAction("Action", null);             // TODO: make sure don't press again while fab is up
                     firstBackPress = currentBackPress;
 
                     snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
