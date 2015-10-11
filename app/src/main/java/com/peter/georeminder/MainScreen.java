@@ -181,9 +181,23 @@ public class MainScreen extends AppCompatActivity {
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
                 long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                 if((currentBackPress - firstBackPress) > 2000){
-                    Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null).show();
+                    Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null);
                     firstBackPress = currentBackPress;
+
+                    snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                        @Override
+                        public void onViewAttachedToWindow(View v) {
+                            newReminder.animate().translationYBy(-136);
+                        }
+
+                        @Override
+                        public void onViewDetachedFromWindow(View v) {
+                            newReminder.animate().translationYBy(136);
+                        }
+                    });
+
+                    snackbar.show();
                     return true;
                 }
         }
