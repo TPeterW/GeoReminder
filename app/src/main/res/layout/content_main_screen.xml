@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_main_screen" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context=".MainScreen">
+    tools:showIn="@layout/activity_main_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainScreen"
+    android:id="@+id/recycler_layout">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fadingEdge="horizontal"
-        android:fadingEdgeLength="@dimen/fading_edge"/>
-
-</android.support.v4.widget.NestedScrollView>
+</android.support.v7.widget.RecyclerView>
