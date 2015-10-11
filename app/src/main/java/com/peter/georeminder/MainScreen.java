@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,12 +19,10 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionMenu;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
-import com.peter.georeminder.utils.recyclerview.DividerItemDecoration;
-import com.peter.georeminder.utils.recyclerview.SpaceItemDecoration;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
@@ -49,7 +45,7 @@ public class MainScreen extends AppCompatActivity {
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView.Adapter adapter;
+    private RecyclerAdapter adapter;
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -88,7 +84,7 @@ public class MainScreen extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         // get data from shared preferences
 
-        reminderList = new ArrayList<>();
+        reminderList = new LinkedList<>();
         // TODO: remove these and actually get the reminders
         reminderList.add(new Reminder());
         reminderList.add(new Reminder());
@@ -113,6 +109,20 @@ public class MainScreen extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new RecyclerAdapter(MainScreen.this, reminderList);
+        adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                // TODO: temporary test code, delete and change later
+//                adapter.addReminder(position, new Reminder());
+                Toast.makeText(MainScreen.this, position + "", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                // TODO: temporary test code, delete and change later
+                adapter.deleteReminder(position);
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         // add dividers
