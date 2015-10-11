@@ -1,45 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/geo_holder_cardview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/cardview_compat_inset_shadow"
+        app:cardCornerRadius="10dp"
+        android:layout_margin="5dp"
+        app:cardBackgroundColor="@color/cardview_light_background">
 
         <RelativeLayout
             android:id="@+id/map_relative_layout"
-            android:layout_width="120dp"
+            android:layout_width="match_parent"
             android:layout_height="120dp">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/recycler_item_map_screenshot"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_margin="10dp"
                 android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"/>
+                android:layout_alignParentLeft="true"
+                android:src="@mipmap/ic_launcher"/>
 
             <RelativeLayout
                 android:id="@+id/content_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_toRightOf="@+id/map_relative_layout">
+                android:layout_toRightOf="@+id/recycler_item_map_screenshot"
+                android:layout_centerVertical="true">
 
                 <TextView
                     android:id="@+id/recycler_item_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_centerHorizontal="true"
                     android:text="Title"
                     android:ellipsize="end"
                     android:textSize="24dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="20dp"/>
 
                 <TextView
+                    android:id="@+id/recycler_item_content"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="20dp"
+                    android:text="This is the content for an geo reminder"
+                    android:ellipsize="marquee"
+                    android:textSize="12dp"
+                    />
 
             </RelativeLayout>
 

@@ -74,6 +74,7 @@
                 android:layout_height="wrap_content"
                 app:fab_size="mini"
                 app:fab_colorNormal="@color/colorPrimary"
+                android:src="@drawable/ic_fab_new_geo"
                 app:fab_label="@string/new_geo"/>
 
             <com.github.clans.fab.FloatingActionButton
@@ -82,6 +83,7 @@
                 android:layout_height="wrap_content"
                 app:fab_size="mini"
                 app:fab_colorNormal="@color/colorPrimary"
+                android:src="@drawable/ic_fab_new_nor"
                 app:fab_label="@string/new_nor"/>
 
         </com.github.clans.fab.FloatingActionMenu>
