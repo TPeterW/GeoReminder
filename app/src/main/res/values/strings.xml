@@ -31,6 +31,7 @@
     <string name="page_create_new_title">New Reminder</string>
     <string name="page_edit_existing_title">Edit</string>
     <string name="page_settings">Preferences</string>
+    <string name="page_view_whole_map_title">All Pins</string>
 
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
@@ -53,5 +54,6 @@
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words
     </string>
+    <string name="title_activity_whole_map_screen">All Events</string>
 
 </resources>
