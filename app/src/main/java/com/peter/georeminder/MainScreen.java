@@ -1,5 +1,6 @@
 package com.peter.georeminder;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionMenu;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
+import com.quinny898.library.persistentsearch.SearchBox;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
@@ -36,6 +38,7 @@ public class MainScreen extends AppCompatActivity {
     // ToolBar
     private FloatingActionButton seeMap;
     private Toolbar toolbar;
+    private com.quinny898.library.persistentsearch.SearchBox persistentSearch;
 
     // "Add" fab menu
     private com.github.clans.fab.FloatingActionMenu newReminder;
@@ -69,7 +72,6 @@ public class MainScreen extends AppCompatActivity {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main_screen);
-
 
         initView();
 
@@ -135,6 +137,9 @@ public class MainScreen extends AppCompatActivity {
     private void initView() {
         // The main layout ------ RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
+
+//        persistentSearch = (SearchBox) findViewById(R.id.search);
+//        persistentSearch.revealFromMenuItem(R.id.action_search, this);
 
         // this buttons takes user to a page
         // and display a map image(or a GoogleMap object that shows all current reminders)

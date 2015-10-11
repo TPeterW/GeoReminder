@@ -3,6 +3,7 @@
 
     <!--Action Bar-->
     <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
     
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>
