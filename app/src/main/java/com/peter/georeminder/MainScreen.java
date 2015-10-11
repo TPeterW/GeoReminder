@@ -9,6 +9,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,8 +17,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 
 public class MainScreen extends AppCompatActivity {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "CaEup4hD9PE80usRXTqez80Yo";
+    private static final String TWITTER_SECRET = "kDEkAOOz2oFnvBn8aneY7YtJtaBP5npSNT4VtnKP826A3OMIRi";
+
 
     // ToolBar
     private FloatingActionButton seeMap;
@@ -28,6 +37,9 @@ public class MainScreen extends AppCompatActivity {
     private com.github.clans.fab.FloatingActionMenu newReminder;
     private com.github.clans.fab.FloatingActionButton addGeoReminder;
     private com.github.clans.fab.FloatingActionButton addNorReminder;
+
+    // Main content (RecyclerView)
+    private RecyclerView recyclerView;
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -42,6 +54,8 @@ public class MainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main_screen);
 
 
@@ -87,9 +101,14 @@ public class MainScreen extends AppCompatActivity {
         seeMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
+                startActivity(toViewWholeMap);
                 //TODO:
             }
         });
+
+        // the container of all CardViews of the reminders
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
         // The two mini add buttons
         addNorReminder = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_new_norreminder);
