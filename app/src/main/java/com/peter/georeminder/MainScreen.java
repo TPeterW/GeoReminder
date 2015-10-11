@@ -9,16 +9,26 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.peter.georeminder.models.Reminder;
+import com.peter.georeminder.utils.RecyclerAdapter;
+import com.peter.georeminder.utils.recyclerview.DividerItemDecoration;
+import com.peter.georeminder.utils.recyclerview.SpaceItemDecoration;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import io.fabric.sdk.android.Fabric;
 
 public class MainScreen extends AppCompatActivity {
@@ -27,11 +37,9 @@ public class MainScreen extends AppCompatActivity {
     private static final String TWITTER_KEY = "CaEup4hD9PE80usRXTqez80Yo";
     private static final String TWITTER_SECRET = "kDEkAOOz2oFnvBn8aneY7YtJtaBP5npSNT4VtnKP826A3OMIRi";
 
-
     // ToolBar
     private FloatingActionButton seeMap;
     private Toolbar toolbar;
-    private CollapsingToolbarLayout collapsingToolbar;
 
     // "Add" fab menu
     private com.github.clans.fab.FloatingActionMenu newReminder;
@@ -40,6 +48,8 @@ public class MainScreen extends AppCompatActivity {
 
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView.Adapter adapter;
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -47,6 +57,12 @@ public class MainScreen extends AppCompatActivity {
     private static final int SETTINGS_REQUEST_CODE = 0x004;
 
     SharedPreferences sharedPreferences;                // to load preferences set in Settings page/fragment
+
+    // Importante
+    // DataList
+    private List<Reminder> reminderList;
+
+
 
     // Record the last time "Back" key was pressed, to implement "double-click-exit"
     private long firstBackPress;
@@ -61,41 +77,56 @@ public class MainScreen extends AppCompatActivity {
 
         initView();
 
+        initData();
+
         initEvent();
 
         loadPref();             //using SharedPreferences
     }
 
+    private void initData() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        // get data from shared preferences
+
+        reminderList = new ArrayList<>();
+        // TODO: remove these and actually get the reminders
+        reminderList.add(new Reminder());
+        reminderList.add(new Reminder());
+        reminderList.add(new Reminder());
+        reminderList.add(new Reminder());
+        reminderList.add(new Reminder());
+        reminderList.add(new Reminder());
+        reminderList.add(new Reminder());
+        reminderList.add(new Reminder());
+    }
+
     private void loadPref() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         //TODO:
     }
 
     private void initEvent() {
         firstBackPress = System.currentTimeMillis() - 2000;
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        // use linear layout manager to set Recycler view
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new RecyclerAdapter(MainScreen.this, reminderList);
+        recyclerView.setAdapter(adapter);
+
+        // add dividers
+        // Currently not needed
+
+        // TODO: delete code below as they are temporary
+        // will implement UltimateRecyclerView
     }
 
     private void initView() {
-        // Toolbar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // The main layout ------ RecyclerView
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
-        // Toolbar layout
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-        AppBarLayout.OnOffsetChangedListener toolbarListener = new AppBarLayout.OnOffsetChangedListener(){
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {            // same trigger that content scrims use
-//                if(collapsingToolbar.getHeight() + verticalOffset < 2 * ViewCompat.getMinimumHeight(collapsingToolbar)) {
-//                    Toast.makeText(MainScreen.this, "Collapsed", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    Toast.makeText(MainScreen.this, "Shown", Toast.LENGTH_SHORT).show();
-//                }
-                //TODO: so far haven't found use to listen to the collapsing of the toolbar layout
-            }
-        };
-
-        // this buttons takes user to another page(or just change the fragment on the main page, I haven't decided yet)
+        // this buttons takes user to a page
         // and display a map image(or a GoogleMap object that shows all current reminders)
         seeMap = (FloatingActionButton) findViewById(R.id.fab_see_map);
         seeMap.setOnClickListener(new View.OnClickListener() {
@@ -106,9 +137,6 @@ public class MainScreen extends AppCompatActivity {
                 //TODO:
             }
         });
-
-        // the container of all CardViews of the reminders
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
         // The two mini add buttons
         addNorReminder = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_new_norreminder);
@@ -136,6 +164,11 @@ public class MainScreen extends AppCompatActivity {
             }
         });
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
+
+
+        // Toolbar, preferably not make any changes to that
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -181,9 +214,23 @@ public class MainScreen extends AppCompatActivity {
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
                 long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                 if((currentBackPress - firstBackPress) > 2000){
-                    Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null).show();
+                    Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null);             // TODO: make sure don't press again while fab is up
                     firstBackPress = currentBackPress;
+
+                    snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                        @Override
+                        public void onViewAttachedToWindow(View v) {
+                            newReminder.animate().translationYBy(-136);
+                        }
+
+                        @Override
+                        public void onViewDetachedFromWindow(View v) {
+                            newReminder.animate().translationYBy(136);
+                        }
+                    });
+
+                    snackbar.show();
                     return true;
                 }
         }
