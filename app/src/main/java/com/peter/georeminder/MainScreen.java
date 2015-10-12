@@ -1,11 +1,10 @@
 package com.peter.georeminder;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,17 +15,18 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
-import com.peter.georeminder.utils.recyclerview.DividerItemDecoration;
-import com.peter.georeminder.utils.recyclerview.SpaceItemDecoration;
+import com.quinny898.library.persistentsearch.SearchBox;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
@@ -40,6 +40,7 @@ public class MainScreen extends AppCompatActivity {
     // ToolBar
     private FloatingActionButton seeMap;
     private Toolbar toolbar;
+    private com.quinny898.library.persistentsearch.SearchBox persistentSearch;
 
     // "Add" fab menu
     private com.github.clans.fab.FloatingActionMenu newReminder;
@@ -49,7 +50,12 @@ public class MainScreen extends AppCompatActivity {
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView.Adapter adapter;
+    private RecyclerAdapter adapter;
+
+    // Empty list
+    private TextView textNoReminder;
+    private Button borderlessNewReminder;
+
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -74,10 +80,9 @@ public class MainScreen extends AppCompatActivity {
         Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main_screen);
 
+        initData();             // load from sharedPreferences list of reminders
 
         initView();
-
-        initData();
 
         initEvent();
 
@@ -88,7 +93,7 @@ public class MainScreen extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         // get data from shared preferences
 
-        reminderList = new ArrayList<>();
+        reminderList = new LinkedList<>();
         // TODO: remove these and actually get the reminders
         reminderList.add(new Reminder());
         reminderList.add(new Reminder());
@@ -100,33 +105,15 @@ public class MainScreen extends AppCompatActivity {
         reminderList.add(new Reminder());
     }
 
-    private void loadPref() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        //TODO:
-    }
-
-    private void initEvent() {
-        firstBackPress = System.currentTimeMillis() - 2000;
-
-        // use linear layout manager to set Recycler view
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        adapter = new RecyclerAdapter(MainScreen.this, reminderList);
-        recyclerView.setAdapter(adapter);
-
-        // add dividers
-        // Currently not needed
-
-        // TODO: delete code below as they are temporary
-        // will implement UltimateRecyclerView
-    }
-
     private void initView() {
         // The main layout ------ RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
+//        persistentSearch = (SearchBox) findViewById(R.id.search);
+//        persistentSearch.revealFromMenuItem(R.id.action_search, this);
+
         // this buttons takes user to a page
+        // the blue one with a map icon
         // and display a map image(or a GoogleMap object that shows all current reminders)
         seeMap = (FloatingActionButton) findViewById(R.id.fab_see_map);
         seeMap.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +125,7 @@ public class MainScreen extends AppCompatActivity {
             }
         });
 
-        // The two mini add buttons
+        // The two mini add buttons (in floating action menu)
         addNorReminder = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_new_norreminder);
         addNorReminder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,10 +152,73 @@ public class MainScreen extends AppCompatActivity {
         });
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
 
+        // Empty list
+        textNoReminder = (TextView) findViewById(R.id.text_no_reminder);
+        borderlessNewReminder = (Button) findViewById(R.id.borderless_btn_new_reminder);
+
 
         // Toolbar, preferably not make any changes to that
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    private void initEvent() {
+        firstBackPress = System.currentTimeMillis() - 2000;             // in case some idiot just presses back button when they enters the app
+
+        // use linear layout manager to set Recycler view
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new RecyclerAdapter(MainScreen.this, reminderList);
+        adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                // TODO: temporary test code, delete and change later
+//                adapter.addReminder(position, new Reminder());
+                Toast.makeText(MainScreen.this, position + "", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                // TODO: temporary test code, delete and change later
+                adapter.deleteReminder(position);
+                if(reminderList.size() == 0){
+                    textNoReminder.setAlpha(1);
+                    borderlessNewReminder.setAlpha(1);
+                    borderlessNewReminder.setClickable(true);
+                }
+            }
+        });
+        recyclerView.setAdapter(adapter);
+
+        // add dividers
+        // Currently not needed
+
+        // TODO: delete code below as they are temporary
+        // will implement UltimateRecyclerView
+
+
+
+        // Empty list
+        borderlessNewReminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newReminder = new Intent(MainScreen.this, EditorScreen.class);       // default is a new GeoReminder
+                newReminder.putExtra(getResources().getString(R.string.bundle_with_map), true);
+                //TODO: more specifications
+                startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
+            }
+        });
+        if(reminderList.size() != 0){
+            textNoReminder.setAlpha(0);
+            borderlessNewReminder.setAlpha(0);
+            borderlessNewReminder.setClickable(false);
+        }
+    }
+
+    private void loadPref() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        //TODO:
     }
 
     @Override

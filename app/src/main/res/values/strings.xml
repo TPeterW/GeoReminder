@@ -3,6 +3,7 @@
 
     <!--Action Bar-->
     <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
     
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>
@@ -13,6 +14,7 @@
     <!--Buttons-->
     <string name="new_geo">Geo Reminder</string>
     <string name="new_nor">Normal Reminder</string>
+    <string name="empty_create_new">Create a new reminder</string>
 
     <!--Settings-->
     <string name="cat_general">General</string>
@@ -32,6 +34,10 @@
     <string name="page_edit_existing_title">Edit</string>
     <string name="page_settings">Preferences</string>
     <string name="page_view_whole_map_title">All Pins</string>
+
+    <!--TextBoxes-->
+    <string name="main_no_reminder">Your reminder list is empty.</string>
+
 
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words

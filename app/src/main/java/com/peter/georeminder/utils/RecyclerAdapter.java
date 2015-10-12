@@ -22,6 +22,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     private Context context;
     private LayoutInflater inflater;
 
+    /**
+     * Implement OnClick and OnLongClick
+     */
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+        void onItemLongClick(View view, int position);
+    }
+
+    // implement onItemClick and onItemLongClick
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     public RecyclerAdapter (Context context, List<Reminder> reminderList){
         this.reminderList = reminderList;
         this.context = context;
@@ -37,12 +52,33 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     }
 
     @Override
-    public void onBindViewHolder(RecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
         holder.mapScreenshot.setImageResource(R.mipmap.ic_launcher);
         holder.reminderTitle.setText("Title");
         holder.reminderContent.setText("Content Content Content Content Content");
-
         // TODO: Change this to use information from reminderList
+
+
+        // set OnItemClick/LongClick listener
+        // implement in calling activity (in this case, MainScreen)
+
+        if(listener != null){
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemClick(holder.cardView, position);
+                }
+            });
+
+            holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    listener.onItemLongClick(holder.cardView, position);
+                    return false;
+                }
+            });
+        }
+
     }
 
     @Override
@@ -50,7 +86,29 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
         return reminderList.size();
     }
 
-    public static class RecyclerViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    public void addReminder(int position, Reminder addedReminder){
+        reminderList.add(position, addedReminder);
+        notifyItemInserted(position);
+    }
+
+    public void deleteReminder(int position){
+        reminderList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged((int) getItemId(position), getItemCount() + 1);
+    }
+
+
+
+
+    /**
+     * ViewHolder
+     */
+    public static class RecyclerViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
         ImageView mapScreenshot;
         TextView reminderTitle;
