@@ -84,11 +84,6 @@ public class MainScreen extends AppCompatActivity {
         Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main_screen);
 
-        // Set up Parse Environment TODO: add backup for reminders
-        // Enable Local Datastore.
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "j5LhuXf9kpeP81DZkf2MFFqhTGZijntJoT290hLY", "pcbALD79URPIFzwjZm4oitYsatmRsLljSFHpsbRq");
-
         // code below is to test the Parse functions TODO: delete when implementing actual back functions
         ParseObject testObject = new ParseObject("TestObject");
         testObject.put("Name", "Tao Peter Wang");
