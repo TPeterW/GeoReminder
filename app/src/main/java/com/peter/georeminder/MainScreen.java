@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.parse.Parse;
+import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
 import com.quinny898.library.persistentsearch.SearchBox;
@@ -76,9 +79,17 @@ public class MainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Set up Twitter Environment
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main_screen);
+
+        // code below is to test the Parse functions TODO: delete when implementing actual back functions
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("Name", "Tao Peter Wang");
+        testObject.put("Location", "NULL");
+        Log.i("Cloud", "Sent Parse TestObject");
+        testObject.saveInBackground();
 
         initData();             // load from sharedPreferences list of reminders
 
