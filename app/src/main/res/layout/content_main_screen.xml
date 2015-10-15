@@ -9,10 +9,17 @@
     android:layout_height="match_parent"
     tools:context=".MainScreen">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_layout"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_to_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <TextView
         android:id="@+id/text_no_reminder"
