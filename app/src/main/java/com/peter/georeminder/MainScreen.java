@@ -85,11 +85,11 @@ public class MainScreen extends AppCompatActivity {
         setContentView(R.layout.activity_main_screen);
 
         // code below is to test the Parse functions TODO: delete when implementing actual back functions
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("Name", "Tao Peter Wang");
-        testObject.put("Location", "NULL");
-        Log.i("Cloud", "Sent Parse TestObject");
-        testObject.saveInBackground();
+//        ParseObject testObject = new ParseObject("TestObject");
+//        testObject.put("Name", "Tao Peter Wang");
+//        testObject.put("Location", "NULL");
+//        Log.i("Cloud", "Sent Parse TestObject");
+//        testObject.saveInBackground();
 
         initData();             // load from sharedPreferences list of reminders
 
