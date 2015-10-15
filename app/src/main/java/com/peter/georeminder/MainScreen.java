@@ -3,10 +3,13 @@ package com.peter.georeminder;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,12 +39,9 @@ import io.fabric.sdk.android.Fabric;
 
 public class MainScreen extends AppCompatActivity {
 
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "CaEup4hD9PE80usRXTqez80Yo";
-    private static final String TWITTER_SECRET = "kDEkAOOz2oFnvBn8aneY7YtJtaBP5npSNT4VtnKP826A3OMIRi";
-
     // ToolBar
     private FloatingActionButton seeMap;
+    private AppBarLayout appBarLayout;
     private Toolbar toolbar;
     private com.quinny898.library.persistentsearch.SearchBox persistentSearch;
 
@@ -54,6 +54,7 @@ public class MainScreen extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerAdapter adapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     // Empty list
     private TextView textNoReminder;
@@ -79,9 +80,6 @@ public class MainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Set up Twitter Environment
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main_screen);
 
         // code below is to test the Parse functions TODO: delete when implementing actual back functions
@@ -118,6 +116,8 @@ public class MainScreen extends AppCompatActivity {
 
     private void initView() {
         // The main layout ------ RecyclerView
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);        // color scheme
         recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
 //        persistentSearch = (SearchBox) findViewById(R.id.search);
@@ -171,6 +171,13 @@ public class MainScreen extends AppCompatActivity {
         // Toolbar, preferably not make any changes to that
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {        // when collapsed, do not enbale
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                swipeRefreshLayout.setEnabled(verticalOffset == 0);
+            }
+        });
     }
 
     private void initEvent() {
@@ -204,6 +211,19 @@ public class MainScreen extends AppCompatActivity {
 
         // add dividers
         // Currently not needed
+
+
+        // Set up Swipe to Refresh
+        swipeRefreshLayout.setEnabled(false);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // TODO: update from server and actually refresh
+
+                swipeRefreshLayout.setRefreshing(true);
+            }
+        });
+
 
         // TODO: delete code below as they are temporary
         // will implement UltimateRecyclerView
@@ -273,6 +293,9 @@ public class MainScreen extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
+                if(swipeRefreshLayout.isRefreshing())
+                    swipeRefreshLayout.setRefreshing(false);
+
                 long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                 if((currentBackPress - firstBackPress) > 2000){
                     Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
