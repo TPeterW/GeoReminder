@@ -10,9 +10,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,13 +45,12 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainScreen extends AppCompatActivity {
+public class MainScreen extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     // ToolBar
     private FloatingActionButton seeMap;
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
-    private com.quinny898.library.persistentsearch.SearchBox persistentSearch;
 
     // "Add" fab menu
     private com.github.clans.fab.FloatingActionMenu newReminder;
@@ -105,7 +108,7 @@ public class MainScreen extends AppCompatActivity {
     }
 
     private void initData() {
-        // initialise statusbar color
+        // initialise StatusBar color
         if(Build.VERSION.SDK_INT >= 21)
             getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
 
@@ -223,6 +226,17 @@ public class MainScreen extends AppCompatActivity {
                 }
             }
         });
+
+
+        // Navigation Bar
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void initEvent() {
@@ -338,32 +352,57 @@ public class MainScreen extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
-                if(swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-
-                long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
-                if((currentBackPress - firstBackPress) > 2000){
-                    Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null);             // TODO: make sure don't press again while fab is up
-                    firstBackPress = currentBackPress;
-
-                    snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-                        @Override
-                        public void onViewAttachedToWindow(View v) {
-                            newReminder.animate().translationYBy(-136);
-                        }
-
-                        @Override
-                        public void onViewDetachedFromWindow(View v) {
-                            newReminder.animate().translationYBy(136);
-                        }
-                    });
-
-                    snackbar.show();
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
                     return true;
+                }
+                else {
+                    if(swipeRefreshLayout.isRefreshing()){
+                        swipeRefreshLayout.setRefreshing(false);
+                        return true;
+                    }
+                    else {
+                        long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
+                        if((currentBackPress - firstBackPress) > 2000){
+                            Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
+                                    .setAction("Action", null);             // TODO: make sure don't press again while fab is up
+                            firstBackPress = currentBackPress;
+
+                            snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                                @Override
+                                public void onViewAttachedToWindow(View v) {
+                                    newReminder.animate().translationYBy(-136);
+                                }
+
+                                @Override
+                                public void onViewDetachedFromWindow(View v) {
+                                    newReminder.animate().translationYBy(136);
+                                }
+                            });
+
+                            snackbar.show();
+                            return true;
+                        }
+                    }
                 }
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id){
+
+        }
+
+        // close the drawer after clicking on an item
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

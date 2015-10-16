@@ -45,7 +45,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
 
     @Override
     public RecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.geo_reminder_recycler_item, parent, false);
+        View view = inflater.inflate(R.layout.reminder_recycler_item, parent, false);
         RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
 
         return viewHolder;
