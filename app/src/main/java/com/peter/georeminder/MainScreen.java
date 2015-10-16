@@ -1,14 +1,17 @@
 package com.peter.georeminder;
 
+import android.animation.ValueAnimator;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +22,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,6 +81,8 @@ public class MainScreen extends AppCompatActivity {
     // Record the last time "Back" key was pressed, to implement "double-click-exit"
     private long firstBackPress;
 
+    private static boolean isDark = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +105,10 @@ public class MainScreen extends AppCompatActivity {
     }
 
     private void initData() {
+        // initialise statusbar color
+        if(Build.VERSION.SDK_INT >= 21)
+            getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         // get data from shared preferences
 
@@ -171,11 +181,46 @@ public class MainScreen extends AppCompatActivity {
         // Toolbar, preferably not make any changes to that
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        @SuppressWarnings("all")
+        // Changes the color of status bar, with animation (using ValueAnimator)
+        final ValueAnimator statusBarAnimator = ValueAnimator.ofArgb
+                (ContextCompat.getColor(MainScreen.this, R.color.colorPrimary),
+                        ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
+        statusBarAnimator.setDuration(500);
+        statusBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            // how it works is that every time it updates, it goes to change the color by a little bit
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (Build.VERSION.SDK_INT >= 21) {
+                    getWindow().setStatusBarColor((Integer) statusBarAnimator.getAnimatedValue());
+                }
+            }
+        });
+
+        // AppBar Layout, the top area
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {        // when collapsed, do not enbale
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 swipeRefreshLayout.setEnabled(verticalOffset == 0);
+
+                if(Build.VERSION.SDK_INT >= 21){
+                    if(verticalOffset < -150){
+//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
+                        if(!isDark) {
+                            statusBarAnimator.start();
+                            isDark = true;
+                        }
+                    }
+                    else {
+//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
+                        if(isDark) {
+                            statusBarAnimator.reverse();
+                            isDark = false;
+                        }
+                    }
+                }
             }
         });
     }
@@ -193,7 +238,7 @@ public class MainScreen extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 // TODO: temporary test code, delete and change later
 //                adapter.addReminder(position, new Reminder());
-                Toast.makeText(MainScreen.this, position + "", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainScreen.this, position + "", Toast.LENGTH_SHORT).show();
             }
 
             @Override
