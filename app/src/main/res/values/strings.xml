@@ -38,6 +38,10 @@
     <!--TextBoxes-->
     <string name="main_no_reminder">Your reminder list is empty.</string>
 
+    <!--Navigation Drawer-->
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+
 
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words

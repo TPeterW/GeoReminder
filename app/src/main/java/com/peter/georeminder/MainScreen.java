@@ -1,15 +1,22 @@
 package com.peter.georeminder;
 
+import android.animation.ValueAnimator;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,13 +45,12 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainScreen extends AppCompatActivity {
+public class MainScreen extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     // ToolBar
     private FloatingActionButton seeMap;
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
-    private com.quinny898.library.persistentsearch.SearchBox persistentSearch;
 
     // "Add" fab menu
     private com.github.clans.fab.FloatingActionMenu newReminder;
@@ -77,6 +84,8 @@ public class MainScreen extends AppCompatActivity {
     // Record the last time "Back" key was pressed, to implement "double-click-exit"
     private long firstBackPress;
 
+    private static boolean isDark = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +108,10 @@ public class MainScreen extends AppCompatActivity {
     }
 
     private void initData() {
+        // initialise StatusBar color
+        if(Build.VERSION.SDK_INT >= 21)
+            getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         // get data from shared preferences
 
@@ -171,13 +184,59 @@ public class MainScreen extends AppCompatActivity {
         // Toolbar, preferably not make any changes to that
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        @SuppressWarnings("all")
+        // Changes the color of status bar, with animation (using ValueAnimator)
+        final ValueAnimator statusBarAnimator = ValueAnimator.ofArgb
+                (ContextCompat.getColor(MainScreen.this, R.color.colorPrimary),
+                        ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
+        statusBarAnimator.setDuration(500);
+        statusBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            // how it works is that every time it updates, it goes to change the color by a little bit
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (Build.VERSION.SDK_INT >= 21) {
+                    getWindow().setStatusBarColor((Integer) statusBarAnimator.getAnimatedValue());
+                }
+            }
+        });
+
+        // AppBar Layout, the top area
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {        // when collapsed, do not enbale
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 swipeRefreshLayout.setEnabled(verticalOffset == 0);
+                // only version higher than 21 (Lollipop) will be getting this status bar animation
+                if(Build.VERSION.SDK_INT >= 21){
+                    if(verticalOffset < -150){
+//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
+                        if(!isDark) {
+                            statusBarAnimator.start();
+                            isDark = true;
+                        }
+                    }
+                    else {
+//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
+                        if(isDark) {
+                            statusBarAnimator.reverse();
+                            isDark = false;
+                        }
+                    }
+                }
             }
         });
+
+
+        // Navigation Bar
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void initEvent() {
@@ -193,7 +252,7 @@ public class MainScreen extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 // TODO: temporary test code, delete and change later
 //                adapter.addReminder(position, new Reminder());
-                Toast.makeText(MainScreen.this, position + "", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainScreen.this, position + "", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -293,32 +352,57 @@ public class MainScreen extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
-                if(swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-
-                long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
-                if((currentBackPress - firstBackPress) > 2000){
-                    Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null);             // TODO: make sure don't press again while fab is up
-                    firstBackPress = currentBackPress;
-
-                    snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-                        @Override
-                        public void onViewAttachedToWindow(View v) {
-                            newReminder.animate().translationYBy(-136);
-                        }
-
-                        @Override
-                        public void onViewDetachedFromWindow(View v) {
-                            newReminder.animate().translationYBy(136);
-                        }
-                    });
-
-                    snackbar.show();
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
                     return true;
+                }
+                else {
+                    if(swipeRefreshLayout.isRefreshing()){
+                        swipeRefreshLayout.setRefreshing(false);
+                        return true;
+                    }
+                    else {
+                        long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
+                        if((currentBackPress - firstBackPress) > 2000){
+                            Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
+                                    .setAction("Action", null);             // TODO: make sure don't press again while fab is up
+                            firstBackPress = currentBackPress;
+
+//                            snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+//                                @Override
+//                                public void onViewAttachedToWindow(View v) {
+//                                    newReminder.animate().translationYBy(-136);
+//                                }
+//
+//                                @Override
+//                                public void onViewDetachedFromWindow(View v) {
+//                                    newReminder.animate().translationYBy(136);
+//                                }
+//                            });
+
+                            snackbar.show();
+                            return true;
+                        }
+                    }
                 }
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id){
+
+        }
+
+        // close the drawer after clicking on an item
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

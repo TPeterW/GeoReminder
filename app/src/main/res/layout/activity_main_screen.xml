@@ -1,93 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainScreen">
+    tools:openDrawer="start"
+    android:id="@+id/drawer_layout">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:fitsSystemWindows="true"
-        android:layout_height="@dimen/app_bar_height"
+    <include
+        layout="@layout/app_bar_main_screen"
         android:layout_width="match_parent"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:tag="AppBarLayout">
+        android:layout_height="match_parent"/>
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:fitsSystemWindows="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="?attr/colorPrimary"
-            android:tag="CollapsingToolbarLayout">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_width="match_parent"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                android:tag="Toolbar"/>
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-
-    </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/content_main_screen" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_see_map"
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        android:src="@android:drawable/ic_dialog_map"
-        android:tag="FloatingActionButton"/>
-    
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_drawer_header_main"
+        app:menu="@menu/menu_nav_drawer"/>
 
-        <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/fam_add_new"
-            android:tag="FloatingActionMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/fab_margin"
-            app:menu_icon="@drawable/fab_add"
-            app:menu_colorNormal="@color/colorPrimary"
-            android:layout_gravity="bottom|right"
-            app:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
-            app:menu_fab_hide_animation="@anim/fab_slide_out_to_right"
-            app:menu_labels_style="@style/MenuLabelsStyle"
-            app:menu_openDirection="up">
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_new_georeminder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_size="mini"
-                app:fab_colorNormal="@color/colorPrimary"
-                android:src="@drawable/ic_fab_new_geo"
-                app:fab_label="@string/new_geo"/>
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_new_norreminder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_size="mini"
-                app:fab_colorNormal="@color/colorPrimary"
-                android:src="@drawable/ic_fab_new_nor"
-                app:fab_label="@string/new_nor"/>
-
-        </com.github.clans.fab.FloatingActionMenu>
-
-    </FrameLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+</android.support.v4.widget.DrawerLayout>

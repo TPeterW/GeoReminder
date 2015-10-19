@@ -3,12 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainScreen">
 
-    <item
-        android:id="@+id/action_search"
-        android:title="@string/action_search"
-        android:orderInCategory="1"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_action_search"/>
+    <!--<item-->
+        <!--android:id="@+id/action_search"-->
+        <!--android:title="@string/action_search"-->
+        <!--android:orderInCategory="1"-->
+        <!--app:showAsAction="always"-->
+        <!--android:icon="@drawable/ic_action_search"/>-->
 
     <item
         android:id="@+id/action_settings"
