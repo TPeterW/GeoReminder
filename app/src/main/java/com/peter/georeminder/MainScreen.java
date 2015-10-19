@@ -207,7 +207,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 swipeRefreshLayout.setEnabled(verticalOffset == 0);
-
+                // only version higher than 21 (Lollipop) will be getting this status bar animation
                 if(Build.VERSION.SDK_INT >= 21){
                     if(verticalOffset < -150){
 //                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
