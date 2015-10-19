@@ -369,17 +369,17 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                                     .setAction("Action", null);             // TODO: make sure don't press again while fab is up
                             firstBackPress = currentBackPress;
 
-                            snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-                                @Override
-                                public void onViewAttachedToWindow(View v) {
-                                    newReminder.animate().translationYBy(-136);
-                                }
-
-                                @Override
-                                public void onViewDetachedFromWindow(View v) {
-                                    newReminder.animate().translationYBy(136);
-                                }
-                            });
+//                            snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+//                                @Override
+//                                public void onViewAttachedToWindow(View v) {
+//                                    newReminder.animate().translationYBy(-136);
+//                                }
+//
+//                                @Override
+//                                public void onViewDetachedFromWindow(View v) {
+//                                    newReminder.animate().translationYBy(136);
+//                                }
+//                            });
 
                             snackbar.show();
                             return true;

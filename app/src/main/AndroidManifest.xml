@@ -16,8 +16,6 @@
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission-sdk-23 android:name="android.permission.CAMERA" />
 
-
-
     <application
         android:name=".utils.ParseApplication"
         android:allowBackup="true"
