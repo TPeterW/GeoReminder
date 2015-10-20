@@ -1,12 +1,11 @@
 package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -21,29 +20,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
 import com.github.clans.fab.FloatingActionMenu;
-import com.parse.Parse;
-import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
-import com.quinny898.library.persistentsearch.SearchBox;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import io.fabric.sdk.android.Fabric;
 
 public class MainScreen extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -56,6 +48,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private com.github.clans.fab.FloatingActionMenu newReminder;
     private com.github.clans.fab.FloatingActionButton addGeoReminder;
     private com.github.clans.fab.FloatingActionButton addNorReminder;
+    private int scrolledDistance = 0;               // for showing and hiding the fam
+    private boolean controlsVisible = true;
+    private static final int HIDE_THRESHOLD = 20;
 
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
@@ -133,8 +128,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);        // color scheme
         recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
-//        persistentSearch = (SearchBox) findViewById(R.id.search);
-//        persistentSearch.revealFromMenuItem(R.id.action_search, this);
 
         // this buttons takes user to a page
         // the blue one with a map icon
@@ -175,6 +168,15 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             }
         });
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
+        newReminder.hideMenuButton(false);
+        new Handler().postDelayed(new Runnable() {                      // fam show and hide animation
+            @Override
+            public void run() {
+                newReminder.showMenuButton(true);
+                newReminder.setMenuButtonShowAnimation(AnimationUtils.loadAnimation(MainScreen.this, R.anim.jump_from_down));
+                newReminder.setMenuButtonHideAnimation(AnimationUtils.loadAnimation(MainScreen.this, R.anim.jump_to_down));
+            }
+        }, 300);
 
         // Empty list
         textNoReminder = (TextView) findViewById(R.id.text_no_reminder);
@@ -210,14 +212,12 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 // only version higher than 21 (Lollipop) will be getting this status bar animation
                 if(Build.VERSION.SDK_INT >= 21){
                     if(verticalOffset < -150){
-//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
                         if(!isDark) {
                             statusBarAnimator.start();
                             isDark = true;
                         }
                     }
                     else {
-//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
                         if(isDark) {
                             statusBarAnimator.reverse();
                             isDark = false;
@@ -268,6 +268,42 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         });
         recyclerView.setAdapter(adapter);
 
+//        if(Build.VERSION.SDK_INT > 22){
+//            recyclerView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+//                @Override
+//                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//
+//                }
+//            });
+//        }
+//        else {
+            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                    if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuButtonHidden()) {
+                        newReminder.hideMenuButton(true);
+                        controlsVisible = false;
+                        scrolledDistance = 0;
+                    } else if (scrolledDistance < -HIDE_THRESHOLD && newReminder.isMenuButtonHidden()) {
+                        newReminder.showMenuButton(true);
+                        controlsVisible = true;
+                        scrolledDistance = 0;
+                    }
+
+                    if((!newReminder.isMenuButtonHidden() && dy>0) || (newReminder.isMenuButtonHidden() && dy<0)) {
+                        scrolledDistance += dy;
+                    }
+                }
+            });
+//        }
+
         // add dividers
         // Currently not needed
 
@@ -288,7 +324,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         // will implement UltimateRecyclerView
 
 
-
         // Empty list
         borderlessNewReminder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,7 +334,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
-        if(reminderList.size() != 0){
+        if(reminderList.size() != 0) {
             textNoReminder.setAlpha(0);
             borderlessNewReminder.setAlpha(0);
             borderlessNewReminder.setClickable(false);
@@ -352,6 +387,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
+                if(newReminder.isOpened()){
+                    newReminder.close(true);
+                    return true;
+                }
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);
