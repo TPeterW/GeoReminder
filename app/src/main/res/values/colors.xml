@@ -3,7 +3,5 @@
     <color name="colorPrimary">#8bc34a</color>
     <color name="colorPrimaryDark">#33691e</color>
     <color name="colorAccent">#2196f3</color>
-    <!--<color name="foreground_material_light">#e92828</color>-->
-    <!--<color name="primary_text_default_material_light">#def9f6f6</color>-->
-    <!--<color name="primary_text_material_light">#ffffff</color>-->
+    <color name="colorTransparent">@android:color/transparent</color>
 </resources>

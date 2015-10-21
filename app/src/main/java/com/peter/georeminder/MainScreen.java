@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -169,7 +170,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             }
         });
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
-        newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
         newReminder.hideMenuButton(false);
         new Handler().postDelayed(new Runnable() {                      // fam show and hide animation
             @Override
@@ -261,7 +261,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             public void onItemLongClick(View view, int position) {
                 // TODO: temporary test code, delete and change later
                 adapter.deleteReminder(position);
-                if(reminderList.size() == 0) {
+                if (reminderList.size() == 0) {
                     textNoReminder.setAlpha(1);
                     borderlessNewReminder.setAlpha(1);
                     borderlessNewReminder.setClickable(true);
@@ -281,15 +281,15 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (scrolledDistance > HIDE_SHOW_THRESHOLD && !newReminder.isMenuButtonHidden()) {
-                    newReminder.hideMenuButton(true);
+                if (scrolledDistance > HIDE_SHOW_THRESHOLD && !newReminder.isMenuHidden()) {
+                    newReminder.hideMenu(true);
                     scrolledDistance = 0;
-                } else if (scrolledDistance < -HIDE_SHOW_THRESHOLD && newReminder.isMenuButtonHidden()) {
-                    newReminder.showMenuButton(true);
+                } else if (scrolledDistance < -HIDE_SHOW_THRESHOLD && newReminder.isMenuHidden()) {
+                    newReminder.showMenu(true);
                     scrolledDistance = 0;
                 }
 
-                if((!newReminder.isMenuButtonHidden() && dy>0) || (newReminder.isMenuButtonHidden() && dy<0)) {
+                if((!newReminder.isMenuHidden() && dy>0) || (newReminder.isMenuHidden() && dy<0)) {
                     scrolledDistance += dy;
                 }
             }
