@@ -20,4 +20,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
 
+    <!--Map Screen-->
+    <dimen name="compass_padding">75dp</dimen>
+
 </resources>
