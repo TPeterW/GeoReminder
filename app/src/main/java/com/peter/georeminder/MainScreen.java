@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
@@ -28,9 +29,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.util.Log;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
 
@@ -49,8 +52,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private com.github.clans.fab.FloatingActionButton addGeoReminder;
     private com.github.clans.fab.FloatingActionButton addNorReminder;
     private int scrolledDistance = 0;               // for showing and hiding the fam
-    private boolean controlsVisible = true;
-    private static final int HIDE_THRESHOLD = 20;
+    private static final int HIDE_SHOW_THRESHOLD = 20;
+    private int scrollOrigin = 0;
 
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
@@ -86,12 +89,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        // code below is to test the Parse functions TODO: delete when implementing actual back functions
-//        ParseObject testObject = new ParseObject("TestObject");
-//        testObject.put("Name", "Tao Peter Wang");
-//        testObject.put("Location", "NULL");
-//        Log.i("Cloud", "Sent Parse TestObject");
-//        testObject.saveInBackground();
+        // TODO: delete when implementing actual back functions
+//        sendParseTestObject();
 
         initData();             // load from sharedPreferences list of reminders
 
@@ -100,6 +99,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         initEvent();
 
         loadPref();             //using SharedPreferences
+
+        checkServices();
     }
 
     private void initData() {
@@ -167,6 +168,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
+        newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
         newReminder.hideMenuButton(false);
         new Handler().postDelayed(new Runnable() {                      // fam show and hide animation
@@ -259,7 +261,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             public void onItemLongClick(View view, int position) {
                 // TODO: temporary test code, delete and change later
                 adapter.deleteReminder(position);
-                if(reminderList.size() == 0){
+                if(reminderList.size() == 0) {
                     textNoReminder.setAlpha(1);
                     borderlessNewReminder.setAlpha(1);
                     borderlessNewReminder.setClickable(true);
@@ -268,41 +270,30 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         });
         recyclerView.setAdapter(adapter);
 
-//        if(Build.VERSION.SDK_INT > 22){
-//            recyclerView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-//                @Override
-//                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//
-//                }
-//            });
-//        }
-//        else {
-            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
+        // set hide and show animation when user scrolls
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (scrolledDistance > HIDE_SHOW_THRESHOLD && !newReminder.isMenuButtonHidden()) {
+                    newReminder.hideMenuButton(true);
+                    scrolledDistance = 0;
+                } else if (scrolledDistance < -HIDE_SHOW_THRESHOLD && newReminder.isMenuButtonHidden()) {
+                    newReminder.showMenuButton(true);
+                    scrolledDistance = 0;
                 }
 
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-
-                    if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuButtonHidden()) {
-                        newReminder.hideMenuButton(true);
-                        controlsVisible = false;
-                        scrolledDistance = 0;
-                    } else if (scrolledDistance < -HIDE_THRESHOLD && newReminder.isMenuButtonHidden()) {
-                        newReminder.showMenuButton(true);
-                        controlsVisible = true;
-                        scrolledDistance = 0;
-                    }
-
-                    if((!newReminder.isMenuButtonHidden() && dy>0) || (newReminder.isMenuButtonHidden() && dy<0)) {
-                        scrolledDistance += dy;
-                    }
+                if((!newReminder.isMenuButtonHidden() && dy>0) || (newReminder.isMenuButtonHidden() && dy<0)) {
+                    scrolledDistance += dy;
                 }
-            });
-//        }
+            }
+        });
 
         // add dividers
         // Currently not needed
@@ -346,6 +337,16 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         //TODO:
     }
 
+    private void checkServices() {
+        //TODO: check Google Service availability
+        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)){
+            case ConnectionResult.API_UNAVAILABLE:
+                break;
+        }
+
+        //TODO: check other availabilities such as Internet connection
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -387,10 +388,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
-                if(newReminder.isOpened()){
-                    newReminder.close(true);
-                    return true;
-                }
+//                if(newReminder.isOpened()){
+//                    newReminder.close(true);
+//                    return true;
+//                }
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);
@@ -407,18 +408,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                             Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
                                     .setAction("Action", null);             // TODO: make sure don't press again while fab is up
                             firstBackPress = currentBackPress;
-
-//                            snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-//                                @Override
-//                                public void onViewAttachedToWindow(View v) {
-//                                    newReminder.animate().translationYBy(-136);
-//                                }
-//
-//                                @Override
-//                                public void onViewDetachedFromWindow(View v) {
-//                                    newReminder.animate().translationYBy(136);
-//                                }
-//                            });
 
                             snackbar.show();
                             return true;
@@ -443,5 +432,34 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    // Below: code for testing and debugging
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void sendParseTestObject() {
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("Name", "Tao Peter Wang");
+        testObject.put("Location", "NULL");
+        Log.i("Cloud", "Sent Parse TestObject");
+        testObject.saveInBackground();
     }
 }
