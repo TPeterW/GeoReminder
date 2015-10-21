@@ -1,4 +1,4 @@
-package com.peter.georeminder.utils.searchbox;
+package com.quinny898.library.persistentsearch;
 
 import android.graphics.drawable.Drawable;
 

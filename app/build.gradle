@@ -52,7 +52,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:8.1.0'
     compile 'com.google.android.gms:play-services-analytics:8.1.0'
     compile 'com.github.clans:fab:1.6.1'
-    compile 'com.quinny898.library.persistentsearch:library:1.1.0-SNAPSHOT'
+//    compile 'com.quinny898.library.persistentsearch:library:1.1.0-SNAPSHOT'
+    compile project(":searchbox")
     compile 'com.parse:parse-android:1.10.3'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:recyclerview-v7:23.1.0'
