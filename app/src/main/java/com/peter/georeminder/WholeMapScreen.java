@@ -1,5 +1,6 @@
 package com.peter.georeminder;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.speech.RecognizerIntent;
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.peter.georeminder.utils.MapFragment;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -121,6 +123,9 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         reminderMap = googleMap;
+
+        //TODO: calculate screen height, change dip to pixels
+        reminderMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar
 
         // Add a marker in Sydney and move the camera
         LatLng random = new LatLng(-34, 151);
