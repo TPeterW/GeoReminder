@@ -43,6 +43,17 @@
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
 
 
+    <!--Service Availability Dialog-->
+    <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>
+    <string name="svcs_cancel">Connection to Google Play Service is cancelled</string>
+    <string name="svcs_acct_invalid">Your Google Account is invalid</string>
+    <string name="svcs_missing">Google Play Service is missing on your device, this might result in the unavailability of geolocation function for reminders</string>
+    <string name="svcs_updating">Google Play Service on this device is currently updating, please try later</string>
+    <string name="svcs_disabled">Google Play Service on this device is disabled, please enable Google map function</string>
+    <string name="svcs_signin">Please sign in to Google Play Service before using geolocation function</string>
+    <!--https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult-->
+
+    
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words

@@ -1,12 +1,11 @@
 package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -26,24 +25,20 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
-import com.parse.Parse;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
-import com.quinny898.library.persistentsearch.SearchBox;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import io.fabric.sdk.android.Fabric;
 
 public class MainScreen extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -56,6 +51,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private com.github.clans.fab.FloatingActionMenu newReminder;
     private com.github.clans.fab.FloatingActionButton addGeoReminder;
     private com.github.clans.fab.FloatingActionButton addNorReminder;
+    private int scrolledDistance = 0;               // for showing and hiding the fam
+    private static final int HIDE_SHOW_THRESHOLD = 20;
+    private int scrollOrigin = 0;
 
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
@@ -91,12 +89,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        // code below is to test the Parse functions TODO: delete when implementing actual back functions
-//        ParseObject testObject = new ParseObject("TestObject");
-//        testObject.put("Name", "Tao Peter Wang");
-//        testObject.put("Location", "NULL");
-//        Log.i("Cloud", "Sent Parse TestObject");
-//        testObject.saveInBackground();
+        // TODO: delete when implementing actual back functions
+//        sendParseTestObject();
 
         initData();             // load from sharedPreferences list of reminders
 
@@ -105,6 +99,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         initEvent();
 
         loadPref();             //using SharedPreferences
+
+        checkServices();
     }
 
     private void initData() {
@@ -133,8 +129,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);        // color scheme
         recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
-//        persistentSearch = (SearchBox) findViewById(R.id.search);
-//        persistentSearch.revealFromMenuItem(R.id.action_search, this);
 
         // this buttons takes user to a page
         // the blue one with a map icon
@@ -175,6 +169,16 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             }
         });
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
+        newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
+        newReminder.hideMenuButton(false);
+        new Handler().postDelayed(new Runnable() {                      // fam show and hide animation
+            @Override
+            public void run() {
+                newReminder.showMenuButton(true);
+                newReminder.setMenuButtonShowAnimation(AnimationUtils.loadAnimation(MainScreen.this, R.anim.jump_from_down));
+                newReminder.setMenuButtonHideAnimation(AnimationUtils.loadAnimation(MainScreen.this, R.anim.jump_to_down));
+            }
+        }, 300);
 
         // Empty list
         textNoReminder = (TextView) findViewById(R.id.text_no_reminder);
@@ -210,14 +214,12 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 // only version higher than 21 (Lollipop) will be getting this status bar animation
                 if(Build.VERSION.SDK_INT >= 21){
                     if(verticalOffset < -150){
-//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
                         if(!isDark) {
                             statusBarAnimator.start();
                             isDark = true;
                         }
                     }
                     else {
-//                       getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
                         if(isDark) {
                             statusBarAnimator.reverse();
                             isDark = false;
@@ -259,7 +261,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             public void onItemLongClick(View view, int position) {
                 // TODO: temporary test code, delete and change later
                 adapter.deleteReminder(position);
-                if(reminderList.size() == 0){
+                if(reminderList.size() == 0) {
                     textNoReminder.setAlpha(1);
                     borderlessNewReminder.setAlpha(1);
                     borderlessNewReminder.setClickable(true);
@@ -267,6 +269,31 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             }
         });
         recyclerView.setAdapter(adapter);
+
+        // set hide and show animation when user scrolls
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (scrolledDistance > HIDE_SHOW_THRESHOLD && !newReminder.isMenuButtonHidden()) {
+                    newReminder.hideMenuButton(true);
+                    scrolledDistance = 0;
+                } else if (scrolledDistance < -HIDE_SHOW_THRESHOLD && newReminder.isMenuButtonHidden()) {
+                    newReminder.showMenuButton(true);
+                    scrolledDistance = 0;
+                }
+
+                if((!newReminder.isMenuButtonHidden() && dy>0) || (newReminder.isMenuButtonHidden() && dy<0)) {
+                    scrolledDistance += dy;
+                }
+            }
+        });
 
         // add dividers
         // Currently not needed
@@ -288,7 +315,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         // will implement UltimateRecyclerView
 
 
-
         // Empty list
         borderlessNewReminder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,7 +325,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
-        if(reminderList.size() != 0){
+        if(reminderList.size() != 0) {
             textNoReminder.setAlpha(0);
             borderlessNewReminder.setAlpha(0);
             borderlessNewReminder.setClickable(false);
@@ -309,6 +335,16 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private void loadPref() {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         //TODO:
+    }
+
+    private void checkServices() {
+        //TODO: check Google Service availability
+        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)){
+            case ConnectionResult.API_UNAVAILABLE:
+                break;
+        }
+
+        //TODO: check other availabilities such as Internet connection
     }
 
     @Override
@@ -352,6 +388,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
+//                if(newReminder.isOpened()){
+//                    newReminder.close(true);
+//                    return true;
+//                }
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);
@@ -368,18 +408,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                             Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
                                     .setAction("Action", null);             // TODO: make sure don't press again while fab is up
                             firstBackPress = currentBackPress;
-
-//                            snackbar.getView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-//                                @Override
-//                                public void onViewAttachedToWindow(View v) {
-//                                    newReminder.animate().translationYBy(-136);
-//                                }
-//
-//                                @Override
-//                                public void onViewDetachedFromWindow(View v) {
-//                                    newReminder.animate().translationYBy(136);
-//                                }
-//                            });
 
                             snackbar.show();
                             return true;
@@ -404,5 +432,34 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    // Below: code for testing and debugging
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void sendParseTestObject() {
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("Name", "Tao Peter Wang");
+        testObject.put("Location", "NULL");
+        Log.i("Cloud", "Sent Parse TestObject");
+        testObject.saveInBackground();
     }
 }
