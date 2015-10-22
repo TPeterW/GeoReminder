@@ -1,9 +1,13 @@
 package com.peter.georeminder;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.KeyEvent;
 
 import com.peter.georeminder.utils.EditItemFragment;
@@ -27,6 +31,12 @@ public class EditorScreen extends AppCompatActivity {
     }
 
     private void initEvent() {
+        if(Build.VERSION.SDK_INT >= 21) {
+            getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+            getWindow().setReturnTransition(new Fade());
+            getWindow().setExitTransition(new Fade());
+        }
+
         getSpecifications();
         //TODO:
     }

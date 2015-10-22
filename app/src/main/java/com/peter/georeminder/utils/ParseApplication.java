@@ -2,6 +2,7 @@ package com.peter.georeminder.utils;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
 import com.parse.Parse;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -13,8 +14,8 @@ import io.fabric.sdk.android.Fabric;
  */
 public class ParseApplication extends Application {
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "CaEup4hD9PE80usRXTqez80Yo";
-    private static final String TWITTER_SECRET = "kDEkAOOz2oFnvBn8aneY7YtJtaBP5npSNT4VtnKP826A3OMIRi";
+    private static final String TWITTER_KEY = "DMsWio2hohKMIz1dq065X82vQ";
+    private static final String TWITTER_SECRET = "CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS";
 
     @Override
     public void onCreate() {
@@ -26,6 +27,6 @@ public class ParseApplication extends Application {
 
         // Set up Twitter Environment
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig));
+        Fabric.with(this, new Twitter(authConfig), new Crashlytics());
     }
 }

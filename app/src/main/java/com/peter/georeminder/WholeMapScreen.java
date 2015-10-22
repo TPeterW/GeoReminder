@@ -3,11 +3,15 @@ package com.peter.georeminder;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -36,14 +40,25 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_whole_map_screen);
 
+        initTransitions();
+
+        initMap();
+
+        initSearchBox();
+    }
+
+    private void initTransitions() {
+        if(Build.VERSION.SDK_INT > 20) {
+            getWindow().setEnterTransition(new Slide(Gravity.RIGHT));
+            getWindow().setReturnTransition(new Slide(Gravity.LEFT));
+        }
+    }
+
+    private void initMap() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.whole_map);
         mapFragment.getMapAsync(this);
-
-        initSearchBox();
-
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     private void initSearchBox() {
