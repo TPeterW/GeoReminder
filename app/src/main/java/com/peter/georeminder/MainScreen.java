@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -72,6 +73,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private TextView textNoReminder;
     private Button borderlessNewReminder;
 
+    // Nav Drawer
+    private Button navLogInOut;
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -141,61 +144,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         // the blue one with a map icon
         // and display a map image(or a GoogleMap object that shows all current reminders)
         seeMap = (FloatingActionButton) findViewById(R.id.fab_see_map);
-        seeMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
-                //TODO:
-
-                if(Build.VERSION.SDK_INT >= 21){
-                    getWindow().setExitTransition(new Explode());
-                    getWindow().setReenterTransition(new Explode());
-                    startActivity(toViewWholeMap, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                }
-                else
-                    startActivity(toViewWholeMap);
-            }
-        });
 
         // The two mini add buttons (in floating action menu)
         addNorReminder = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_new_norreminder);
-        addNorReminder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                newReminder.close(true);
-                Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
-                toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), false);
-                //TODO: add specifications about the reminder to be created
-
-                // activity transition animation
-                if(Build.VERSION.SDK_INT >= 21){
-                    getWindow().setExitTransition(new Fade());
-                    getWindow().setReenterTransition(new Fade());
-                    startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                }
-                else
-                    startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
-            }
-        });
         addGeoReminder = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_new_georeminder);
-        addGeoReminder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newReminder.close(true);
-                Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
-                toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), true);
-                //TODO: add specifications about the reminder to be created
 
-                // activity transition animation
-                if(Build.VERSION.SDK_INT >= 21){
-                    getWindow().setExitTransition(new Fade());
-                    getWindow().setReenterTransition(new Fade());
-                    startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                }
-                else
-                    startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
-            }
-        });
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
         newReminder.hideMenuButton(false);
         new Handler().postDelayed(new Runnable() {                      // fam show and hide animation
@@ -211,13 +164,20 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         textNoReminder = (TextView) findViewById(R.id.text_no_reminder);
         borderlessNewReminder = (Button) findViewById(R.id.borderless_btn_new_reminder);
 
-
         // Toolbar, preferably not make any changes to that
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Nav Drawer
+        navLogInOut = (Button) findViewById(R.id.nav_log_in_out);
+
+
+
+        /* Below is initialisation of gadgets on the screen */
+
         @SuppressWarnings("all")
         // Changes the color of status bar, with animation (using ValueAnimator)
+        // will only happen if higher than Lollipop
         final ValueAnimator statusBarAnimator = ValueAnimator.ofArgb
                 (ContextCompat.getColor(MainScreen.this, R.color.colorPrimary),
                         ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
@@ -239,15 +199,14 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 swipeRefreshLayout.setEnabled(verticalOffset == 0);
                 // only version higher than 21 (Lollipop) will be getting this status bar animation
-                if(Build.VERSION.SDK_INT >= 21){
-                    if(verticalOffset < -150){
-                        if(!isDark) {
+                if (Build.VERSION.SDK_INT >= 21) {
+                    if (verticalOffset < -150) {
+                        if (!isDark) {
                             statusBarAnimator.start();
                             isDark = true;
                         }
-                    }
-                    else {
-                        if(isDark) {
+                    } else {
+                        if (isDark) {
                             statusBarAnimator.reverse();
                             isDark = false;
                         }
@@ -255,7 +214,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 }
             }
         });
-
 
         // Navigation Bar
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -266,6 +224,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        navLogInOut = (Button) findViewById(R.id.nav_log_in_out);
     }
 
     private void initEvent() {
@@ -276,7 +236,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new RecyclerAdapter(MainScreen.this, reminderList);
-        adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {              // click event for each reminder item
             @Override
             public void onItemClick(View view, int position) {
                 // TODO: temporary test code, delete and change later
@@ -295,8 +255,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 }
             }
         });
-        recyclerView.setAdapter(adapter);
 
+        recyclerView.setAdapter(adapter);
         // set hide and show animation when user scrolls
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -339,9 +299,61 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         });
 
 
-        // TODO: delete code below as they are temporary
-        // will implement UltimateRecyclerView
+        // this buttons takes user to a page
+        // the blue one with a map icon
+        // and display a map image(or a GoogleMap object that shows all current reminders)
+        seeMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
+                //TODO:
 
+                if (Build.VERSION.SDK_INT >= 21) {
+                    getWindow().setExitTransition(new Explode());
+                    getWindow().setReenterTransition(new Explode());
+                    startActivity(toViewWholeMap, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                } else
+                    startActivity(toViewWholeMap);
+            }
+        });
+
+        // The two mini add buttons (in floating action menu)
+        addNorReminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newReminder.close(true);
+                Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
+                toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), false);
+                //TODO: add specifications about the reminder to be created
+
+                // activity transition animation
+                if(Build.VERSION.SDK_INT >= 21){
+                    getWindow().setExitTransition(new Fade());
+                    getWindow().setReenterTransition(new Fade());
+                    startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                }
+                else
+                    startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
+            }
+        });
+        addGeoReminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newReminder.close(true);
+                Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
+                toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), true);
+                //TODO: add specifications about the reminder to be created
+
+                // activity transition animation
+                if(Build.VERSION.SDK_INT >= 21){
+                    getWindow().setExitTransition(new Fade());
+                    getWindow().setReenterTransition(new Fade());
+                    startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                }
+                else
+                    startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
+            }
+        });
 
         // Empty list
         borderlessNewReminder.setOnClickListener(new View.OnClickListener() {
@@ -350,7 +362,14 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 Intent newReminder = new Intent(MainScreen.this, EditorScreen.class);       // default is a new GeoReminder
                 newReminder.putExtra(getResources().getString(R.string.bundle_with_map), true);
                 //TODO: more specifications
-                startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
+
+                if(Build.VERSION.SDK_INT >= 21){
+                    getWindow().setExitTransition(new Fade());
+                    getWindow().setReenterTransition(new Fade());
+                    startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                }
+                else
+                    startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
         if(reminderList.size() != 0) {
@@ -358,6 +377,14 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             borderlessNewReminder.setAlpha(0);
             borderlessNewReminder.setClickable(false);
         }
+
+        // Nav Drawer
+        navLogInOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
     }
 
     private void loadPref() {
@@ -384,9 +411,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id){
+        switch (item.getItemId()){
             case R.id.action_settings:
                 Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
                 startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
@@ -395,9 +420,35 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_settings:
+                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
+                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
+                break;
+            case R.id.nav_feedback:
+                String uriText = "mailto:peterwangtao0@hotmail.com"
+                                + "?subject=" + Uri.encode("Feedback on GeoReminder")
+                                + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
+                Uri uri = Uri.parse(uriText);
+                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
+                sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
+                startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                break;
+        }
+
+        // close the drawer after clicking on an item
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
+            // TODO: check if list is till empty, otherwise hide the new reminder button and text
             case CREATE_NEW_GEO_REMINDER_REQUEST_CODE:
 //                Bundle resultFromCreating = data.getExtras();
                 return;
@@ -445,21 +496,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         }
 
         return super.onKeyDown(keyCode, event);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch(id){
-
-        }
-
-        // close the drawer after clicking on an item
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     // Below: code for testing and debugging

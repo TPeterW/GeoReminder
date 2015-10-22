@@ -8,8 +8,16 @@
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>
 
-    <!--Navigation Bar-->
+    <!--Navigation Drawer-->
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+    <string name="nav_opt_all">All Reminders</string>
     <string name="nav_opt_draft">Drafts</string>
+    <string name="nav_opt_geo">Geo Reminders</string>
+    <string name="nav_opt_nor">Normal Reminders</string>
+    <string name="nav_feedback">Feedback</string>
+    <string name="nav_setting">Settings</string>
+    <string name="nav_head_username">Local</string>
     
     <!--Bundle Keys-->
     <string name="bundle_with_map">withMap</string>
@@ -18,6 +26,8 @@
     <string name="new_geo">Geo Reminder</string>
     <string name="new_nor">Normal Reminder</string>
     <string name="empty_create_new">Create a new reminder</string>
+    <string name="login">Log In</string>
+    <string name="logout">Log Out</string>
 
     <!--Settings-->
     <string name="cat_general">General</string>
@@ -40,11 +50,6 @@
 
     <!--TextBoxes-->
     <string name="main_no_reminder">Your reminder list is empty.</string>
-
-    <!--Navigation Drawer-->
-    <string name="navigation_drawer_open">Open Navigation Drawer</string>
-    <string name="navigation_drawer_close">Close Navigation Drawer</string>
-
 
     <!--Service Availability Dialog-->
     <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>

@@ -35,6 +35,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     private SearchBox searchBox;
     private android.support.v7.widget.Toolbar toolbar;
 
+    private static final int PERSISTENT_SEARCH_REQUEST_CODE = 0x008;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +50,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initTransitions() {
-        if(Build.VERSION.SDK_INT > 20) {
+        if(Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(new Slide(Gravity.RIGHT));
             getWindow().setReturnTransition(new Slide(Gravity.LEFT));
         }
@@ -150,7 +152,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1234 && resultCode == RESULT_OK) {
+        if (requestCode == PERSISTENT_SEARCH_REQUEST_CODE && resultCode == RESULT_OK) {
             ArrayList<String> matches = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             searchBox.populateEditText(matches.get(0));
