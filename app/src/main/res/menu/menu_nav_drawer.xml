@@ -3,7 +3,8 @@
 
     <group android:checkableBehavior="single">
         <item android:id="@+id/nav_opt_all" android:icon="@drawable/ic_nav_all"
-            android:title="@string/nav_opt_all" />
+            android:title="@string/nav_opt_all"
+            android:checked="true"/>
         <item android:id="@+id/nav_opt_geo" android:icon="@drawable/ic_nav_geo"
             android:title="@string/nav_opt_geo" />
         <item android:id="@+id/nav_opt_nor" android:icon="@drawable/ic_nav_nor"

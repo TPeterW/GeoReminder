@@ -7,8 +7,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark" android:orientation="vertical"
-    android:gravity="bottom">
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:gravity="bottom"
+    android:id="@+id/nav_header_layout">
 
     <ImageView
         android:id="@+id/nav_head_avatar"
@@ -48,6 +49,9 @@
         android:layout_alignParentBottom="true"
         android:background="@color/colorTransparent"
         android:text="@string/login"
-        style="?android:attr/borderlessButtonStyle"/>
+        style="?android:attr/borderlessButtonStyle"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        />
 
 </RelativeLayout>

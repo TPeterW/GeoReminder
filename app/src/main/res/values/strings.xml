@@ -51,6 +51,14 @@
     <!--TextBoxes-->
     <string name="main_no_reminder">Your reminder list is empty.</string>
 
+    <!--Dialog-->
+    <string name="dialog_delete_text">Delete</string>
+    <string name="dialog_share_text">Share</string>
+
+    <!--Settings-->
+    <string name="cat_sync">Sync</string>
+    <string name="pref_autosync">Auto Backup</string>
+
     <!--Service Availability Dialog-->
     <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>
     <string name="svcs_cancel">Connection to Google Play Service is cancelled</string>

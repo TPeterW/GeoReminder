@@ -2,6 +2,8 @@ package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -35,6 +37,8 @@ import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +47,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
+import com.peter.georeminder.utils.ItemDialogFragment;
 import com.peter.georeminder.utils.RecyclerAdapter;
 
 import java.util.LinkedList;
@@ -225,7 +230,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        navLogInOut = (Button) findViewById(R.id.nav_log_in_out);
+        // TODO: button or list options drawer header
     }
 
     private void initEvent() {
@@ -246,13 +251,24 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
             @Override
             public void onItemLongClick(View view, int position) {
-                // TODO: temporary test code, delete and change later
-                adapter.deleteReminder(position);
-                if (reminderList.size() == 0) {
-                    textNoReminder.setAlpha(1);
-                    borderlessNewReminder.setAlpha(1);
-                    borderlessNewReminder.setClickable(true);
+                // TODO: add code
+
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                ItemDialogFragment previousFragment = (ItemDialogFragment) getFragmentManager().findFragmentByTag(position + "");
+                if(previousFragment != null){
+                    fragmentTransaction.remove(previousFragment);
                 }
+                fragmentTransaction.addToBackStack(null);
+
+                ItemDialogFragment operationFragment = ItemDialogFragment.newInstance();
+                operationFragment.show(fragmentTransaction, position + "");
+
+//                adapter.deleteReminder(position);
+//                if (reminderList.size() == 0) {
+//                    textNoReminder.setAlpha(1);
+//                    borderlessNewReminder.setAlpha(1);
+//                    borderlessNewReminder.setClickable(true);
+//                }
             }
         });
 
@@ -377,14 +393,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             borderlessNewReminder.setAlpha(0);
             borderlessNewReminder.setClickable(false);
         }
-
-        // Nav Drawer
-        navLogInOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                
-            }
-        });
     }
 
     private void loadPref() {
@@ -428,6 +436,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
                 startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
                 break;
+
             case R.id.nav_feedback:
                 String uriText = "mailto:peterwangtao0@hotmail.com"
                                 + "?subject=" + Uri.encode("Feedback on GeoReminder")

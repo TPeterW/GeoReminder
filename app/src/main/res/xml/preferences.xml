@@ -18,9 +18,15 @@
         android:key="random"
         android:title="Random"/>
 
-    <SwitchPreference
-        android:key="fixed"
-        android:title="Fixed"/>
+    <PreferenceCategory
+        android:key="sync"
+        android:title="@string/cat_sync">
+
+        <SwitchPreference
+            android:key="auto_sync"
+            android:title="@string/pref_autosync"/>
+
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:key="about"
