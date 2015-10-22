@@ -7,7 +7,7 @@
         <item android:id="@+id/opt2" android:icon="@drawable/ic_fab_new_geo"
             android:title="Option2" />
         <item android:id="@+id/opt3" android:icon="@drawable/ic_fab_new_geo"
-            android:title="Option3" />
+            android:title="@string/nav_opt_draft" />
         <item android:id="@+id/opt4" android:icon="@drawable/ic_fab_new_geo"
             android:title="Option4" />
     </group>

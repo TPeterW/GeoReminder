@@ -7,6 +7,9 @@
     
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>
+
+    <!--Navigation Bar-->
+    <string name="nav_opt_draft">Drafts</string>
     
     <!--Bundle Keys-->
     <string name="bundle_with_map">withMap</string>

@@ -10,11 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="@dimen/cardview_compat_inset_shadow"
-        app:cardCornerRadius="10dp"
         android:layout_margin="5dp"
-        android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
-        app:cardBackgroundColor="@color/cardview_light_background">
+        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        style="@style/CardView.Ripple">
 
         <RelativeLayout
             android:id="@+id/map_relative_layout"

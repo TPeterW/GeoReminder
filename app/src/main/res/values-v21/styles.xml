@@ -5,4 +5,8 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="CardView.Ripple" parent="CardView.Light">
+        <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
 </resources>

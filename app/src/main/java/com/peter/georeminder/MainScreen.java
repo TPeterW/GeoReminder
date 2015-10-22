@@ -1,6 +1,7 @@
 package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,7 +22,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
@@ -139,8 +145,15 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             @Override
             public void onClick(View v) {
                 Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
-                startActivity(toViewWholeMap);
                 //TODO:
+
+                if(Build.VERSION.SDK_INT >= 21){
+                    getWindow().setExitTransition(new Explode());
+                    getWindow().setReenterTransition(new Explode());
+                    startActivity(toViewWholeMap, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                }
+                else
+                    startActivity(toViewWholeMap);
             }
         });
 
@@ -154,7 +167,14 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), false);
                 //TODO: add specifications about the reminder to be created
 
-                startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
+                // activity transition animation
+                if(Build.VERSION.SDK_INT >= 21){
+                    getWindow().setExitTransition(new Fade());
+                    getWindow().setReenterTransition(new Fade());
+                    startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                }
+                else
+                    startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
             }
         });
         addGeoReminder = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_new_georeminder);
@@ -166,7 +186,14 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), true);
                 //TODO: add specifications about the reminder to be created
 
-                startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
+                // activity transition animation
+                if(Build.VERSION.SDK_INT >= 21){
+                    getWindow().setExitTransition(new Fade());
+                    getWindow().setReenterTransition(new Fade());
+                    startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                }
+                else
+                    startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
         newReminder = (FloatingActionMenu) findViewById(R.id.fam_add_new);
@@ -294,6 +321,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 }
             }
         });
+
 
         // add dividers
         // Currently not needed

@@ -43,7 +43,7 @@
             android:name=".EditorScreen"
             android:label="@string/page_create_new_title"
             android:parentActivityName=".MainScreen"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".SettingScreen"
