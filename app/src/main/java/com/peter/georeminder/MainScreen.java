@@ -1,15 +1,16 @@
 package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
-import android.app.ActivityOptions;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -27,20 +28,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.transition.Fade;
-import android.transition.Slide;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -48,7 +43,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
-import com.peter.georeminder.utils.ItemDialogFragment;
 import com.peter.georeminder.utils.RecyclerAdapter;
 
 import java.util.LinkedList;
@@ -80,7 +74,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private Button borderlessNewReminder;
 
     // Nav Drawer
-    private ToggleButton listChange;
+    private ToggleButton acctInfoSwitch;
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -229,7 +223,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // TODO: Init the views
+        //TODO: Init the views
+        acctInfoSwitch = (ToggleButton) navigationView.findViewById(R.id.account_view_toggle_btn);
+        //TODO: in initEvent(), define event
 
     }
 
@@ -250,20 +246,32 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             }
 
             @Override
-            public void onItemLongClick(View view, int position) {
+            public void onItemLongClick(View view, final int position) {
+                // to alert the user about deleting by vibrating
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
                 // TODO: add code
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
+                builder.setTitle(getResources().getString(R.string.dialog_delete_title))
+                        .setMessage(getResources().getString(R.string.dialog_delete_msg))
+                        .setPositiveButton(getResources().getString(R.string.dialog_pos_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                adapter.deleteReminder(position);
+                            }
+                        })
+                        .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // let's do nothing
+                            }
+                        })
+                        .setIcon(ContextCompat.getDrawable(MainScreen.this, R.drawable.ic_dialog_warning));
+                AlertDialog dialog = builder.create();
+                // vibrate, TODO: check disable vibration
+                vibrator.vibrate(20);
+                dialog.show();
 
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                ItemDialogFragment previousFragment = (ItemDialogFragment) getFragmentManager().findFragmentByTag(position + "");
-                if(previousFragment != null){
-                    fragmentTransaction.remove(previousFragment);
-                }
-                fragmentTransaction.addToBackStack(null);
-
-                ItemDialogFragment operationFragment = ItemDialogFragment.newInstance();
-                operationFragment.show(fragmentTransaction, position + "");
-
-//                adapter.deleteReminder(position);
 //                if (reminderList.size() == 0) {
 //                    textNoReminder.setAlpha(1);
 //                    borderlessNewReminder.setAlpha(1);
@@ -476,10 +484,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
-//                if(newReminder.isOpened()){
-//                    newReminder.close(true);
-//                    return true;
-//                }
+                if(newReminder.isOpened()){
+                    newReminder.close(true);
+                }
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);

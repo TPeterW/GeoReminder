@@ -3,20 +3,27 @@
 
     <PreferenceCategory
         android:key="general"
-        android:title="General">
+        android:title="@string/cat_general">
 
         <ListPreference
             android:key="colorTheme"
             android:title="@string/pref_theme"
             android:dialogTitle="@string/pref_theme"
             android:entries="@array/color_theme_entry"
-            android:entryValues="@array/color_theme_value"/>
+            android:entryValues="@array/color_theme_value" />
 
     </PreferenceCategory>
 
-    <CheckBoxPreference
-        android:key="random"
-        android:title="Random"/>
+    <PreferenceCategory
+        android:key="view"
+        android:title="@string/cat_view">
+
+        <CheckBoxPreference
+            android:key="show_draft"
+            android:title="@string/pref_show_draft"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:key="sync"
@@ -24,7 +31,8 @@
 
         <SwitchPreference
             android:key="auto_sync"
-            android:title="@string/pref_autosync"/>
+            android:title="@string/pref_autosync"
+            android:defaultValue="true"/>
 
     </PreferenceCategory>
 
@@ -38,7 +46,7 @@
 
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="http://www.google.com" />
+                android:data="market://details?id=com.peter.georeminder" />
 
         </Preference>
 
