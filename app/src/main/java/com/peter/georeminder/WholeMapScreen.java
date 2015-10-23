@@ -8,7 +8,11 @@ import android.os.Build;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
@@ -28,12 +32,12 @@ import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 
-public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback {
+public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap reminderMap;
 
     private SearchBox searchBox;
-    private android.support.v7.widget.Toolbar toolbar;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +45,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         setContentView(R.layout.activity_whole_map_screen);
 
         initTransitions();
+
+        initDrawer();
 
         initMap();
 
@@ -52,6 +58,14 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             getWindow().setEnterTransition(new Slide(Gravity.RIGHT));
             getWindow().setReturnTransition(new Slide(Gravity.LEFT));
         }
+    }
+
+    private void initDrawer() {
+        // Navigation Bar
+        drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_map_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void initMap() {
@@ -66,17 +80,16 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         searchBox.enableVoiceRecognition(this);
         for(int x = 0; x < 5; x++){
             SearchResult option = new SearchResult("Result " + Integer.toString(x),
-                    ContextCompat.getDrawable(WholeMapScreen.this, R.mipmap.ic_launcher)); //TODO: change to ic_history
+                    ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_search_history));
             searchBox.addSearchable(option);
         }
         searchBox.setMenuListener(new SearchBox.MenuListener(){
-
             @Override
             public void onMenuClick() {
                 //Hamburger has been clicked
-                Toast.makeText(WholeMapScreen.this, "Menu click", Toast.LENGTH_LONG).show();
+                if(!drawer.isDrawerOpen(GravityCompat.START))
+                    drawer.openDrawer(GravityCompat.START);
             }
-
         });
         searchBox.setSearchListener(new SearchBox.SearchListener(){
 
@@ -174,7 +187,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                         })
                         .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) { }  // do nothing
+                            public void onClick(DialogInterface dialog, int which) {
+                            }  // do nothing
                         })
                         .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
                 AlertDialog dialog = builder.create();
@@ -212,6 +226,16 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         if(searchBox.isFocused()){
             searchBox.clearFocus();
         }
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+            return;
+        }
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+        return false;
     }
 }

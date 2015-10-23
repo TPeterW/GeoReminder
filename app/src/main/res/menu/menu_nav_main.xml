@@ -11,10 +11,12 @@
             android:title="@string/nav_opt_nor" />
         <item android:id="@+id/nav_opt_draft" android:icon="@drawable/ic_nav_draft"
             android:title="@string/nav_opt_draft" />
+        <item android:id="@+id/nav_opt_map" android:icon="@drawable/ic_nav_view_map"
+            android:title="@string/nav_opt_view_in_map" />
     </group>
 
 
-    <item android:title="Communicate">
+    <item android:title="@string/nav_title_commu">
         <menu>
             <item android:id="@+id/nav_feedback" android:icon="@drawable/ic_nav_feedback"
                 android:title="@string/nav_feedback" />
