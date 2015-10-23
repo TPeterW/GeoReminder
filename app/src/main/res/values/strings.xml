@@ -9,20 +9,36 @@
     <string name="press_again_exit">Press again to exit</string>
     <string name="activity_not_fonud">Necessary Application Not Found</string>
 
+    <!--Toast-->
+    <string name="support_thank_msg">Thank you! Mental support is sufficient at this point!</string>
+
     <!--Navigation Drawer-->
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
-    <string name="nav_title_commu">Communicate</string>
-    <string name="nav_title_reminders">Reminders</string>
+    <string name="nav_title_map_types">Map Type</string>
+    <string name="nav_title_commu">Communication</string>
+
+    <string name="nav_sec_other">Others</string>
+    <string name="nav_local_email">Local User</string>
+
     <string name="nav_opt_all">All Reminders</string>
     <string name="nav_opt_draft">Drafts</string>
     <string name="nav_opt_geo">Geo Reminders</string>
     <string name="nav_opt_nor">Normal Reminders</string>
     <string name="nav_opt_view_in_map">View in Map</string>
+    <string name="nav_opt_about">About</string>
+    <string name="nav_opt_support">Support</string>
     <string name="nav_feedback">Feedback</string>
     <string name="nav_setting">Settings</string>
+
+    <string name="nav_head_appname">GeoReminder</string>
     <string name="nav_head_username">Local</string>
-    
+    <string name="nav_acct_switch">Switch Account</string>
+    <string name="nav_acct_manage">Manage Account</string>
+    <string name="nav_desc_switch">Switch to Another Account</string>
+    <string name="nav_desc_manage">Manage Your Account</string>
+
+
     <!--Bundle Keys-->
     <string name="bundle_with_map">withMap</string>
 
@@ -80,7 +96,7 @@
     <!--Overflow Menu-->
     <string name="map_normal">Normal</string>
     <string name="map_hybrid">Hybrid</string>
-    <string name="map_terrain">Terran</string>
+    <string name="map_terrain">Terrain</string>
     <string name="map_satellite">Satellite</string>
 
     

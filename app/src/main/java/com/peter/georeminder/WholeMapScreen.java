@@ -19,9 +19,9 @@ import android.transition.Slide;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,13 +35,18 @@ import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 
-public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback {
+public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap reminderMap;
 
     private SearchBox searchBox;
 
     private static final int SETTINGS_REQUEST_CODE = 0x004;
+
+    // Nav Drawer
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
+    private ImageView avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +70,23 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initDrawer() {
+// Navigation Bar
+        drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
 
+        navigationView = (NavigationView) findViewById(R.id.nav_map_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        // the workaround for support:design:23.1.0
+        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_whole_map);
+
+        //TODO: Init the views
+        avatar = (ImageView) headerLayout.findViewById(R.id.nav_head_avatar);
+        avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: go to user account page
+            }
+        });
     }
 
     private void initMap() {
@@ -87,9 +108,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onMenuClick() {
                 //Hamburger has been clicked
-//                if (!drawer.isDrawerOpen(GravityCompat.START))
-//                    drawer.openDrawer(GravityCompat.START);
-                Toast.makeText(WholeMapScreen.this, "Menu Clicked", Toast.LENGTH_SHORT).show();
+                if (!drawer.isDrawerOpen(GravityCompat.START))
+                    drawer.openDrawer(GravityCompat.START);
             }
         });
         searchBox.setSearchListener(new SearchBox.SearchListener(){
@@ -132,15 +152,19 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.map_type_normal:
+                        navigationView.getMenu().getItem(0).setChecked(true);       // item 0: normal
                         reminderMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                         return true;
                     case R.id.map_type_terrain:
+                        navigationView.getMenu().getItem(1).setChecked(true);       // item 1: terrain
                         reminderMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                         return true;
                     case R.id.map_type_hybrid:
+                        navigationView.getMenu().getItem(2).setChecked(true);       // item 2: hybrid
                         reminderMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         return true;
                     case R.id.map_type_satellite:
+                        navigationView.getMenu().getItem(3).setChecked(true);       // item 3: satellite
                         reminderMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                         return true;
                 }
@@ -227,50 +251,62 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_map_type_normal:
+                reminderMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+
+            case R.id.nav_map_type_terrain:
+                reminderMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+
+            case R.id.nav_map_type_hybrid:
+                reminderMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+
+            case R.id.nav_map_type_satellite:
+                reminderMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+
+            case R.id.nav_settings:
+                Intent toSettingScreen = new Intent(WholeMapScreen.this, SettingScreen.class);
+                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
+                break;
+
+            case R.id.nav_feedback:
+                String uriText = "mailto:peterwangtao0@hotmail.com"
+                        + "?subject=" + Uri.encode("Feedback on GeoReminder")
+                        + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about the map in GeoReminder: \n");
+                Uri uri = Uri.parse(uriText);
+                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
+                sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
+                try {
+                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                }
+                catch (ActivityNotFoundException e){
+                    Toast centreToast =  Toast.makeText(WholeMapScreen.this, getResources().getString(R.string.activity_not_fonud), Toast.LENGTH_SHORT);
+                    centreToast.setGravity(Gravity.CENTER, 0, 0);
+                    centreToast.show();
+                }
+                break;
+        }
+
+        // close the drawer after clicking on an item
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
     public void onBackPressed() {
         if(searchBox.isFocused()){
             searchBox.clearFocus();
         }
-//        if(drawer.isDrawerOpen(GravityCompat.START)){
-//            drawer.closeDrawer(GravityCompat.START);
-//            return;
-//        }
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+            return;
+        }
         super.onBackPressed();
     }
-
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        //TODO: other options
-//        switch (item.getItemId()){
-//            case R.id.nav_settings:
-//                Intent toSettingScreen = new Intent(WholeMapScreen.this, SettingScreen.class);
-//                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
-//                break;
-//
-//            case R.id.nav_feedback:
-//                String uriText = "mailto:peterwangtao0@hotmail.com"
-//                        + "?subject=" + Uri.encode("Feedback on GeoReminder")
-//                        + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
-//                Uri uri = Uri.parse(uriText);
-//                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
-//                sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
-//                try {
-//                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
-//                }
-//                catch (ActivityNotFoundException e){
-//                    Toast centreToast =  Toast.makeText(WholeMapScreen.this, getResources().getString(R.string.activity_not_fonud), Toast.LENGTH_SHORT);
-//                    centreToast.setGravity(Gravity.CENTER, 0, 0);
-//                    centreToast.show();
-//                }
-//                break;
-//        }
-//
-//        // close the drawer after clicking on an item
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
-
-
 }
