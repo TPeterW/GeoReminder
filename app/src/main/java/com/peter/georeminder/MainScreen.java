@@ -41,6 +41,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
@@ -79,7 +80,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private Button borderlessNewReminder;
 
     // Nav Drawer
-    private Button navLogInOut;
+    private ToggleButton listChange;
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -173,8 +174,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Nav Drawer
-        navLogInOut = (Button) findViewById(R.id.nav_log_in_out);
 
 
 
@@ -230,7 +229,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // TODO: button or list options drawer header
+        // TODO: Init the views
+
     }
 
     private void initEvent() {

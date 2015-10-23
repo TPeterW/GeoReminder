@@ -41,17 +41,17 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"/>
 
-    <Button
-        android:id="@+id/nav_log_in_out"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+    <ToggleButton
+        android:id="@+id/account_view_toggle_btn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorTransparent"
-        android:text="@string/login"
-        style="?android:attr/borderlessButtonStyle"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="center"
+        android:background="@drawable/login_togglebutton"
+        android:textOff="@null"
+        android:textOn="@null"
+        style="?android:attr/selectableItemBackground"/>
 
 </RelativeLayout>
