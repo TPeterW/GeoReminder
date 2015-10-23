@@ -59,7 +59,9 @@
     <string name="dialog_delete_title">Delete</string>
     <string name="dialog_pos_btn">Yes</string>
     <string name="dialog_neg_btn">Cancel</string>
+    <string name="dialog_confirm_btn">OK</string>
     <string name="dialog_delete_msg">Do you want to delete this reminder?</string>
+    <string name="dialog_new_geo">New Geo Reminder</string>
 
     <!--Service Availability Dialog-->
     <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>

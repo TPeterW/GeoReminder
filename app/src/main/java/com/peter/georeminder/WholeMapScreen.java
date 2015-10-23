@@ -1,7 +1,11 @@
 package com.peter.georeminder;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -153,6 +157,36 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         uiSettings.setCompassEnabled(true);
 
         //TODO: set OnCameraChangeListener
+
+
+        reminderMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(WholeMapScreen.this);
+                builder.setMessage(getResources().getString(R.string.dialog_new_geo))
+                        .setPositiveButton(getResources().getString(R.string.dialog_confirm_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO: record the location and create new Reminder
+                            }
+                        })
+                        .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) { }  // do nothing
+                        })
+                        .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
+                AlertDialog dialog = builder.create();
+                // vibrate, TODO: check disable vibration
+                vibrator.vibrate(20);
+                dialog.show();
+            }
+        });
+
+
+
+
 
         //TODO: calculate screen height, change dip to pixels
         reminderMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar
