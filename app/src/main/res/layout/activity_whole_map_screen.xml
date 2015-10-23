@@ -17,7 +17,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        map:headerLayout="@layout/nav_drawer_header_main"
         map:menu="@menu/menu_nav_whole_map"/>
+    <!--This is for a workaround for the bug that appeared in support:design:23.1.0-->
+    <!--map:headerLayout="@layout/nav_drawer_header_main"-->
 
 </android.support.v4.widget.DrawerLayout>

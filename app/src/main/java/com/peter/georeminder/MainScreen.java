@@ -2,6 +2,7 @@ package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -60,8 +61,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private com.github.clans.fab.FloatingActionButton addGeoReminder;
     private com.github.clans.fab.FloatingActionButton addNorReminder;
     private int scrolledDistance = 0;               // for showing and hiding the fam
-    private static final int HIDE_SHOW_THRESHOLD = 20;
-    private int scrollOrigin = 0;
+    private static final int SHOW_THRESHOLD = 20;      // might want to change this later
+    private static final int HIDE_THRESHOLD = 50;
 
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
@@ -80,8 +81,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
     private static final int EDIT_EXISTING_REMINDER_REQUEST_CODE = 0x003;
     private static final int SETTINGS_REQUEST_CODE = 0x004;
-
-    SharedPreferences sharedPreferences;                // to load preferences set in Settings page/fragment
 
     // Importante
     // DataList
@@ -114,12 +113,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     }
 
     private void initData() {
-        // initialise StatusBar color
-        if(Build.VERSION.SDK_INT >= 21)
-            getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        // get data from shared preferences
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        // TODO: get data from shared preferences
 
         reminderList = new LinkedList<>();
         // TODO: remove these and actually get the reminders
@@ -134,6 +130,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     }
 
     private void initView() {
+        // initialise StatusBar color
+        if(Build.VERSION.SDK_INT >= 21)
+            getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
+
         // The main layout ------ RecyclerView
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);        // color scheme
@@ -223,8 +223,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // the workaround for support:design:23.1.0
+        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_drawer_header_main);
+
         //TODO: Init the views
-        acctInfoSwitch = (ToggleButton) navigationView.findViewById(R.id.account_view_toggle_btn);
+        acctInfoSwitch = (ToggleButton) headerLayout.findViewById(R.id.account_view_toggle_btn);
         //TODO: in initEvent(), define event
 
     }
@@ -292,10 +295,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (scrolledDistance > HIDE_SHOW_THRESHOLD && !newReminder.isMenuHidden()) {
+                if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuHidden()) {
                     newReminder.hideMenu(true);
                     scrolledDistance = 0;
-                } else if (scrolledDistance < -HIDE_SHOW_THRESHOLD && newReminder.isMenuHidden()) {
+                } else if (scrolledDistance < -SHOW_THRESHOLD && newReminder.isMenuHidden()) {
                     newReminder.showMenu(true);
                     scrolledDistance = 0;
                 }
@@ -404,7 +407,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     }
 
     private void loadPref() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         //TODO:
     }
 
@@ -452,7 +455,14 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 Uri uri = Uri.parse(uriText);
                 Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
                 sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
-                startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                try {
+                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                }
+                catch (ActivityNotFoundException e){
+                    Snackbar.make(newReminder, getResources().getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null)
+                            .show();
+                }
                 break;
         }
 

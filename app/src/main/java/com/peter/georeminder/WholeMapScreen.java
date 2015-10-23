@@ -1,14 +1,18 @@
 package com.peter.georeminder;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,8 +21,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +44,10 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     private SearchBox searchBox;
     private DrawerLayout drawer;
+
+    private ToggleButton acctInfoSwitch;
+
+    private static final int SETTINGS_REQUEST_CODE = 0x004;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +76,13 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_map_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // the workaround for support:design:23.1.0
+        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_drawer_header_main);
+
+        //TODO: Init the views
+        acctInfoSwitch = (ToggleButton) headerLayout.findViewById(R.id.account_view_toggle_btn);
+        //TODO: in initEvent(), define event
     }
 
     private void initMap() {
@@ -83,11 +100,11 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                     ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_search_history));
             searchBox.addSearchable(option);
         }
-        searchBox.setMenuListener(new SearchBox.MenuListener(){
+        searchBox.setMenuListener(new SearchBox.MenuListener() {
             @Override
             public void onMenuClick() {
                 //Hamburger has been clicked
-                if(!drawer.isDrawerOpen(GravityCompat.START))
+                if (!drawer.isDrawerOpen(GravityCompat.START))
                     drawer.openDrawer(GravityCompat.START);
             }
         });
@@ -174,8 +191,9 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
         reminderMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLng) {
-                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            public void onMapLongClick(final LatLng latLng) {
+                // latLng is the position of the click
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);          // this needs a permission
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(WholeMapScreen.this);
                 builder.setMessage(getResources().getString(R.string.dialog_new_geo))
@@ -183,6 +201,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // TODO: record the location and create new Reminder
+                                reminderMap.addMarker(new MarkerOptions().position(latLng).title("My Marker").flat(true));
+                                reminderMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));   // instead of moveCamera
                             }
                         })
                         .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
@@ -192,6 +212,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                         })
                         .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
                 AlertDialog dialog = builder.create();
+                dialog.getWindow().setDimAmount((float).2);            // dim background by n * 100%
                 // vibrate, TODO: check disable vibration
                 vibrator.vibrate(20);
                 dialog.show();
@@ -233,9 +254,37 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         super.onBackPressed();
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem menuItem) {
+    public boolean onNavigationItemSelected(MenuItem item) {
+        //TODO: other options
+        switch (item.getItemId()){
+            case R.id.nav_settings:
+                Intent toSettingScreen = new Intent(WholeMapScreen.this, SettingScreen.class);
+                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
+                break;
 
-        return false;
+            case R.id.nav_feedback:
+                String uriText = "mailto:peterwangtao0@hotmail.com"
+                        + "?subject=" + Uri.encode("Feedback on GeoReminder")
+                        + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
+                Uri uri = Uri.parse(uriText);
+                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
+                sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
+                try {
+                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                }
+                catch (ActivityNotFoundException e){
+                    Toast centreToast =  Toast.makeText(WholeMapScreen.this, getResources().getString(R.string.activity_not_fonud), Toast.LENGTH_SHORT);
+                    centreToast.setGravity(Gravity.CENTER, 0, 0);
+                    centreToast.show();
+                }
+                break;
+        }
+
+        // close the drawer after clicking on an item
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }
