@@ -14,8 +14,6 @@ public class BackEventEditText extends EditText {
 
     private SearchBox searchBox;
 
-    private long counter = 0;
-
     public void setSearchBox(SearchBox searchBox) {
         this.searchBox = searchBox;
     }

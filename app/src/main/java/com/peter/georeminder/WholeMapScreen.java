@@ -1,9 +1,11 @@
 package com.peter.georeminder;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -11,8 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -20,9 +20,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.peter.georeminder.utils.MapFragment;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -48,7 +48,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initTransitions() {
-        if(Build.VERSION.SDK_INT > 20) {
+        if(Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(new Slide(Gravity.RIGHT));
             getWindow().setReturnTransition(new Slide(Gravity.LEFT));
         }
@@ -112,13 +112,22 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             }
 
         });
-        searchBox.setOverflowMenu(R.menu.overflow_menu);
+        searchBox.setOverflowMenu(R.menu.menu_search_overflow);
         searchBox.setOverflowMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.test_menu_item:
-                        Toast.makeText(WholeMapScreen.this, "Clicked!", Toast.LENGTH_SHORT).show();
+                    case R.id.map_type_normal:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        return true;
+                    case R.id.map_type_terrain:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                        return true;
+                    case R.id.map_type_hybrid:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        return true;
+                    case R.id.map_type_satellite:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                         return true;
                 }
                 return false;
@@ -138,6 +147,46 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         reminderMap = googleMap;
+        reminderMap.setBuildingsEnabled(true);             // enable 3D building view
+        reminderMap.setMyLocationEnabled(true);
+        UiSettings uiSettings = reminderMap.getUiSettings();
+        uiSettings.setAllGesturesEnabled(true);
+        uiSettings.setMapToolbarEnabled(true);
+        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setIndoorLevelPickerEnabled(true);
+        uiSettings.setCompassEnabled(true);
+
+        //TODO: set OnCameraChangeListener
+
+
+        reminderMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(WholeMapScreen.this);
+                builder.setMessage(getResources().getString(R.string.dialog_new_geo))
+                        .setPositiveButton(getResources().getString(R.string.dialog_confirm_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO: record the location and create new Reminder
+                            }
+                        })
+                        .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) { }  // do nothing
+                        })
+                        .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
+                AlertDialog dialog = builder.create();
+                // vibrate, TODO: check disable vibration
+                vibrator.vibrate(20);
+                dialog.show();
+            }
+        });
+
+
+
+
 
         //TODO: calculate screen height, change dip to pixels
         reminderMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar

@@ -18,6 +18,8 @@ public class EditItemFragment extends Fragment {
     private boolean withMap;
     private Bundle bundle;
 
+    //TODO: so much
+
     public EditItemFragment() {
         withMap = false;
         //TODO: and other specifications of the reminder to check
