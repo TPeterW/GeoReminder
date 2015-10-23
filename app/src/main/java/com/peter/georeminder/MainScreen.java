@@ -49,7 +49,7 @@ import com.peter.georeminder.utils.RecyclerAdapter;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MainScreen extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainScreen extends AppCompatActivity{
 
     // ToolBar
     private FloatingActionButton seeMap;
@@ -73,9 +73,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     // Empty list
     private TextView textNoReminder;
     private Button borderlessNewReminder;
-
-    // Nav Drawer
-    private ToggleButton acctInfoSwitch;
 
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
@@ -212,24 +209,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 }
             }
         });
-
-        // Navigation Bar
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        // the workaround for support:design:23.1.0
-        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_drawer_header_main);
-
-        //TODO: Init the views
-        acctInfoSwitch = (ToggleButton) headerLayout.findViewById(R.id.account_view_toggle_btn);
-        //TODO: in initEvent(), define event
-
     }
 
     private void initEvent() {
@@ -439,38 +418,38 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.nav_settings:
-                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
-                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
-                break;
-
-            case R.id.nav_feedback:
-                String uriText = "mailto:peterwangtao0@hotmail.com"
-                                + "?subject=" + Uri.encode("Feedback on GeoReminder")
-                                + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
-                Uri uri = Uri.parse(uriText);
-                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
-                sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
-                try {
-                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
-                }
-                catch (ActivityNotFoundException e){
-                    Snackbar.make(newReminder, getResources().getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
-                            .setAction("Action", null)
-                            .show();
-                }
-                break;
-        }
-
-        // close the drawer after clicking on an item
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        switch (item.getItemId()){
+//            case R.id.nav_settings:
+//                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
+//                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
+//                break;
+//
+//            case R.id.nav_feedback:
+//                String uriText = "mailto:peterwangtao0@hotmail.com"
+//                                + "?subject=" + Uri.encode("Feedback on GeoReminder")
+//                                + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
+//                Uri uri = Uri.parse(uriText);
+//                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
+//                sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
+//                try {
+//                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+//                }
+//                catch (ActivityNotFoundException e){
+//                    Snackbar.make(newReminder, getResources().getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
+//                            .setAction("Action", null)
+//                            .show();
+//                }
+//                break;
+//        }
+//
+//        // close the drawer after clicking on an item
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -497,11 +476,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 if(newReminder.isOpened()){
                     newReminder.close(true);
                 }
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                if (drawer.isDrawerOpen(GravityCompat.START)) {
-                    drawer.closeDrawer(GravityCompat.START);
-                    return true;
-                }
+//                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                if (drawer.isDrawerOpen(GravityCompat.START)) {
+//                    drawer.closeDrawer(GravityCompat.START);
+//                    return true;
+//                }
                 else {
                     if(swipeRefreshLayout.isRefreshing()){
                         swipeRefreshLayout.setRefreshing(false);
