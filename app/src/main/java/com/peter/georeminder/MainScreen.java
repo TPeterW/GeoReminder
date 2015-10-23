@@ -15,14 +15,11 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,18 +27,31 @@ import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.transition.Fade;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
@@ -49,7 +59,7 @@ import com.peter.georeminder.utils.RecyclerAdapter;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MainScreen extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainScreen extends AppCompatActivity{
 
     // ToolBar
     private FloatingActionButton seeMap;
@@ -74,9 +84,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private TextView textNoReminder;
     private Button borderlessNewReminder;
 
-    // Nav Drawer
-    private ToggleButton acctInfoSwitch;
-
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
     private static final int EDIT_EXISTING_REMINDER_REQUEST_CODE = 0x003;
@@ -86,7 +93,22 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     // DataList
     private List<Reminder> reminderList;
 
-
+    // For custom Nav Drawer
+    private AccountHeader drawerHeader = null;
+    private Drawer drawer = null;
+    private IProfile userProfile;
+    // Identifiers
+    private static final int LOCAL_USER_IDENTIFIER =    101;
+    private static final int ONLINE_USER_IDENTIFIER =   102;
+    private static final int ALL_IDENTIFIER =           11;
+    private static final int GEO_IDENTIFIER =           12;
+    private static final int NOR_IDENTIFIER =           13;
+    private static final int DRAFT_IDENTIFIER =         14;
+    private static final int VIEW_MAP_IDENTIFIER =      15;
+    private static final int ABOUT_IDENTIFIER =         21;
+    private static final int SUPPORT_IDENTIFIER =       22;
+    private static final int FEEDBACK_IDENTIFIER =      51;
+    private static final int SETTINGS_IDENTIFIER =      52;
 
     // Record the last time "Back" key was pressed, to implement "double-click-exit"
     private long firstBackPress;
@@ -103,7 +125,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         initData();             // load from sharedPreferences list of reminders
 
-        initView();
+        initView(savedInstanceState);       // Bundle for creating drawer header
 
         initEvent();
 
@@ -127,9 +149,19 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         reminderList.add(new Reminder());
         reminderList.add(new Reminder());
         reminderList.add(new Reminder());
+
+
+        // Nav Drawer
+        // create user profile
+        //TODO: if user is registered and logged, skip this step and go ahead to load the profile as the user profile
+        userProfile = new ProfileDrawerItem()
+                .withName(getResources().getString(R.string.nav_head_appname))
+                .withEmail(getResources().getString(R.string.nav_local_email))
+                .withIcon(ContextCompat.getDrawable(MainScreen.this, R.mipmap.ic_default_avatar))
+                .withIdentifier(LOCAL_USER_IDENTIFIER);
     }
 
-    private void initView() {
+    private void initView(Bundle savedInstanceState) {
         // initialise StatusBar color
         if(Build.VERSION.SDK_INT >= 21)
             getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
@@ -213,27 +245,113 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             }
         });
 
-        // Navigation Bar
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        // Initialise Drawer
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        // create account header
+        buildHeader(false, savedInstanceState);         // drawerHeader is built in this method
 
-        // the workaround for support:design:23.1.0
-        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_drawer_header_main);
+        drawer = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withAccountHeader(drawerHeader)
+                .withStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary))
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all),
+                        new PrimaryDrawerItem().withIdentifier(GEO_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_geo)).withIcon(R.drawable.ic_nav_geo),
+                        new PrimaryDrawerItem().withIdentifier(NOR_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_nor)).withIcon(R.drawable.ic_nav_nor),
+                        new PrimaryDrawerItem().withIdentifier(DRAFT_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_draft)).withIcon(R.drawable.ic_nav_draft),
+                        new PrimaryDrawerItem().withIdentifier(VIEW_MAP_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_view_in_map)).withIcon(R.drawable.ic_nav_view_map).withSelectable(false),
 
-        //TODO: Init the views
-        acctInfoSwitch = (ToggleButton) headerLayout.findViewById(R.id.account_view_toggle_btn);
-        //TODO: in initEvent(), define event
+                        new SectionDrawerItem().withName(getResources().getString(R.string.nav_sec_other)).withTextColor(ContextCompat.getColor(MainScreen.this, R.color.colorAccent)),
+                        new SecondaryDrawerItem().withIdentifier(ABOUT_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_about)).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(SUPPORT_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_support)).withSelectable(false)
+                )
+                .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
+                    @Override
+                    public boolean onNavigationClickListener(View clickedView) {
+                        //this method is only called if the Arrow icon is shown. The hamburger is automatically managed by the MaterialDrawer
+                        //if the back arrow is shown. close the activity
+                        //TODO:
+                        Toast.makeText(MainScreen.this, "onNav Called", Toast.LENGTH_SHORT).show();
+                        MainScreen.this.finish();
+                        //return true if we have consumed the event
+                        return true;
+                    }
+                })
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        switch (drawerItem.getIdentifier()) {
+                            case ALL_IDENTIFIER:
 
+                                break;
+                            case GEO_IDENTIFIER:
+
+                                break;
+                            case NOR_IDENTIFIER:
+
+                                break;
+                            case DRAFT_IDENTIFIER:
+
+                                break;
+                            case VIEW_MAP_IDENTIFIER:
+
+                                break;
+                            case ABOUT_IDENTIFIER:
+                                Intent toMyWebsite = new Intent(Intent.ACTION_VIEW);
+                                Uri homePageUri = Uri.parse("http://tpeterw.github.io");
+                                toMyWebsite.setData(homePageUri);
+                                startActivity(toMyWebsite);
+                                break;
+                            case SUPPORT_IDENTIFIER:
+                                Toast thank_msg = Toast.makeText(MainScreen.this, getResources().getString(R.string.support_thank_msg), Toast.LENGTH_SHORT);
+                                thank_msg.setGravity(Gravity.CENTER, 0, 0);
+                                thank_msg.show();
+                                break;
+                            case FEEDBACK_IDENTIFIER:
+                                String uriText = "mailto:peterwangtao0@hotmail.com"
+                                                + "?subject=" + Uri.encode("Feedback on GeoReminder")
+                                                + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
+                                Uri emailUri = Uri.parse(uriText);
+                                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
+                                sendFeedbackEmail.setData(emailUri);                                             // do not use setType, it messes things up
+                                try {
+                                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                                }
+                                catch (ActivityNotFoundException e){
+                                    Snackbar.make(newReminder, getResources().getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
+                                            .setAction("Action", null)
+                                            .show();
+                                }
+                                break;
+                            case SETTINGS_IDENTIFIER:
+                                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
+                                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
+                                break;
+                        }
+
+                        drawer.closeDrawer();
+                        return true;
+                    }
+                })
+                .addStickyDrawerItems(
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.nav_feedback)).withIdentifier(FEEDBACK_IDENTIFIER).withIcon(R.drawable.ic_nav_feedback).withSelectable(false),
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.nav_setting)).withIdentifier(SETTINGS_IDENTIFIER).withIcon(R.drawable.ic_nav_setting).withSelectable(false)
+                )
+                .withSavedInstance(savedInstanceState)
+                .build();
     }
 
     private void initEvent() {
         firstBackPress = System.currentTimeMillis() - 2000;             // in case some idiot just presses back button when they enters the app
+
+        appBarLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(newReminder.isOpened())
+                    newReminder.close(true);
+            }
+        });
 
         // use linear layout manager to set Recycler view
         layoutManager = new LinearLayoutManager(this);
@@ -275,11 +393,12 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 vibrator.vibrate(20);
                 dialog.show();
 
-//                if (reminderList.size() == 0) {
-//                    textNoReminder.setAlpha(1);
-//                    borderlessNewReminder.setAlpha(1);
-//                    borderlessNewReminder.setClickable(true);
-//                }
+                //TODO: also after adding one, remember to hide these two views
+                if (reminderList.size() == 0) {
+                    textNoReminder.setAlpha(1);
+                    borderlessNewReminder.setAlpha(1);
+                    borderlessNewReminder.setClickable(true);
+                }
             }
         });
 
@@ -439,39 +558,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.nav_settings:
-                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
-                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
-                break;
-
-            case R.id.nav_feedback:
-                String uriText = "mailto:peterwangtao0@hotmail.com"
-                                + "?subject=" + Uri.encode("Feedback on GeoReminder")
-                                + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
-                Uri uri = Uri.parse(uriText);
-                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
-                sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
-                try {
-                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
-                }
-                catch (ActivityNotFoundException e){
-                    Snackbar.make(newReminder, getResources().getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
-                            .setAction("Action", null)
-                            .show();
-                }
-                break;
-        }
-
-        // close the drawer after clicking on an item
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
@@ -493,13 +579,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
-            case KeyEvent.KEYCODE_BACK:                                     // if two presses differ from each other in time for more than 2 seconds
-                if(newReminder.isOpened()){
+            case KeyEvent.KEYCODE_BACK:
+                if(drawer.isDrawerOpen() || newReminder.isOpened()){
+                    drawer.closeDrawer();
                     newReminder.close(true);
-                }
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                if (drawer.isDrawerOpen(GravityCompat.START)) {
-                    drawer.closeDrawer(GravityCompat.START);
                     return true;
                 }
                 else {
@@ -508,6 +591,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                         return true;
                     }
                     else {
+                        // if two presses differ from each other in time for more than 2 seconds
                         long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                         if((currentBackPress - firstBackPress) > 2000){
                             Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
@@ -522,6 +606,22 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void buildHeader(boolean compact, Bundle savedInstanceState) {
+        // Create the AccountHeader
+        drawerHeader = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.color.colorPrimary)
+                .withCompactStyle(compact)
+                .addProfiles(
+                        userProfile,
+                        //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
+//                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_switch)).withDescription(getResources().getString(R.string.nav_desc_switch)).withIcon(R.drawable.ic_nav_add).withIdentifier(PROFILE_SETTING),
+                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_manage)).withDescription(getResources().getString(R.string.nav_desc_manage)).withIcon(R.drawable.ic_nav_manage)
+                )
+                .withSavedInstance(savedInstanceState)
+                .build();
     }
 
     // Below: code for testing and debugging
