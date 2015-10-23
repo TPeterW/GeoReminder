@@ -1,7 +1,5 @@
 package com.peter.georeminder;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.speech.RecognizerIntent;
@@ -11,8 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -20,9 +16,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.peter.georeminder.utils.MapFragment;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -34,8 +30,6 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     private SearchBox searchBox;
     private android.support.v7.widget.Toolbar toolbar;
-
-    private static final int PERSISTENT_SEARCH_REQUEST_CODE = 0x008;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,13 +108,22 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             }
 
         });
-        searchBox.setOverflowMenu(R.menu.overflow_menu);
+        searchBox.setOverflowMenu(R.menu.menu_search_overflow);
         searchBox.setOverflowMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.test_menu_item:
-                        Toast.makeText(WholeMapScreen.this, "Clicked!", Toast.LENGTH_SHORT).show();
+                    case R.id.map_type_normal:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        return true;
+                    case R.id.map_type_terrain:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                        return true;
+                    case R.id.map_type_hybrid:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        return true;
+                    case R.id.map_type_satellite:
+                        reminderMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                         return true;
                 }
                 return false;
@@ -140,6 +143,16 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         reminderMap = googleMap;
+        reminderMap.setBuildingsEnabled(true);             // enable 3D building view
+        reminderMap.setMyLocationEnabled(true);
+        UiSettings uiSettings = reminderMap.getUiSettings();
+        uiSettings.setAllGesturesEnabled(true);
+        uiSettings.setMapToolbarEnabled(true);
+        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setIndoorLevelPickerEnabled(true);
+        uiSettings.setCompassEnabled(true);
+
+        //TODO: set OnCameraChangeListener
 
         //TODO: calculate screen height, change dip to pixels
         reminderMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar
@@ -152,7 +165,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PERSISTENT_SEARCH_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == 1234 && resultCode == RESULT_OK) {
             ArrayList<String> matches = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             searchBox.populateEditText(matches.get(0));

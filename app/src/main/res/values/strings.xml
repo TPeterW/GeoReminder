@@ -71,6 +71,12 @@
     <string name="svcs_signin">Please sign in to Google Play Service before using geolocation function</string>
     <!--https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult-->
 
+    <!--Overflow Menu-->
+    <string name="map_normal">Normal</string>
+    <string name="map_hybrid">Hybrid</string>
+    <string name="map_terrain">Terran</string>
+    <string name="map_satellite">Satellite</string>
+
     
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
