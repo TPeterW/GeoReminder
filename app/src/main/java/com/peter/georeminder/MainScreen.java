@@ -61,7 +61,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     private com.github.clans.fab.FloatingActionButton addGeoReminder;
     private com.github.clans.fab.FloatingActionButton addNorReminder;
     private int scrolledDistance = 0;               // for showing and hiding the fam
-    private static final int SHOW_THRESHOLD = 20;      // might want to change this later
+    private static final int SHOW_THRESHOLD = 20;
     private static final int HIDE_THRESHOLD = 50;
 
     // Main content (RecyclerView)
