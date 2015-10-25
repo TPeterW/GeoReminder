@@ -8,6 +8,7 @@ import android.view.View;
 
 /**
  * Created by Peter on 10/11/15.
+ * After launch, this screen will appear for 1.5 seconds, then head off to MainScreen and destroy itself
  */
 public class SplashScreen extends Activity {
     private static int SPLASH_TIME_OUT = 1500;
@@ -23,11 +24,7 @@ public class SplashScreen extends Activity {
         decorView.setSystemUiVisibility(uiOptions);
 
         new Handler().postDelayed(new Runnable() {
-
-            /*
-             * Showing splash screen with a timer.
-             */
-
+            // Showing splash screen with a timer.
             @Override
             public void run() {
                 // This method will be executed once the timer is over

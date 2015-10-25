@@ -46,7 +46,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     // Nav Drawer
     private DrawerLayout drawer;
     private NavigationView navigationView;
-    private ImageView avatar;
+
+    //TODO: use amap if Google Play services aren't available
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +65,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     private void initTransitions() {
         if(Build.VERSION.SDK_INT >= 21) {
-            getWindow().setEnterTransition(new Slide(Gravity.RIGHT));
-            getWindow().setReturnTransition(new Slide(Gravity.LEFT));
+            getWindow().setEnterTransition(new Slide(Gravity.END));
+            getWindow().setReturnTransition(new Slide(Gravity.START));
         }
     }
 
@@ -80,11 +81,12 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_whole_map);
 
         //TODO: Init the views
-        avatar = (ImageView) headerLayout.findViewById(R.id.nav_head_avatar);
+        ImageView avatar = (ImageView) headerLayout.findViewById(R.id.nav_head_avatar);
         avatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO: go to user account page
+                Toast.makeText(WholeMapScreen.this, "Avatar", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -209,7 +211,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // TODO: record the location and create new Reminder
-                                reminderMap.addMarker(new MarkerOptions().position(latLng).title("My Marker").flat(true));
+                                reminderMap.addMarker(new MarkerOptions().position(latLng).title("My Marker").flat(false));
                                 reminderMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));   // instead of moveCamera
                             }
                         })

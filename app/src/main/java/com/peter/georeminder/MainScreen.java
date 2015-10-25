@@ -34,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,10 +60,16 @@ import java.util.List;
 
 public class MainScreen extends AppCompatActivity{
 
+    // Analytics Tracker
+    AnalyticsTrackers analyticsTrackers;
+
     // ToolBar
     private FloatingActionButton seeMap;
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
+
+    // Status Bar Colour
+    private ValueAnimator statusBarAnimator;
 
     // "Add" fab menu
     private com.github.clans.fab.FloatingActionMenu newReminder;
@@ -76,7 +81,6 @@ public class MainScreen extends AppCompatActivity{
 
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     private RecyclerAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -138,6 +142,9 @@ public class MainScreen extends AppCompatActivity{
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         // TODO: get data from shared preferences
+
+        // Trackers
+        analyticsTrackers = AnalyticsTrackers.getInstance();
 
         reminderList = new LinkedList<>();
         // TODO: remove these and actually get the reminders
@@ -205,22 +212,23 @@ public class MainScreen extends AppCompatActivity{
 
         /* Below is initialisation of gadgets on the screen */
 
-        @SuppressWarnings("all")
         // Changes the color of status bar, with animation (using ValueAnimator)
         // will only happen if higher than Lollipop
-        final ValueAnimator statusBarAnimator = ValueAnimator.ofArgb
-                (ContextCompat.getColor(MainScreen.this, R.color.colorPrimary),
-                        ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
-        statusBarAnimator.setDuration(500);
-        statusBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            // how it works is that every time it updates, it goes to change the color by a little bit
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if (Build.VERSION.SDK_INT >= 21) {
-                    getWindow().setStatusBarColor((Integer) statusBarAnimator.getAnimatedValue());
+        if(Build.VERSION.SDK_INT >= 21){
+            statusBarAnimator = ValueAnimator.ofArgb
+                    (ContextCompat.getColor(MainScreen.this, R.color.colorPrimary),
+                            ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
+            statusBarAnimator.setDuration(500);
+            statusBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                // how it works is that every time it updates, it goes to change the color by a little bit
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        getWindow().setStatusBarColor((Integer) statusBarAnimator.getAnimatedValue());
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // AppBar Layout, the top area
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
@@ -230,7 +238,7 @@ public class MainScreen extends AppCompatActivity{
                 swipeRefreshLayout.setEnabled(verticalOffset == 0);
                 // only version higher than 21 (Lollipop) will be getting this status bar animation
                 if (Build.VERSION.SDK_INT >= 21) {
-                    if (verticalOffset < -150) {
+                    if (verticalOffset < -150) {                // negative indicates it has been moved up
                         if (!isDark) {
                             statusBarAnimator.start();
                             isDark = true;
@@ -256,28 +264,16 @@ public class MainScreen extends AppCompatActivity{
                 .withAccountHeader(drawerHeader)
                 .withStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary))
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all),
-                        new PrimaryDrawerItem().withIdentifier(GEO_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_geo)).withIcon(R.drawable.ic_nav_geo),
-                        new PrimaryDrawerItem().withIdentifier(NOR_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_nor)).withIcon(R.drawable.ic_nav_nor),
-                        new PrimaryDrawerItem().withIdentifier(DRAFT_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_draft)).withIcon(R.drawable.ic_nav_draft),
-                        new PrimaryDrawerItem().withIdentifier(VIEW_MAP_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_view_in_map)).withIcon(R.drawable.ic_nav_view_map).withSelectable(false),
+                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all),
+                        new PrimaryDrawerItem().withIdentifier(GEO_IDENTIFIER).withName(getString(R.string.nav_opt_geo)).withIcon(R.drawable.ic_nav_geo),
+                        new PrimaryDrawerItem().withIdentifier(NOR_IDENTIFIER).withName(getString(R.string.nav_opt_nor)).withIcon(R.drawable.ic_nav_nor),
+                        new PrimaryDrawerItem().withIdentifier(DRAFT_IDENTIFIER).withName(getString(R.string.nav_opt_draft)).withIcon(R.drawable.ic_nav_draft),
+                        new PrimaryDrawerItem().withIdentifier(VIEW_MAP_IDENTIFIER).withName(getString(R.string.nav_opt_view_in_map)).withIcon(R.drawable.ic_nav_view_map).withSelectable(false),
 
-                        new SectionDrawerItem().withName(getResources().getString(R.string.nav_sec_other)).withTextColor(ContextCompat.getColor(MainScreen.this, R.color.colorAccent)),
-                        new SecondaryDrawerItem().withIdentifier(ABOUT_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_about)).withSelectable(false),
-                        new SecondaryDrawerItem().withIdentifier(SUPPORT_IDENTIFIER).withName(getResources().getString(R.string.nav_opt_support)).withSelectable(false)
+                        new SectionDrawerItem().withName(getString(R.string.nav_sec_other)).withTextColor(ContextCompat.getColor(MainScreen.this, R.color.colorAccent)),
+                        new SecondaryDrawerItem().withIdentifier(ABOUT_IDENTIFIER).withName(getString(R.string.nav_opt_about)).withSelectable(false),
+                        new SecondaryDrawerItem().withIdentifier(SUPPORT_IDENTIFIER).withName(getString(R.string.nav_opt_support)).withSelectable(false)
                 )
-                .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
-                    @Override
-                    public boolean onNavigationClickListener(View clickedView) {
-                        //this method is only called if the Arrow icon is shown. The hamburger is automatically managed by the MaterialDrawer
-                        //if the back arrow is shown. close the activity
-                        //TODO:
-                        Toast.makeText(MainScreen.this, "onNav Called", Toast.LENGTH_SHORT).show();
-                        MainScreen.this.finish();
-                        //return true if we have consumed the event
-                        return true;
-                    }
-                })
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -304,7 +300,7 @@ public class MainScreen extends AppCompatActivity{
                                 startActivity(toMyWebsite);
                                 break;
                             case SUPPORT_IDENTIFIER:
-                                Toast thank_msg = Toast.makeText(MainScreen.this, getResources().getString(R.string.support_thank_msg), Toast.LENGTH_SHORT);
+                                Toast thank_msg = Toast.makeText(MainScreen.this, getString(R.string.support_thank_msg), Toast.LENGTH_LONG);
                                 thank_msg.setGravity(Gravity.CENTER, 0, 0);
                                 thank_msg.show();
                                 break;
@@ -319,7 +315,7 @@ public class MainScreen extends AppCompatActivity{
                                     startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
                                 }
                                 catch (ActivityNotFoundException e){
-                                    Snackbar.make(newReminder, getResources().getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
+                                    Snackbar.make(newReminder, getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
                                             .setAction("Action", null)
                                             .show();
                                 }
@@ -335,8 +331,8 @@ public class MainScreen extends AppCompatActivity{
                     }
                 })
                 .addStickyDrawerItems(
-                        new PrimaryDrawerItem().withName(getResources().getString(R.string.nav_feedback)).withIdentifier(FEEDBACK_IDENTIFIER).withIcon(R.drawable.ic_nav_feedback).withSelectable(false),
-                        new PrimaryDrawerItem().withName(getResources().getString(R.string.nav_setting)).withIdentifier(SETTINGS_IDENTIFIER).withIcon(R.drawable.ic_nav_setting).withSelectable(false)
+                        new PrimaryDrawerItem().withName(getString(R.string.nav_feedback)).withIdentifier(FEEDBACK_IDENTIFIER).withIcon(R.drawable.ic_nav_feedback).withSelectable(false),
+                        new PrimaryDrawerItem().withName(getString(R.string.nav_setting)).withIdentifier(SETTINGS_IDENTIFIER).withIcon(R.drawable.ic_nav_setting).withSelectable(false)
                 )
                 .withSavedInstance(savedInstanceState)
                 .build();
@@ -345,43 +341,45 @@ public class MainScreen extends AppCompatActivity{
     private void initEvent() {
         firstBackPress = System.currentTimeMillis() - 2000;             // in case some idiot just presses back button when they enters the app
 
-        appBarLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(newReminder.isOpened())
-                    newReminder.close(true);
-            }
-        });
-
         // use linear layout manager to set Recycler view
-        layoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new RecyclerAdapter(MainScreen.this, reminderList);
         adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {              // click event for each reminder item
             @Override
             public void onItemClick(View view, int position) {
-                // TODO: temporary test code, delete and change later
-//                adapter.addReminder(position, new Reminder());
-//                Toast.makeText(MainScreen.this, position + "", Toast.LENGTH_SHORT).show();
+                if(newReminder.isOpened())
+                    newReminder.close(true);
+                else {
+                    // TODO: do a check, which edit screen to go to
+                }
             }
 
             @Override
             public void onItemLongClick(View view, final int position) {
+                if(newReminder.isOpened())
+                    newReminder.close(true);
+
                 // to alert the user about deleting by vibrating
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
                 // TODO: add code
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
-                builder.setTitle(getResources().getString(R.string.dialog_delete_title))
-                        .setMessage(getResources().getString(R.string.dialog_delete_msg))
-                        .setPositiveButton(getResources().getString(R.string.dialog_pos_btn), new DialogInterface.OnClickListener() {
+                builder.setTitle(getString(R.string.dialog_delete_title))
+                        .setMessage(getString(R.string.dialog_delete_msg))
+                        .setPositiveButton(getString(R.string.dialog_pos_btn), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 adapter.deleteReminder(position);
+                                if (reminderList.size() == 0) {
+                                    textNoReminder.setAlpha(1);
+                                    borderlessNewReminder.setAlpha(1);
+                                    borderlessNewReminder.setClickable(true);
+                                }
                             }
                         })
-                        .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // let's do nothing
@@ -394,11 +392,6 @@ public class MainScreen extends AppCompatActivity{
                 dialog.show();
 
                 //TODO: also after adding one, remember to hide these two views
-                if (reminderList.size() == 0) {
-                    textNoReminder.setAlpha(1);
-                    borderlessNewReminder.setAlpha(1);
-                    borderlessNewReminder.setClickable(true);
-                }
             }
         });
 
@@ -452,7 +445,8 @@ public class MainScreen extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
-                //TODO:
+                //TODO: to check all the reminders and drafts
+                //TODO: check if Google service is availble (you know what? make it global), and decide which page to go to
 
                 if (Build.VERSION.SDK_INT >= 21) {
                     getWindow().setExitTransition(new Explode());
@@ -469,7 +463,7 @@ public class MainScreen extends AppCompatActivity{
             public void onClick(View view) {
                 newReminder.close(true);
                 Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
-                toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), false);
+                toEditScreen.putExtra(getString(R.string.bundle_with_map), false);
                 //TODO: add specifications about the reminder to be created
 
                 // activity transition animation
@@ -487,7 +481,7 @@ public class MainScreen extends AppCompatActivity{
             public void onClick(View v) {
                 newReminder.close(true);
                 Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
-                toEditScreen.putExtra(getResources().getString(R.string.bundle_with_map), true);
+                toEditScreen.putExtra(getString(R.string.bundle_with_map), true);
                 //TODO: add specifications about the reminder to be created
 
                 // activity transition animation
@@ -506,7 +500,7 @@ public class MainScreen extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent newReminder = new Intent(MainScreen.this, EditorScreen.class);       // default is a new GeoReminder
-                newReminder.putExtra(getResources().getString(R.string.bundle_with_map), true);
+                newReminder.putExtra(getString(R.string.bundle_with_map), true);
                 //TODO: more specifications
 
                 if(Build.VERSION.SDK_INT >= 21){
@@ -594,8 +588,8 @@ public class MainScreen extends AppCompatActivity{
                         // if two presses differ from each other in time for more than 2 seconds
                         long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                         if((currentBackPress - firstBackPress) > 2000){
-                            Snackbar snackbar = Snackbar.make(newReminder, getResources().getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
-                                    .setAction("Action", null);             // TODO: make sure don't press again while fab is up
+                            Snackbar snackbar = Snackbar.make(newReminder, getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
+                                    .setAction("Action", null);
                             firstBackPress = currentBackPress;
 
                             snackbar.show();
@@ -618,7 +612,7 @@ public class MainScreen extends AppCompatActivity{
                         userProfile,
                         //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
 //                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_switch)).withDescription(getResources().getString(R.string.nav_desc_switch)).withIcon(R.drawable.ic_nav_add).withIdentifier(PROFILE_SETTING),
-                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_manage)).withDescription(getResources().getString(R.string.nav_desc_manage)).withIcon(R.drawable.ic_nav_manage)
+                        new ProfileSettingDrawerItem().withName(getString(R.string.nav_acct_manage)).withDescription(getString(R.string.nav_desc_manage)).withIcon(R.drawable.ic_nav_manage)
                 )
                 .withSavedInstance(savedInstanceState)
                 .build();
