@@ -291,7 +291,7 @@ public class MainScreen extends AppCompatActivity{
 
                                 break;
                             case VIEW_MAP_IDENTIFIER:
-
+                                toWholeMap(false);
                                 break;
                             case ABOUT_IDENTIFIER:
                                 Intent toMyWebsite = new Intent(Intent.ACTION_VIEW);
@@ -415,7 +415,7 @@ public class MainScreen extends AppCompatActivity{
                     scrolledDistance = 0;
                 }
 
-                if((!newReminder.isMenuHidden() && dy>0) || (newReminder.isMenuHidden() && dy<0)) {
+                if ((!newReminder.isMenuHidden() && dy > 0) || (newReminder.isMenuHidden() && dy < 0)) {
                     scrolledDistance += dy;
                 }
             }
@@ -444,16 +444,7 @@ public class MainScreen extends AppCompatActivity{
         seeMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
-                //TODO: to check all the reminders and drafts
-                //TODO: check if Google service is availble (you know what? make it global), and decide which page to go to
-
-                if (Build.VERSION.SDK_INT >= 21) {
-                    getWindow().setExitTransition(new Explode());
-                    getWindow().setReenterTransition(new Explode());
-                    startActivity(toViewWholeMap, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                } else
-                    startActivity(toViewWholeMap);
+                toWholeMap(true);
             }
         });
 
@@ -485,12 +476,11 @@ public class MainScreen extends AppCompatActivity{
                 //TODO: add specifications about the reminder to be created
 
                 // activity transition animation
-                if(Build.VERSION.SDK_INT >= 21){
+                if (Build.VERSION.SDK_INT >= 21) {
                     getWindow().setExitTransition(new Fade());
                     getWindow().setReenterTransition(new Fade());
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                }
-                else
+                } else
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
@@ -616,6 +606,24 @@ public class MainScreen extends AppCompatActivity{
                 )
                 .withSavedInstance(savedInstanceState)
                 .build();
+    }
+
+    private void toWholeMap(Boolean animateExit) {
+        Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
+        //TODO: to check all the reminders and drafts
+        //TODO: check if Google service is availble (you know what? make it global), and decide which page to go to
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            if(animateExit){
+                getWindow().setExitTransition(new Explode());
+            }
+            else {
+                getWindow().setExitTransition(null);
+            }
+            getWindow().setReenterTransition(new Explode());
+            startActivity(toViewWholeMap, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+        } else
+            startActivity(toViewWholeMap);
     }
 
     // Below: code for testing and debugging

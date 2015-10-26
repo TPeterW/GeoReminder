@@ -20,6 +20,8 @@ public class GeoReminderApplication extends Application {
     private static final String TWITTER_KEY = "DMsWio2hohKMIz1dq065X82vQ";
     private static final String TWITTER_SECRET = "CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS";
 
+    private static final String AMAP_KEY = "16d253c329acfc23af261d52a61969e6";
+
     @Override
     public void onCreate() {
         super.onCreate();
