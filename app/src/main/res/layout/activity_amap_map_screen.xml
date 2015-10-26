@@ -4,20 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.peter.georeminder.WholeMapScreen"
-    android:id="@+id/map_drawer_layout">
+    android:id="@+id/amap_map_drawer_layout">
 
     <include
-        layout="@layout/content_whole_map_screen"
+        layout="@layout/content_amap_map_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <android.support.design.widget.NavigationView
-        android:id="@+id/nav_map_view"
+        android:id="@+id/nav_amap_map_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        map:menu="@menu/menu_nav_whole_map"/>
+        map:menu="@menu/menu_nav_amap_map"/>
     <!--This is for a workaround for the bug that appeared in support:design:23.1.0-->
     <!--map:headerLayout="@layout/nav_drawer_header_main"-->
 
