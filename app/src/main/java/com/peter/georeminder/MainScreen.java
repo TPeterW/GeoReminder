@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -93,6 +94,7 @@ public class MainScreen extends AppCompatActivity{
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
     private static final int EDIT_EXISTING_REMINDER_REQUEST_CODE = 0x003;
     private static final int SETTINGS_REQUEST_CODE = 0x004;
+    private static final int LOGIN_REQUEST_CODE = 0x005;
 
     // Importante
     // DataList
@@ -590,6 +592,11 @@ public class MainScreen extends AppCompatActivity{
 
                 return;
 
+            case LOGIN_REQUEST_CODE:
+                loadPref();
+                //TODO: change avatar and sync all reminders
+                return;
+
             case SETTINGS_REQUEST_CODE:
                 loadPref();
                 return;
@@ -639,9 +646,18 @@ public class MainScreen extends AppCompatActivity{
                         userProfile,
                         //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
 //                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_switch)).withDescription(getResources().getString(R.string.nav_desc_switch)).withIcon(R.drawable.ic_nav_add).withIdentifier(PROFILE_SETTING),
-                        new ProfileSettingDrawerItem().withName(getString(R.string.nav_acct_manage)).withDescription(getString(R.string.nav_desc_manage)).withIcon(R.drawable.ic_nav_manage)
+                        new ProfileSettingDrawerItem().withName(getString(R.string.nav_acct_manage)).withDescription(getString(R.string.nav_desc_manage))
+                                .withIcon(R.drawable.ic_nav_manage).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
+                                startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE);
+                                return false;
+                            }
+                        })
                 )
                 .withSavedInstance(savedInstanceState)
+                .withCloseDrawerOnProfileListClick(false)
                 .build();
     }
 
