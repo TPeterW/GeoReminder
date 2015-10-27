@@ -1,6 +1,8 @@
 package com.peter.georeminder.utils;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import com.crashlytics.android.Crashlytics;
 import com.parse.Parse;
@@ -34,5 +36,11 @@ public class GeoReminderApplication extends Application {
 
         // Set up Google Analytics
         AnalyticsTrackers.initialize(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        MultiDex.install(this);
+        super.attachBaseContext(base);
     }
 }

@@ -40,6 +40,7 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -133,9 +134,9 @@ public class MainScreen extends AppCompatActivity{
 
         initEvent();
 
-        loadPref();             //using SharedPreferences
-
         checkServices();
+
+        loadPref();             //using SharedPreferences
     }
 
     private void initData() {
@@ -181,7 +182,7 @@ public class MainScreen extends AppCompatActivity{
 
         // this buttons takes user to a page
         // the blue one with a map icon
-        // and display a map image(or a GoogleMap object that shows all current reminders)
+        // and display all the reminders on a map
         seeMap = (FloatingActionButton) findViewById(R.id.fab_see_map);
 
         // The two mini add buttons (in floating action menu)
@@ -440,7 +441,7 @@ public class MainScreen extends AppCompatActivity{
 
         // this buttons takes user to a page
         // the blue one with a map icon
-        // and display a map image(or a GoogleMap object that shows all current reminders)
+        // and display all the reminders on a map
         seeMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -511,15 +512,51 @@ public class MainScreen extends AppCompatActivity{
 
     private void loadPref() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        //TODO:
+        //TODO: remember to check if the user wants to use amap instead of gms
     }
 
     private void checkServices() {
-        //TODO: check Google Service availability
-        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)){
+        // not sure which version of code is correct
+//        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)){
+//            case ConnectionResult.API_UNAVAILABLE:
+//                break;
+//        }
+        //TODO: check if the user wants to use Amap first, before checking google play services
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext())){
+            case ConnectionResult.SUCCESS:
+                editor.putBoolean(getString(R.string.shared_pref_google_avail), true);
+                break;
+
             case ConnectionResult.API_UNAVAILABLE:
+                editor.putBoolean(getString(R.string.shared_pref_google_avail), false);
+                //TODO: only show this message once
+                Toast.makeText(MainScreen.this, getString(R.string.svcs_unavail), Toast.LENGTH_SHORT).show();
+                break;
+
+            case ConnectionResult.SERVICE_DISABLED:
+                editor.putBoolean(getString(R.string.shared_pref_google_avail), false);
+                Toast.makeText(MainScreen.this, getString(R.string.svcs_disabled), Toast.LENGTH_SHORT).show();
+                break;
+
+            case ConnectionResult.SERVICE_MISSING:
+                editor.putBoolean(getString(R.string.shared_pref_google_avail), false);
+                Toast.makeText(MainScreen.this, getString(R.string.svcs_missing), Toast.LENGTH_SHORT).show();
+                break;
+            
+            case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
+                editor.putBoolean(getString(R.string.shared_pref_google_avail), false);
+                Toast.makeText(MainScreen.this, getString(R.string.svcs_req_update), Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+                editor.putBoolean(getString(R.string.shared_pref_google_avail), false);
+                Toast.makeText(MainScreen.this, getString(R.string.svcs_other), Toast.LENGTH_SHORT).show();
                 break;
         }
+        editor.apply();
 
         //TODO: check other availabilities such as Internet connection
     }
@@ -611,7 +648,6 @@ public class MainScreen extends AppCompatActivity{
     private void toWholeMap(Boolean animateExit) {
         Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
         //TODO: to check all the reminders and drafts
-        //TODO: check if Google service is availble (you know what? make it global), and decide which page to go to
 
         if (Build.VERSION.SDK_INT >= 21) {
             if(animateExit){

@@ -11,6 +11,8 @@
 
     <!--Toast-->
     <string name="support_thank_msg">Thank you! Mental support is sufficient at this point!</string>
+    <string name="GPS_unavail">GPS Service Unavailable</string>
+    <string name="cannot_find_location">Sorry, cannot find your location</string>
 
     <!--Navigation Drawer-->
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
@@ -54,10 +56,13 @@
     <string name="cat_about">About</string>
     <string name="cat_view">View</string>
     <string name="cat_sync">Sync</string>
+    <string name="cat_map">Map</string>
     <string name="pref_theme">Theme</string>
     <string name="pref_rate">Rate this app</string>
-    <string name="pref_show_draft">Show drafts in list</string>
+    <string name="pref_show_draft">Show drafts</string>
     <string name="pref_autosync">Auto backup</string>
+    <string name="pref_choose_map">Choose Map Service</string>
+    <string name="pref_dialog_title">Map Service</string>
 
     <!--Color Themes-->
     <string name="theme_green">Green</string>
@@ -91,7 +96,12 @@
     <string name="svcs_updating">Google Play Service on this device is currently updating, please try later</string>
     <string name="svcs_disabled">Google Play Service on this device is disabled, please enable Google map function</string>
     <string name="svcs_signin">Please sign in to Google Play Service before using geolocation function</string>
+    <string name="svcs_req_update">Google Play Service version is too old</string>
+    <string name="svcs_other">Ran into some problems when initialising Google Play Service</string>
     <!--https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult-->
+
+    <!--SharedPreferences-->
+    <string name="shared_pref_google_avail">GoogleMapAvailable</string>
 
     <!--Overflow Menu-->
     <string name="map_normal">Normal</string>
@@ -99,8 +109,13 @@
     <string name="map_terrain">Terrain</string>
     <string name="map_satellite">Satellite</string>
     <string name="map_night">Night</string>
+    <string name="map_my_position">To My Position</string>
 
-    
+    <!--Map Service-->
+    <string name="google_map">Google Map</string>
+    <string name="amap_map">AMap</string>
+
+
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words

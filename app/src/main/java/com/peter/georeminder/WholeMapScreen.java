@@ -5,12 +5,18 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +29,12 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.LocationSource.OnLocationChangedListener;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.CameraPositionCreator;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -35,31 +47,52 @@ import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 
-public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
+public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback,
+        NavigationView.OnNavigationItemSelectedListener, LocationSource, OnLocationChangedListener{
 
-    private GoogleMap reminderMap;
+    private GoogleMap googleMap;
+
+    private MapView mapView;
+    private AMap aMap;
 
     private SearchBox searchBox;
 
     private static final int SETTINGS_REQUEST_CODE = 0x004;
+    private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE = 0x001;
+    private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 0x002;
 
     // Nav Drawer
     private DrawerLayout drawer;
     private NavigationView navigationView;
+
+    private boolean useGoogleMap;
+
+    LocationManager locationManager;
 
     //TODO: use amap if Google Play services aren't available
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //TODO: check google service availability, and decide which map to use
-        setContentView(R.layout.activity_google_map_screen);
+        //TODO: check google service availability and decide which map to use
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // if google is available and user chooses to use google, which is default btw
+        useGoogleMap = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false)
+                && sharedPreferences.getString("whichMap", "0").equals("0");        // "0" is google map
+
+        if(useGoogleMap){
+            setContentView(R.layout.activity_google_map_screen);
+        }
+        else {                  // use AMAP
+            setContentView(R.layout.activity_amap_map_screen);
+        }
 
         initTransitions();
 
         initDrawer();
 
-        initMap();
+        initMap(savedInstanceState);
 
         initSearchBox();
     }
@@ -72,16 +105,28 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initDrawer() {
-// Navigation Bar
-        drawer = (DrawerLayout) findViewById(R.id.google_map_drawer_layout);
+        // TODO: maybe only necessary for AMap
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        navigationView = (NavigationView) findViewById(R.id.nav_google_map_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        // Navigation Drawer
+        if(useGoogleMap){
+            drawer = (DrawerLayout) findViewById(R.id.google_map_drawer_layout);
 
+            navigationView = (NavigationView) findViewById(R.id.nav_google_map_view);
+            navigationView.setNavigationItemSelectedListener(this);
+        }
+        else {
+            drawer = (DrawerLayout) findViewById(R.id.amap_map_drawer_layout);
+
+            navigationView = (NavigationView) findViewById(R.id.nav_amap_map_view);
+            navigationView.setNavigationItemSelectedListener(this);
+        }
+
+        // two drawers use the same header
         // the workaround for support:design:23.1.0
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_whole_map);
 
-        //TODO: Init the views
+        //TODO: init the views
         ImageView avatar = (ImageView) headerLayout.findViewById(R.id.nav_head_avatar);
         avatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,17 +135,37 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                 Toast.makeText(WholeMapScreen.this, "Avatar", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
-    private void initMap() {
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.whole_google_map);
-        mapFragment.getMapAsync(this);
+    private void initMap(Bundle savedInstanceState) {
+        if(useGoogleMap){
+            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.whole_google_map);
+            mapFragment.getMapAsync(this);
+        }
+        else {
+            // Initialise AMAP
+            mapView = (MapView) findViewById(R.id.whole_amap_map);
+            mapView.onCreate(savedInstanceState);
+            aMap = mapView.getMap();
+
+            setUpAmap();
+        }
+
     }
 
     private void initSearchBox() {
-        searchBox = (SearchBox) findViewById(R.id.google_map_searchBox);
+        if(useGoogleMap){
+            searchBox = (SearchBox) findViewById(R.id.google_map_searchBox);
+            searchBox.setOverflowMenu(R.menu.menu_gogole_map_search_overflow);
+        }
+        else {
+            searchBox = (SearchBox) findViewById(R.id.amap_map_searchBox);
+            searchBox.setOverflowMenu(R.menu.menu_amap_map_search_overflow);
+        }
+
         searchBox.enableVoiceRecognition(this);
         for(int x = 0; x < 5; x++){
             SearchResult option = new SearchResult("Result " + Integer.toString(x),
@@ -115,7 +180,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                     drawer.openDrawer(GravityCompat.START);
             }
         });
-        searchBox.setSearchListener(new SearchBox.SearchListener(){
+        searchBox.setSearchListener(new SearchBox.SearchListener() {
 
             @Override
             public void onSearchOpened() {
@@ -135,7 +200,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
             @Override
             public void onSearch(String searchTerm) {
-                Toast.makeText(WholeMapScreen.this, searchTerm +" Searched", Toast.LENGTH_LONG).show();
+                Toast.makeText(WholeMapScreen.this, searchTerm + " Searched", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -149,27 +214,57 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             }
 
         });
-        searchBox.setOverflowMenu(R.menu.menu_gogole_map_search_overflow);
+
         searchBox.setOverflowMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
+                    // Google Map
                     case R.id.google_map_type_normal:
                         navigationView.getMenu().getItem(0).setChecked(true);       // item 0: normal
-                        reminderMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                         return true;
                     case R.id.google_map_type_terrain:
                         navigationView.getMenu().getItem(1).setChecked(true);       // item 1: terrain
-                        reminderMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                        googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                         return true;
                     case R.id.google_map_type_hybrid:
                         navigationView.getMenu().getItem(2).setChecked(true);       // item 2: hybrid
-                        reminderMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         return true;
                     case R.id.google_map_type_satellite:
                         navigationView.getMenu().getItem(3).setChecked(true);       // item 3: satellite
-                        reminderMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                         return true;
+
+                    // AMAP
+                    case R.id.amap_my_position:
+                        int coarseLocation = ContextCompat.checkSelfPermission(WholeMapScreen.this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+                        int fineLocation = ContextCompat.checkSelfPermission(WholeMapScreen.this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+                        if(coarseLocation == PackageManager.PERMISSION_DENIED){
+                            ActivityCompat.requestPermissions(WholeMapScreen.this,
+                                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    COARSE_LOCATION_PERMISSION_REQUEST_CODE);
+                        }
+
+                        if(fineLocation == PackageManager.PERMISSION_DENIED){
+                            ActivityCompat.requestPermissions(WholeMapScreen.this,
+                                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                                    FINE_LOCATION_PERMISSION_REQUEST_CODE);
+                        }
+
+                        Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                        if (myLocation != null){
+                            aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.changeLatLng(
+                                    new com.amap.api.maps.model.LatLng(myLocation.getLatitude(),
+                                            myLocation.getLongitude())));
+                        }
+                        else {
+                            Toast.makeText(WholeMapScreen.this, "myLocation is null", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
                 }
                 return false;
             }
@@ -186,11 +281,11 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        reminderMap = googleMap;
-        reminderMap.setBuildingsEnabled(true);             // enable 3D building view
-        reminderMap.setMyLocationEnabled(true);
-        UiSettings uiSettings = reminderMap.getUiSettings();
+    public void onMapReady(GoogleMap inputMap) {
+        googleMap = inputMap;
+        googleMap.setBuildingsEnabled(true);             // enable 3D building view
+        googleMap.setMyLocationEnabled(true);
+        UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
@@ -200,7 +295,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         //TODO: set OnCameraChangeListener
 
 
-        reminderMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(final LatLng latLng) {
                 // latLng is the position of the click
@@ -212,19 +307,18 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // TODO: record the location and create new Reminder
-                                reminderMap.addMarker(new MarkerOptions().position(latLng).title("My Marker").flat(false));
-                                reminderMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));   // instead of moveCamera
+                                googleMap.addMarker(new MarkerOptions().position(latLng).title("My Marker").flat(false).draggable(true));
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));   // instead of moveCamera
                             }
                         })
                         .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }  // do nothing
+                            public void onClick(DialogInterface dialog, int which) { }  // do nothing
                         })
                         .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
                 AlertDialog dialog = builder.create();
-                dialog.getWindow().setDimAmount((float).2);            // dim background by n * 100%
-                // vibrate, TODO: check disable vibration
+                dialog.getWindow().setDimAmount((float) .2);            // dim background by n * 100%
+                // vibrate, TODO: check disable vibration, and permission for sdk 23
                 vibrator.vibrate(20);
                 dialog.show();
             }
@@ -235,12 +329,63 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
 
         //TODO: calculate screen height, change dip to pixels
-        reminderMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar
+        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar
 
         // Add a marker in Sydney and move the camera
         LatLng random = new LatLng(-34, 151);
-        reminderMap.addMarker(new MarkerOptions().position(random).title("Random Marker"));
-        reminderMap.moveCamera(CameraUpdateFactory.newLatLng(random));
+        googleMap.addMarker(new MarkerOptions().position(random).title("Random Marker"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(random));
+
+        //TODO: can be used for edit screen
+//        if(ContextCompat.checkSelfPermission(WholeMapScreen.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+//            == PackageManager.PERMISSION_GRANTED){
+//            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
+//                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude(),
+//                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
+//        }
+    }
+
+    private void setUpAmap() {
+        aMap.setLocationSource(this);                   // TODO: implement methods
+        aMap.setMyLocationEnabled(true);
+        aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);          // ROTATE follows and rotates as user moves, FOLLOW only follows
+        aMap.setTrafficEnabled(true);
+        com.amap.api.maps.UiSettings uiSettings = aMap.getUiSettings();
+        uiSettings.setScaleControlsEnabled(true);
+        uiSettings.setZoomGesturesEnabled(true);
+        uiSettings.setMyLocationButtonEnabled(false);
+
+        aMap.setOnMapLongClickListener(new AMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(final com.amap.api.maps.model.LatLng latLng) {
+                // latLng is the position of the click
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);          // this needs a permission
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(WholeMapScreen.this);
+                builder.setMessage(getResources().getString(R.string.dialog_new_geo))
+                        .setPositiveButton(getResources().getString(R.string.dialog_confirm_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO: record the location and create new Reminder
+                                aMap.addMarker(new com.amap.api.maps.model.MarkerOptions().position(latLng).title("My Marker").setFlat(false).draggable(true));
+                                aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newLatLng(latLng));   // instead of moveCamera
+                                aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(latLng).zoom(15f).build()));     // zoom level: 200m
+                            }
+                        })
+                        .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) { }  // do nothing
+                        })
+                        .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
+                AlertDialog dialog = builder.create();
+                dialog.getWindow().setDimAmount((float) .2);            // dim background by n * 100%
+                // vibrate, TODO: check disable vibration, and permission for sdk 23
+                vibrator.vibrate(20);
+                dialog.show();
+
+                //TODO: add to draft list
+            }
+        });
     }
 
     @Override
@@ -250,6 +395,13 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             searchBox.populateEditText(matches.get(0));
         }
+
+        switch (requestCode){
+            case SETTINGS_REQUEST_CODE:
+                //TODO: loadPref();
+                break;
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -257,26 +409,40 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.nav_google_map_type_normal:
-                reminderMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 break;
 
             case R.id.nav_google_map_type_terrain:
-                reminderMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                 break;
 
             case R.id.nav_google_map_type_hybrid:
-                reminderMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                 break;
 
             case R.id.nav_google_map_type_satellite:
-                reminderMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                 break;
 
+            case R.id.nav_amap_map_type_normal:
+                aMap.setMapType(AMap.MAP_TYPE_NORMAL);
+                break;
+
+            case R.id.nav_amap_map_type_night:
+                aMap.setMapType(AMap.MAP_TYPE_NIGHT);
+                break;
+
+            case R.id.nav_amap_map_type_satellite:
+                aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
+                break;
+
+            case R.id.nav_amap_map_settings:
             case R.id.nav_google_map_settings:
                 Intent toSettingScreen = new Intent(WholeMapScreen.this, SettingScreen.class);
                 startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
                 break;
 
+            case R.id.nav_amap_map_feedback:        // falls through
             case R.id.nav_google_map_feedback:
                 String uriText = "mailto:peterwangtao0@hotmail.com"
                         + "?subject=" + Uri.encode("Feedback on GeoReminder")
@@ -293,13 +459,66 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                     centreToast.show();
                 }
                 break;
+
         }
 
         // close the drawer after clicking on an item
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.google_map_drawer_layout);
+        if(useGoogleMap){
+            drawer = (DrawerLayout) findViewById(R.id.google_map_drawer_layout);
+        }
+        else {
+            drawer = (DrawerLayout) findViewById(R.id.amap_map_drawer_layout);
+        }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode){
+            case COARSE_LOCATION_PERMISSION_REQUEST_CODE:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    // all good, do nothing
+                }
+                else {
+                    Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case FINE_LOCATION_PERMISSION_REQUEST_CODE:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    // all good, do nothing
+                }
+                else {
+                    Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    /**
+     * All for Amaps
+     *
+     */
+
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+
+    }
+
+    @Override
+    public void deactivate() {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+
 
     @Override
     public void onBackPressed() {
@@ -311,5 +530,37 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             return;
         }
         super.onBackPressed();
+    }
+
+    /**
+     * Standard override for AMAP
+     */
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!useGoogleMap)
+            mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(!useGoogleMap)
+            mapView.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(!useGoogleMap)
+            mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(!useGoogleMap)
+            mapView.onDestroy();
     }
 }
