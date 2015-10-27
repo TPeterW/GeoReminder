@@ -4,7 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Fade;
 import android.transition.Slide;
@@ -15,6 +14,7 @@ import com.peter.georeminder.utils.EditItemFragment;
 
 /**
  * Created by Peter on 10/8/15.
+ * Screen that loads two different fragments depending on the type of reminder
  */
 public class EditorScreen extends AppCompatActivity {
 
@@ -45,10 +45,10 @@ public class EditorScreen extends AppCompatActivity {
         EditItemFragment editItemFragment = new EditItemFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putBoolean(getResources().getString(R.string.bundle_with_map), withMap);
+        bundle.putBoolean(getString(R.string.bundle_with_map), withMap);
 
         //TODO: and other specifications
-        editItemFragment.setArguments(bundle);
+        editItemFragment.setArguments(bundle);              // pass the withMap parameter to the fragment with a bundle
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction showEditLayout = fragmentManager.beginTransaction();
         showEditLayout.add(R.id.edit_container, editItemFragment);

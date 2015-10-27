@@ -1,9 +1,13 @@
 package com.peter.georeminder.utils;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import com.crashlytics.android.Crashlytics;
 import com.parse.Parse;
+import com.peter.georeminder.AnalyticsTrackers;
+import com.peter.georeminder.R;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
@@ -11,8 +15,9 @@ import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by Peter on 10/12/15.
+ * Custom Application class
  */
-public class ParseApplication extends Application {
+public class GeoReminderApplication extends Application {
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "DMsWio2hohKMIz1dq065X82vQ";
     private static final String TWITTER_SECRET = "CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS";
@@ -28,5 +33,14 @@ public class ParseApplication extends Application {
         // Set up Twitter Environment
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig), new Crashlytics());
+
+        // Set up Google Analytics
+        AnalyticsTrackers.initialize(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        MultiDex.install(this);
+        super.attachBaseContext(base);
     }
 }

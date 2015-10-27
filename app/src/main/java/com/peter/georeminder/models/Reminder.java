@@ -3,6 +3,8 @@ package com.peter.georeminder.models;
 import android.graphics.Color;
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -10,12 +12,13 @@ import java.util.Date;
  * Created by Peter on 10/6/15.
  */
 public class Reminder {
+    private Date createDate;
     private Date startingDate;
     private Date endDate;
 
-    private Location createLocation;
-    private Location remindLocation;
-    private Location lastKnownLocation;
+    private LatLng createLocation;
+    private LatLng remindLocation;
+    private LatLng lastKnownLocation;
     private int locationAccuracy;
 
     private String title;

@@ -7,6 +7,7 @@ import com.peter.georeminder.R;
 
 /**
  * Created by Peter on 10/9/15.
+ *
  */
 public class SettingsFragment extends PreferenceFragment {
 
@@ -15,5 +16,7 @@ public class SettingsFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences);
+
+        //TODO: get Google Service Availability from SharedPreference and maybe remove the preference
     }
 }

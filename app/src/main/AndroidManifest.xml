@@ -4,22 +4,32 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission-sdk-23 android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission-sdk-23 android:name="android.permission.INTERNET" />
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission-sdk-23 android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission-sdk-23 android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission-sdk-23 android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission-sdk-23 android:name="android.permission.CAMERA" />
     <uses-permission-sdk-23 android:name="android.permission.VIBRATE" />
+    <uses-permission-sdk-23 android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name=".utils.ParseApplication"
+        android:name=".utils.GeoReminderApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -45,13 +55,22 @@
             android:name=".EditorScreen"
             android:label="@string/page_create_new_title"
             android:parentActivityName=".MainScreen"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".SettingScreen"
             android:label="@string/page_settings"
             android:parentActivityName=".MainScreen"
             android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".WholeMapScreen"
+            android:label="@string/title_activity_whole_map_screen"
+            android:parentActivityName=".MainScreen"
+            android:theme="@style/AppTheme.TransparentActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="MainScreen" />
         </activity>
 
         <meta-data
@@ -71,16 +90,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
-        <activity
-            android:name=".WholeMapScreen"
-            android:label="@string/title_activity_whole_map_screen"
-            android:parentActivityName=".MainScreen"
-            android:theme="@style/AppTheme.TransparentActionBar" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainScreen" />
-        </activity>
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="16d253c329acfc23af261d52a61969e6" />
 
         <service
             android:name=".utils.BackgroundService"
