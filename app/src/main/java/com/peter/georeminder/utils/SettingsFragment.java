@@ -21,7 +21,7 @@ public class SettingsFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.preferences);
 
         //TODO: get Google Service Availability from SharedPreference and maybe remove the preference
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         boolean googleServicesAvailable = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false);
         if(!googleServicesAvailable){
             ListPreference prefMapService = (ListPreference) findPreference("whichMap");

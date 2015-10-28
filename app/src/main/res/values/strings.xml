@@ -40,6 +40,9 @@
     <string name="nav_desc_switch">Switch to Another Account</string>
     <string name="nav_desc_manage">Manage Your Account</string>
 
+    <!--Reminder fields-->
+    <string name="rem_def_title">Untitled</string>
+
 
     <!--Bundle Keys-->
     <string name="bundle_with_map">withMap</string>
@@ -58,11 +61,12 @@
     <string name="cat_sync">Sync</string>
     <string name="cat_map">Map</string>
     <string name="pref_theme">Theme</string>
-    <string name="pref_rate">Rate this app</string>
-    <string name="pref_show_draft">Show drafts</string>
-    <string name="pref_autosync">Auto backup</string>
+    <string name="pref_rate">Rate This App</string>
+    <string name="pref_show_draft">Show Drafts</string>
+    <string name="pref_autosync">Auto Backup</string>
     <string name="pref_choose_map">Choose Map Service</string>
     <string name="pref_dialog_title">Map Service</string>
+    <string name="pref_about_me">About Me</string>
 
     <!--Color Themes-->
     <string name="theme_green">Green</string>
@@ -82,10 +86,13 @@
 
     <!--Dialog-->
     <string name="dialog_delete_title">Delete</string>
+    <string name="dialog_share_title">Share</string>
+    <string name="dialog_edit_title">Edit</string>
     <string name="dialog_pos_btn">Yes</string>
     <string name="dialog_neg_btn">Cancel</string>
     <string name="dialog_confirm_btn">OK</string>
     <string name="dialog_delete_msg">Do you want to delete this reminder?</string>
+    <string name="dialog_share_msg">Share with...</string>
     <string name="dialog_new_geo">New Geo Reminder</string>
 
     <!--Service Availability Dialog-->

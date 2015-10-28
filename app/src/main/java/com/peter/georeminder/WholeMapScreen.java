@@ -261,7 +261,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                                             myLocation.getLongitude())));
                         }
                         else {
-                            Toast.makeText(WholeMapScreen.this, "myLocation is null", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                         }
                         break;
                 }

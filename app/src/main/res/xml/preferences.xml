@@ -67,6 +67,16 @@
 
         </Preference>
 
+        <Preference
+            android:key="about"
+            android:title="@string/pref_about_me">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://tpeterw.github.io" />
+
+        </Preference>
+
     </PreferenceCategory>
 
 </PreferenceScreen>
