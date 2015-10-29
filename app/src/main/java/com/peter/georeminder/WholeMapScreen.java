@@ -34,7 +34,6 @@ import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.LocationSource.OnLocationChangedListener;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.CameraPosition;
-import com.amap.api.maps.model.CameraPositionCreator;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -262,7 +261,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                                             myLocation.getLongitude())));
                         }
                         else {
-                            Toast.makeText(WholeMapScreen.this, "myLocation is null", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                         }
                         break;
                 }

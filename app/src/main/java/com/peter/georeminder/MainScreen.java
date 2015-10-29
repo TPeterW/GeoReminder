@@ -13,16 +13,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.transition.Fade;
@@ -39,7 +40,6 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -93,6 +93,7 @@ public class MainScreen extends AppCompatActivity{
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
     private static final int EDIT_EXISTING_REMINDER_REQUEST_CODE = 0x003;
     private static final int SETTINGS_REQUEST_CODE = 0x004;
+    private static final int LOGIN_REQUEST_CODE = 0x005;
 
     // Importante
     // DataList
@@ -149,14 +150,14 @@ public class MainScreen extends AppCompatActivity{
 
         reminderList = new LinkedList<>();
         // TODO: remove these and actually get the reminders
-        reminderList.add(new Reminder());
-        reminderList.add(new Reminder());
-        reminderList.add(new Reminder());
-        reminderList.add(new Reminder());
-        reminderList.add(new Reminder());
-        reminderList.add(new Reminder());
-        reminderList.add(new Reminder());
-        reminderList.add(new Reminder());
+        reminderList.add(new Reminder(this).setTitle("Reminder 1"));
+        reminderList.add(new Reminder(this).setTitle("Reminder 2"));
+        reminderList.add(new Reminder(this).setTitle("Reminder 3"));
+        reminderList.add(new Reminder(this).setTitle("Reminder 4"));
+        reminderList.add(new Reminder(this).setTitle("Reminder 5"));
+        reminderList.add(new Reminder(this).setTitle("Reminder 6"));
+        reminderList.add(new Reminder(this).setTitle("Reminder 7"));
+        reminderList.add(new Reminder(this).setTitle("Reminder 8"));
 
 
         // Nav Drawer
@@ -254,8 +255,7 @@ public class MainScreen extends AppCompatActivity{
             }
         });
 
-        // Initialise Drawer
-
+        // initialise drawer
         // create account header
         buildHeader(false, savedInstanceState);         // drawerHeader is built in this method
 
@@ -362,31 +362,32 @@ public class MainScreen extends AppCompatActivity{
                 if(newReminder.isOpened())
                     newReminder.close(true);
 
+                // get the reminder
+                String currentTitle = adapter.getItem(position).getTitle();
+
                 // to alert the user about deleting by vibrating
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
                 // TODO: add code
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
-                builder.setTitle(getString(R.string.dialog_delete_title))
-                        .setMessage(getString(R.string.dialog_delete_msg))
-                        .setPositiveButton(getString(R.string.dialog_pos_btn), new DialogInterface.OnClickListener() {
+                builder.setTitle(currentTitle)
+                        .setItems(new String[]{getString(R.string.dialog_edit_title), getString(R.string.dialog_share_title), getString(R.string.dialog_delete_title)},
+                                new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                adapter.deleteReminder(position);
-                                if (reminderList.size() == 0) {
-                                    textNoReminder.setAlpha(1);
-                                    borderlessNewReminder.setAlpha(1);
-                                    borderlessNewReminder.setClickable(true);
+                                switch (which) {
+                                    case 0:     // edit button
+                                        Toast.makeText(MainScreen.this, "Edit", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case 1:     // share button
+                                        showShareDialog(position);
+                                        break;
+                                    case 2:     // delete button
+                                        showDeleteDialog(position);
+                                        break;
                                 }
                             }
-                        })
-                        .setNegativeButton(getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // let's do nothing
-                            }
-                        })
-                        .setIcon(ContextCompat.getDrawable(MainScreen.this, R.drawable.ic_dialog_warning));
+                        });
                 AlertDialog dialog = builder.create();
                 // vibrate, TODO: check disable vibration
                 vibrator.vibrate(20);
@@ -410,10 +411,10 @@ public class MainScreen extends AppCompatActivity{
 
                 if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuHidden()) {
                     newReminder.hideMenu(true);
-                    scrolledDistance = 0;
+                    scrolledDistance = 0;               // if menu is hidden, reset the scrolledDistance
                 } else if (scrolledDistance < -SHOW_THRESHOLD && newReminder.isMenuHidden()) {
                     newReminder.showMenu(true);
-                    scrolledDistance = 0;
+                    scrolledDistance = 0;               // ditto here
                 }
 
                 if ((!newReminder.isMenuHidden() && dy > 0) || (newReminder.isMenuHidden() && dy < 0)) {
@@ -590,6 +591,11 @@ public class MainScreen extends AppCompatActivity{
 
                 return;
 
+            case LOGIN_REQUEST_CODE:
+                loadPref();
+                //TODO: change avatar and sync all reminders
+                return;
+
             case SETTINGS_REQUEST_CODE:
                 loadPref();
                 return;
@@ -639,9 +645,18 @@ public class MainScreen extends AppCompatActivity{
                         userProfile,
                         //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
 //                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_switch)).withDescription(getResources().getString(R.string.nav_desc_switch)).withIcon(R.drawable.ic_nav_add).withIdentifier(PROFILE_SETTING),
-                        new ProfileSettingDrawerItem().withName(getString(R.string.nav_acct_manage)).withDescription(getString(R.string.nav_desc_manage)).withIcon(R.drawable.ic_nav_manage)
+                        new ProfileSettingDrawerItem().withName(getString(R.string.nav_acct_manage)).withDescription(getString(R.string.nav_desc_manage))
+                                .withIcon(R.drawable.ic_nav_manage).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
+                                startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE);
+                                return false;
+                            }
+                        })
                 )
                 .withSavedInstance(savedInstanceState)
+                .withCloseDrawerOnProfileListClick(false)
                 .build();
     }
 
@@ -660,6 +675,38 @@ public class MainScreen extends AppCompatActivity{
             startActivity(toViewWholeMap, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
         } else
             startActivity(toViewWholeMap);
+    }
+
+    private void showDeleteDialog(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.dialog_delete_title))
+                .setIcon(ContextCompat.getDrawable(MainScreen.this, R.drawable.ic_dialog_warning))
+                .setMessage(getString(R.string.dialog_delete_msg))
+                .setPositiveButton(getString(R.string.dialog_pos_btn), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.deleteReminder(position);
+                        if (reminderList.size() == 0) {
+                            textNoReminder.setAlpha(1);
+                            borderlessNewReminder.setAlpha(1);
+                            borderlessNewReminder.setClickable(true);
+                        }
+                    }
+                })
+                .setNegativeButton(getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // let's do nothing
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showShareDialog(final int position){
+        Intent shareWith = new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, "This is totally temporary").setType("text/plain");
+        startActivity(Intent.createChooser(shareWith, getString(R.string.dialog_share_msg)));
     }
 
     // Below: code for testing and debugging

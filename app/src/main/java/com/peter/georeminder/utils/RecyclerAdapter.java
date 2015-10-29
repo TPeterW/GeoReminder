@@ -54,7 +54,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
         holder.mapScreenshot.setImageResource(R.mipmap.ic_launcher);
-        holder.reminderTitle.setText("Title");
+        holder.reminderTitle.setText(getItem(position).getTitle());
         holder.reminderContent.setText("Content Content Content Content Content");
         // TODO: Change this to use information from reminderList
 
@@ -89,6 +89,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public Reminder getItem(int position){
+        return reminderList.get(position);
     }
 
     public void addReminder(int position, Reminder addedReminder){
