@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -55,6 +57,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
+import com.peter.georeminder.utils.waverefresh.WaveSwipeRefreshLayout;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -66,6 +69,7 @@ public class MainScreen extends AppCompatActivity{
 
     // ToolBar
     private FloatingActionButton seeMap;
+    private CoordinatorLayout coordinatorLayout;
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
 
@@ -83,7 +87,8 @@ public class MainScreen extends AppCompatActivity{
     // Main content (RecyclerView)
     private RecyclerView recyclerView;
     private RecyclerAdapter adapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
+//    private SwipeRefreshLayout swipeRefreshLayout;
+    private WaveSwipeRefreshLayout swipeRefreshLayout;
 
     // Empty list
     private TextView textNoReminder;
@@ -176,8 +181,13 @@ public class MainScreen extends AppCompatActivity{
             getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
 
         // The main layout ------ RecyclerView
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);        // color scheme
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coor_layout);
+        swipeRefreshLayout = (WaveSwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+        swipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);        // color scheme
+        swipeRefreshLayout.setMaxDropHeight(300);           // TODO: figure out why this doesn't work
+        swipeRefreshLayout.setWaveColor(Color.parseColor("#8bc34a"));
+        swipeRefreshLayout.setShadowRadius(12);
+        swipeRefreshLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.colorTransparent));
         recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
 
@@ -430,12 +440,13 @@ public class MainScreen extends AppCompatActivity{
 
         // Set up Swipe to Refresh
         swipeRefreshLayout.setEnabled(false);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onRefresh() {
-                // TODO: update from server and actually refresh
-
-                swipeRefreshLayout.setRefreshing(true);
+            public void onRefresh() {           // this is a very dirty workaround for the build tool support problem
+                appBarLayout.setExpanded(false, true);
+                recyclerView.setNestedScrollingEnabled(false);
+                setTitle(getString(R.string.title_syncing));
+                toolbar.setTitle(getString(R.string.title_syncing));
             }
         });
 
@@ -615,6 +626,10 @@ public class MainScreen extends AppCompatActivity{
                 else {
                     if(swipeRefreshLayout.isRefreshing()){
                         swipeRefreshLayout.setRefreshing(false);
+                        recyclerView.setNestedScrollingEnabled(true);
+                        appBarLayout.setExpanded(true, true);
+                        setTitle(getString(R.string.app_name));     // change title back
+                        toolbar.setTitle(getString(R.string.app_name));
                         return true;
                     }
                     else {

@@ -110,7 +110,6 @@
         <service
             android:name=".utils.BackgroundService"
             android:icon="@mipmap/ic_launcher" />
-
     </application>
 
 </manifest>

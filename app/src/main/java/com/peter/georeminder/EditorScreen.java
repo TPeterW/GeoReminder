@@ -33,7 +33,7 @@ public class EditorScreen extends AppCompatActivity {
 
     private void initEvent() {
         if(Build.VERSION.SDK_INT >= 21) {
-            getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+            getWindow().setEnterTransition(new Slide(Gravity.END));
             getWindow().setReturnTransition(new Fade());
         }
 

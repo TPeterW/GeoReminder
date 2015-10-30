@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">GeoReminder</string>
 
+    <!--Page Titles-->
+    <string name="title_syncing">Syncing</string>
+
     <!--Action Bar-->
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
