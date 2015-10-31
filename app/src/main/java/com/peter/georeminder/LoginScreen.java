@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.transition.Slide;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.KeyEvent;
@@ -33,6 +35,8 @@ import android.widget.Toast;
 
 import com.dd.processbutton.iml.ActionProcessButton;
 import com.peter.georeminder.utils.ProgressGenerator;
+import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
+import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +46,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cursor>, ProgressGenerator.OnCompleteListener {
+public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cursor>, ProgressGenerator.OnCompleteListener {
 
     // TODO: log in through google play and other social media
 
@@ -57,6 +61,9 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
     // login
     private boolean isSigningIn;
 
+    // Swipe Back
+    private SwipeBackLayout swipeBackLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +76,15 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
     }
 
     private void initView() {
+        if(Build.VERSION.SDK_INT >= 21){
+            getWindow().setEnterTransition(new Slide(GravityCompat.END));
+            getWindow().setReturnTransition(new Slide(GravityCompat.END));
+            getWindow().setExitTransition(new Slide(GravityCompat.END));
+        }
+
+        swipeBackLayout = getSwipeBackLayout();
+        swipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
+
         setupActionBar();
 
         // Set up the login form.
@@ -101,6 +117,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
                 } else {                      // not currently signing in
                     attemptLogin();
                 }
+                //TODO: setProgress(-1)显示Error
             }
         });
 

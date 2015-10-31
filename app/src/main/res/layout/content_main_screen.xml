@@ -33,15 +33,23 @@
 
     </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
 
+    <ImageView
+        android:id="@+id/image_no_reminder"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:src="@drawable/empty_list"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"/>
+
     <TextView
         android:id="@+id/text_no_reminder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/main_no_reminder"
         android:textSize="26sp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"/>
+        android:layout_below="@id/image_no_reminder"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/borderless_btn_new_reminder"

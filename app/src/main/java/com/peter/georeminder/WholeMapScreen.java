@@ -102,6 +102,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
         initTransitions();
 
+        initNavigationBar();
+
         initDrawer();
 
         initMap(savedInstanceState);
@@ -113,6 +115,12 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         if(Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(new Slide(Gravity.END));
             getWindow().setReturnTransition(new Slide(Gravity.START));
+        }
+    }
+
+    private void initNavigationBar() {
+        if(Build.VERSION.SDK_INT >= 21){
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }
 
@@ -325,7 +333,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                         })
                         .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) { }  // do nothing
+                            public void onClick(DialogInterface dialog, int which) {
+                            }  // do nothing
                         })
                         .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
                 AlertDialog dialog = builder.create();
@@ -335,9 +344,6 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                 dialog.show();
             }
         });
-
-
-
 
 
         //TODO: calculate screen height, change dip to pixels
@@ -457,8 +463,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             case R.id.nav_amap_map_feedback:        // falls through
             case R.id.nav_google_map_feedback:
                 String uriText = "mailto:peterwangtao0@hotmail.com"
-                        + "?subject=" + Uri.encode(getString(R.string.feedback_content))
-                        + "&body=" + Uri.encode(getString(R.string.feedback_content));
+                        + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
+                        + "&body=" + Uri.encode(getString(R.string.feedback_content_map));
                 Uri uri = Uri.parse(uriText);
                 Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
                 sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up

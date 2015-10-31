@@ -141,6 +141,7 @@
     <!--Intent-->
     <string name="feedback_subject">Feedback on GeoReminder</string>
     <string name="feedback_content">Hi Peter,\n\nI would like to say a few words about GeoReminder: \n</string>
+    <string name="feedback_content_map">Hi Peter,\n\nI would like to say a few words about the map section of GeoReminder: \n</string>
     <string name="send_feedback">Send Feedback&#8230;</string>
 
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words

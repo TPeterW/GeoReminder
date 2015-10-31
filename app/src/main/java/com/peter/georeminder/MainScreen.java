@@ -25,7 +25,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.transition.Fade;
@@ -37,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +64,7 @@ import java.util.List;
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 
 public class MainScreen extends AppCompatActivity{
+    //TODO: put Build.VERSION.SDK_INT into shared preference so that it wouldn't have to check every time
 
     // Analytics Tracker
     AnalyticsTrackers analyticsTrackers;
@@ -92,6 +93,7 @@ public class MainScreen extends AppCompatActivity{
     private WaveSwipeRefreshLayout swipeRefreshLayout;
 
     // Empty list
+    private ImageView imageNoReminder;
     private TextView textNoReminder;
     private Button borderlessNewReminder;
 
@@ -125,7 +127,7 @@ public class MainScreen extends AppCompatActivity{
     // Record the last time "Back" key was pressed, to implement "double-click-exit"
     private long firstBackPress;
 
-    private static boolean isDark = false;
+    private static boolean isDark = false;          // the colour of the StatusBar
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,7 +194,7 @@ public class MainScreen extends AppCompatActivity{
         swipeRefreshLayout = (WaveSwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);        // color scheme
         swipeRefreshLayout.setMaxDropHeight(300);           // TODO: figure out why this doesn't work
-        swipeRefreshLayout.setWaveColor(Color.parseColor("#8bc34a"));
+        swipeRefreshLayout.setWaveColor(Color.parseColor("#8bc34a"));       // that's colorPrimary
         swipeRefreshLayout.setShadowRadius(7);
         swipeRefreshLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.colorTransparent));
 
@@ -220,6 +222,7 @@ public class MainScreen extends AppCompatActivity{
         }, 300);
 
         // Empty list
+        imageNoReminder = (ImageView) findViewById(R.id.image_no_reminder);
         textNoReminder = (TextView) findViewById(R.id.text_no_reminder);
         borderlessNewReminder = (Button) findViewById(R.id.borderless_btn_new_reminder);
 
@@ -524,8 +527,9 @@ public class MainScreen extends AppCompatActivity{
             }
         });
         if(reminderList.size() != 0) {
-            textNoReminder.setAlpha(0);
-            borderlessNewReminder.setAlpha(0);
+            imageNoReminder.setVisibility(View.INVISIBLE);
+            textNoReminder.setVisibility(View.INVISIBLE);
+            borderlessNewReminder.setVisibility(View.INVISIBLE);
             borderlessNewReminder.setClickable(false);
         }
     }
@@ -674,7 +678,14 @@ public class MainScreen extends AppCompatActivity{
                             @Override
                             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                                 Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
-                                startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE);
+                                startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        drawer.closeDrawer();
+                                    }
+                                }, 200);        // wait for the activity to start then close the drawer
                                 return false;
                             }
                         })
@@ -711,8 +722,9 @@ public class MainScreen extends AppCompatActivity{
                     public void onClick(DialogInterface dialog, int which) {
                         adapter.deleteReminder(position);
                         if (reminderList.size() == 0) {
-                            textNoReminder.setAlpha(1);
-                            borderlessNewReminder.setAlpha(1);
+                            imageNoReminder.setVisibility(View.VISIBLE);
+                            textNoReminder.setVisibility(View.VISIBLE);
+                            borderlessNewReminder.setVisibility(View.VISIBLE);
                             borderlessNewReminder.setClickable(true);
                         }
                     }

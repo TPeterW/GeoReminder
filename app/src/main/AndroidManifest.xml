@@ -72,7 +72,7 @@
             android:name=".WholeMapScreen"
             android:label="@string/title_activity_whole_map_screen"
             android:parentActivityName=".MainScreen"
-            android:theme="@style/AppTheme.TransparentActionBar" >
+            android:theme="@style/AppTheme.TransparentStatusBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainScreen" />
