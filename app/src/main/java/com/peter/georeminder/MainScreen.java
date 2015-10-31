@@ -57,10 +57,11 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseObject;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.RecyclerAdapter;
-import com.peter.georeminder.utils.waverefresh.WaveSwipeRefreshLayout;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 
 public class MainScreen extends AppCompatActivity{
 
@@ -177,17 +178,24 @@ public class MainScreen extends AppCompatActivity{
 
     private void initView(Bundle savedInstanceState) {
         // initialise StatusBar color
-        if(Build.VERSION.SDK_INT >= 21)
+        if(Build.VERSION.SDK_INT >= 21){
             getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
+            //TODO: decide whether to change the navigation bar color or not
+//            getWindow().setNavigationBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
+        }
 
         // The main layout ------ RecyclerView
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coor_layout);
+
+//        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
+//        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
         swipeRefreshLayout = (WaveSwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);        // color scheme
         swipeRefreshLayout.setMaxDropHeight(300);           // TODO: figure out why this doesn't work
         swipeRefreshLayout.setWaveColor(Color.parseColor("#8bc34a"));
-        swipeRefreshLayout.setShadowRadius(12);
+        swipeRefreshLayout.setShadowRadius(7);
         swipeRefreshLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.colorTransparent));
+
         recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
 
@@ -317,13 +325,13 @@ public class MainScreen extends AppCompatActivity{
                                 break;
                             case FEEDBACK_IDENTIFIER:
                                 String uriText = "mailto:peterwangtao0@hotmail.com"
-                                                + "?subject=" + Uri.encode("Feedback on GeoReminder")
-                                                + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about GeoReminder: \n");
+                                                + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
+                                                + "&body=" + Uri.encode(getString(R.string.feedback_content));
                                 Uri emailUri = Uri.parse(uriText);
                                 Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
                                 sendFeedbackEmail.setData(emailUri);                                             // do not use setType, it messes things up
                                 try {
-                                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                                    startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
                                 }
                                 catch (ActivityNotFoundException e){
                                     Snackbar.make(newReminder, getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
@@ -627,6 +635,7 @@ public class MainScreen extends AppCompatActivity{
                     if(swipeRefreshLayout.isRefreshing()){
                         swipeRefreshLayout.setRefreshing(false);
                         recyclerView.setNestedScrollingEnabled(true);
+                        recyclerView.setScrollY(0);
                         appBarLayout.setExpanded(true, true);
                         setTitle(getString(R.string.app_name));     // change title back
                         toolbar.setTitle(getString(R.string.app_name));

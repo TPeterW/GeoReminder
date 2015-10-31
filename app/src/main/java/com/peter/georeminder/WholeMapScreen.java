@@ -15,6 +15,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -45,6 +46,18 @@ import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
+
+//         ___           ___           ___
+//        /\  \         /\  \         /\  \
+//       |::\  \       /::\  \       /::\  \
+//       |:|:\  \     /:/\:\  \     /:/\:\__\
+//     __|:|\:\  \   /:/ /::\  \   /:/ /:/  /
+//    /::::|_\:\__\ /:/_/:/\:\__\ /:/_/:/  /
+//    \:\~~\  \/__/ \:\/:/  \/__/ \:\/:/  /
+//     \:\  \        \::/__/       \::/__/
+//      \:\  \        \:\  \        \:\  \
+//       \:\__\        \:\__\        \:\__\
+//        \/__/         \/__/         \/__/
 
 public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback,
         NavigationView.OnNavigationItemSelectedListener, LocationSource, OnLocationChangedListener{
@@ -444,13 +457,13 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             case R.id.nav_amap_map_feedback:        // falls through
             case R.id.nav_google_map_feedback:
                 String uriText = "mailto:peterwangtao0@hotmail.com"
-                        + "?subject=" + Uri.encode("Feedback on GeoReminder")
-                        + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about the map in GeoReminder: \n");
+                        + "?subject=" + Uri.encode(getString(R.string.feedback_content))
+                        + "&body=" + Uri.encode(getString(R.string.feedback_content));
                 Uri uri = Uri.parse(uriText);
                 Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
                 sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
                 try {
-                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                    startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
                 }
                 catch (ActivityNotFoundException e){
                     Toast centreToast =  Toast.makeText(WholeMapScreen.this, getResources().getString(R.string.activity_not_fonud), Toast.LENGTH_SHORT);
@@ -473,7 +486,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case COARSE_LOCATION_PERMISSION_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){

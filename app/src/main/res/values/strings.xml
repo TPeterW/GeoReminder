@@ -56,6 +56,8 @@
     <string name="empty_create_new">Create a new reminder</string>
     <string name="login">Log In</string>
     <string name="logout">Log Out</string>
+    <string name="cancel">Cancel</string>
+    <string name="register">Register</string>
 
     <!--Settings-->
     <string name="cat_general">General</string>
@@ -66,7 +68,7 @@
     <string name="pref_theme">Theme</string>
     <string name="pref_rate">Rate This App</string>
     <string name="pref_show_draft">Show Drafts</string>
-    <string name="pref_autosync">Auto Backup</string>
+    <string name="pref_auto_sync">Auto Backup</string>
     <string name="pref_choose_map">Choose Map Service</string>
     <string name="pref_dialog_title">Map Service</string>
     <string name="pref_about_me">About Me</string>
@@ -95,7 +97,7 @@
     <string name="dialog_neg_btn">Cancel</string>
     <string name="dialog_confirm_btn">OK</string>
     <string name="dialog_delete_msg">Do you want to delete this reminder?</string>
-    <string name="dialog_share_msg">Share with...</string>
+    <string name="dialog_share_msg">Share with&#8230;</string>
     <string name="dialog_new_geo">New Geo Reminder</string>
 
     <!--Service Availability Dialog-->
@@ -135,6 +137,11 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+
+    <!--Intent-->
+    <string name="feedback_subject">Feedback on GeoReminder</string>
+    <string name="feedback_content">Hi Peter,\n\nI would like to say a few words about GeoReminder: \n</string>
+    <string name="send_feedback">Send Feedback&#8230;</string>
 
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words

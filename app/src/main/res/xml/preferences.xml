@@ -48,7 +48,7 @@
 
         <SwitchPreference
             android:key="auto_sync"
-            android:title="@string/pref_autosync"
+            android:title="@string/pref_auto_sync"
             android:defaultValue="true"/>
 
     </PreferenceCategory>
