@@ -97,6 +97,9 @@ public class MainScreen extends AppCompatActivity{
     private TextView textNoReminder;
     private Button borderlessNewReminder;
 
+    // Preferences
+    private boolean useAnimation;
+
     private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
     private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
     private static final int EDIT_EXISTING_REMINDER_REQUEST_CODE = 0x003;
@@ -146,10 +149,11 @@ public class MainScreen extends AppCompatActivity{
         checkServices();
 
         loadPref();             //using SharedPreferences
+
+        Log.i("MainScreen", "Create");  //TODO: delete
     }
 
     private void initData() {
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         // TODO: get data from shared preferences
 
@@ -536,7 +540,9 @@ public class MainScreen extends AppCompatActivity{
 
     private void loadPref() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        //TODO: remember to check if the user wants to use amap instead of gms
+
+        useAnimation = sharedPreferences.getBoolean("showAnim", true);
+        // TODO: apply fancy animations here
     }
 
     private void checkServices() {
@@ -772,5 +778,39 @@ public class MainScreen extends AppCompatActivity{
         testObject.put("Location", "NULL");
         Log.i("Cloud", "Sent Parse TestObject");
         testObject.saveInBackground();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i("MainScreen", "Stop");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.i("MainScreen", "Destroy");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.shared_pref_anim_pref_enabled), true)
+                .apply();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        Log.i("MainScreen", "Start");
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.i("MainScreen", "Restart");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i("MainScreen", "Pause");
+        super.onPause();
     }
 }

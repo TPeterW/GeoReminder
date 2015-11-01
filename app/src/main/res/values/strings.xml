@@ -66,12 +66,14 @@
     <string name="cat_sync">Sync</string>
     <string name="cat_map">Map</string>
     <string name="pref_theme">Theme</string>
+    <string name="pref_show_anim">Animation</string>
     <string name="pref_rate">Rate This App</string>
     <string name="pref_show_draft">Show Drafts</string>
     <string name="pref_auto_sync">Auto Backup</string>
     <string name="pref_choose_map">Choose Map Service</string>
-    <string name="pref_dialog_title">Map Service</string>
+    <string name="pref_map_dialog_title">Map Service</string>
     <string name="pref_about_me">About Me</string>
+    <string name="pref_anim_dialog_msg">Changes will take effect after next launch</string>
 
     <!--Color Themes-->
     <string name="theme_green">Green</string>
@@ -114,6 +116,7 @@
 
     <!--SharedPreferences-->
     <string name="shared_pref_google_avail">GoogleMapAvailable</string>
+    <string name="shared_pref_anim_pref_enabled">AnimPrefAnabled</string>
 
     <!--Overflow Menu-->
     <string name="map_normal">Normal</string>

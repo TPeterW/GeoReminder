@@ -2,7 +2,10 @@ package com.peter.georeminder.utils;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.multidex.MultiDex;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.parse.Parse;
@@ -42,5 +45,11 @@ public class GeoReminderApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+    }
+
+    @Override
+    public void onTerminate() {
+        Log.i("Application", "Terminate");
+        super.onTerminate();
     }
 }

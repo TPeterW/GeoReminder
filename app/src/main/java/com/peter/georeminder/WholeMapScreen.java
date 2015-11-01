@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -85,13 +87,20 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         //TODO: check google service availability and decide which map to use
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         // if google is available and user chooses to use google, which is default btw
         useGoogleMap = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false)
                 && sharedPreferences.getString("whichMap", "0").equals("0");        // "0" is google map
+
+        if(useGoogleMap){
+            setTheme(R.style.AppTheme_TranslucentWindow);
+        }
+        else {                  // use AMAP
+            setTheme(R.style.AppTheme_TranslucentStatusBar);
+        }
+
+        super.onCreate(savedInstanceState);
 
         if(useGoogleMap){
             setContentView(R.layout.activity_google_map_screen);
@@ -119,8 +128,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initNavigationBar() {
-        if(Build.VERSION.SDK_INT >= 21){
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        if(useGoogleMap && Build.VERSION.SDK_INT >= 21){
+
         }
     }
 
@@ -347,9 +356,10 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
 
         //TODO: calculate screen height, change dip to pixels
-        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar
+        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, getNavigationBarHeight(this, Configuration.ORIENTATION_PORTRAIT));           // compass not to be hidden by search bar
 
         // Add a marker in Sydney and move the camera
+        // TODO: temp
         LatLng random = new LatLng(-34, 151);
         googleMap.addMarker(new MarkerOptions().position(random).title("Random Marker"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(random));
@@ -537,6 +547,17 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
 
+    private int getNavigationBarHeight(Context context, int orientation) {
+        Resources resources = context.getResources();
+
+        int id = resources.getIdentifier(
+                orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape",
+                "dimen", "android");
+        if (id > 0) {
+            return resources.getDimensionPixelSize(id);
+        }
+        return 0;
+    }
 
     @Override
     public void onBackPressed() {

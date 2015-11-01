@@ -13,6 +13,11 @@
             android:entryValues="@array/color_theme_value"
             android:defaultValue="0"/>
 
+        <CheckBoxPreference
+            android:key="showAnim"
+            android:title="@string/pref_show_anim"
+            android:defaultValue="true" />
+
     </PreferenceCategory>
 
     <!--TODO: remove preference if Google isn't available-->
@@ -23,7 +28,7 @@
         <ListPreference
             android:key="whichMap"
             android:title="@string/pref_choose_map"
-            android:dialogTitle="@string/pref_dialog_title"
+            android:dialogTitle="@string/pref_map_dialog_title"
             android:entries="@array/map_service_entry"
             android:entryValues="@array/map_service_value"
             android:defaultValue="0"

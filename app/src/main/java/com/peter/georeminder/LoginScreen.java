@@ -31,8 +31,11 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.dd.processbutton.iml.ActionProcessButton;
 import com.peter.georeminder.utils.ProgressGenerator;
 import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
@@ -53,6 +56,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     private static final int READ_CONTACTS_REQUEST_CODE = 0x001;
 
     // UI references.
+    private LinearLayout emailLoginForm;
     private AutoCompleteTextView inputEmail;
     private EditText inputPasswd;
     private ActionProcessButton btnLogIn;
@@ -88,6 +92,8 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         setupActionBar();
 
         // Set up the login form.
+        emailLoginForm = (LinearLayout) findViewById(R.id.email_login_form);
+
         inputEmail = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
         inputPasswd = (EditText) findViewById(R.id.password);
@@ -206,11 +212,17 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             inputPasswd.setError(getString(R.string.error_invalid_password));
             cancel = true;
             inputPasswd.requestFocus();
+            YoYo.with(Techniques.Shake)
+                    .duration(100)
+                    .playOn(emailLoginForm);
         }
         else if (!isPasswordValid(password)){
             inputPasswd.setError(getString(R.string.error_invalid_password));
             cancel = true;
             inputPasswd.requestFocus();
+            YoYo.with(Techniques.Shake)
+                    .duration(100)
+                    .playOn(emailLoginForm);
         }
 
         // Check for a valid email address.
