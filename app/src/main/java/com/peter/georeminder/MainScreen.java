@@ -140,6 +140,9 @@ public class MainScreen extends AppCompatActivity{
         // TODO: delete when implementing actual back functions
 //        sendParseTestObject();
 
+        // TODO: check if the intro page has been shown before
+        showIntro(true);
+
         initData();             // load from sharedPreferences list of reminders
 
         initView(savedInstanceState);       // Bundle for creating drawer header
@@ -151,6 +154,14 @@ public class MainScreen extends AppCompatActivity{
         loadPref();             //using SharedPreferences
 
         Log.i("MainScreen", "Create");  //TODO: delete
+    }
+
+    private void showIntro(boolean toShow) {
+        //TODO: this is temporary
+        if(toShow){
+            Intent toIntroScreen = new Intent(MainScreen.this, IntroScreen.class);
+            startActivity(toIntroScreen);
+        }
     }
 
     private void initData() {
@@ -676,7 +687,7 @@ public class MainScreen extends AppCompatActivity{
                 .withHeaderBackground(R.color.colorPrimary)
                 .withCompactStyle(compact)
                 .addProfiles(
-                        userProfile,
+                        userProfile,        // TODO: figure out the click event for profile image
                         //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
 //                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_switch)).withDescription(getResources().getString(R.string.nav_desc_switch)).withIcon(R.drawable.ic_nav_add).withIdentifier(PROFILE_SETTING),
                         new ProfileSettingDrawerItem().withName(getString(R.string.nav_acct_manage)).withDescription(getString(R.string.nav_desc_manage))
@@ -696,6 +707,14 @@ public class MainScreen extends AppCompatActivity{
                             }
                         })
                 )
+//                .withOnAccountHeaderSelectionViewClickListener(new AccountHeader.OnAccountHeaderSelectionViewClickListener() {
+//                    // this is on little triangle click listener
+//                    @Override
+//                    public boolean onClick(View view, IProfile profile) {
+//
+//                        return false;
+//                    }
+//                })
                 .withSavedInstance(savedInstanceState)
                 .withCloseDrawerOnProfileListClick(false)
                 .build();

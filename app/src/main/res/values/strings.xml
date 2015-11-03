@@ -58,6 +58,8 @@
     <string name="logout">Log Out</string>
     <string name="cancel">Cancel</string>
     <string name="register">Register</string>
+    <string name="skip">Skip</string>
+    <string name="proceed">Proceed</string>
 
     <!--Settings-->
     <string name="cat_general">General</string>
