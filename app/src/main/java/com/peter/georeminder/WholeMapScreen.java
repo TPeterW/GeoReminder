@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -15,6 +17,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -34,7 +37,6 @@ import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.LocationSource.OnLocationChangedListener;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.CameraPosition;
-import com.amap.api.maps.model.CameraPositionCreator;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -46,6 +48,18 @@ import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
+
+//         ___           ___           ___
+//        /\  \         /\  \         /\  \
+//       |::\  \       /::\  \       /::\  \
+//       |:|:\  \     /:/\:\  \     /:/\:\__\
+//     __|:|\:\  \   /:/ /::\  \   /:/ /:/  /
+//    /::::|_\:\__\ /:/_/:/\:\__\ /:/_/:/  /
+//    \:\~~\  \/__/ \:\/:/  \/__/ \:\/:/  /
+//     \:\  \        \::/__/       \::/__/
+//      \:\  \        \:\  \        \:\  \
+//       \:\__\        \:\__\        \:\__\
+//        \/__/         \/__/         \/__/
 
 public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback,
         NavigationView.OnNavigationItemSelectedListener, LocationSource, OnLocationChangedListener{
@@ -73,13 +87,20 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         //TODO: check google service availability and decide which map to use
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         // if google is available and user chooses to use google, which is default btw
         useGoogleMap = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false)
                 && sharedPreferences.getString("whichMap", "0").equals("0");        // "0" is google map
+
+        if(useGoogleMap){
+            setTheme(R.style.AppTheme_TranslucentWindow);
+        }
+        else {                  // use AMAP
+            setTheme(R.style.AppTheme_TranslucentStatusBar);
+        }
+
+        super.onCreate(savedInstanceState);
 
         if(useGoogleMap){
             setContentView(R.layout.activity_google_map_screen);
@@ -89,6 +110,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         }
 
         initTransitions();
+
+        initNavigationBar();
 
         initDrawer();
 
@@ -101,6 +124,12 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         if(Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(new Slide(Gravity.END));
             getWindow().setReturnTransition(new Slide(Gravity.START));
+        }
+    }
+
+    private void initNavigationBar() {
+        if(useGoogleMap && Build.VERSION.SDK_INT >= 21){
+
         }
     }
 
@@ -262,7 +291,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                                             myLocation.getLongitude())));
                         }
                         else {
-                            Toast.makeText(WholeMapScreen.this, "myLocation is null", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                         }
                         break;
                 }
@@ -313,7 +342,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                         })
                         .setNegativeButton(getResources().getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) { }  // do nothing
+                            public void onClick(DialogInterface dialog, int which) {
+                            }  // do nothing
                         })
                         .setIcon(ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_nav_geo));        // TODO: might want to change icon
                 AlertDialog dialog = builder.create();
@@ -325,13 +355,11 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         });
 
 
-
-
-
         //TODO: calculate screen height, change dip to pixels
-        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, 0);           // compass not to be hidden by search bar
+        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, getNavigationBarHeight(this, Configuration.ORIENTATION_PORTRAIT));           // compass not to be hidden by search bar
 
         // Add a marker in Sydney and move the camera
+        // TODO: temp
         LatLng random = new LatLng(-34, 151);
         googleMap.addMarker(new MarkerOptions().position(random).title("Random Marker"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(random));
@@ -445,13 +473,13 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             case R.id.nav_amap_map_feedback:        // falls through
             case R.id.nav_google_map_feedback:
                 String uriText = "mailto:peterwangtao0@hotmail.com"
-                        + "?subject=" + Uri.encode("Feedback on GeoReminder")
-                        + "&body=" + Uri.encode("Hi Peter,\n\nI would like to say a few words about the map in GeoReminder: \n");
+                        + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
+                        + "&body=" + Uri.encode(getString(R.string.feedback_content_map));
                 Uri uri = Uri.parse(uriText);
                 Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
                 sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
                 try {
-                    startActivity(Intent.createChooser(sendFeedbackEmail, "Send Feedback..."));
+                    startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
                 }
                 catch (ActivityNotFoundException e){
                     Toast centreToast =  Toast.makeText(WholeMapScreen.this, getResources().getString(R.string.activity_not_fonud), Toast.LENGTH_SHORT);
@@ -474,7 +502,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case COARSE_LOCATION_PERMISSION_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -519,6 +547,17 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
 
+    private int getNavigationBarHeight(Context context, int orientation) {
+        Resources resources = context.getResources();
+
+        int id = resources.getIdentifier(
+                orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape",
+                "dimen", "android");
+        if (id > 0) {
+            return resources.getDimensionPixelSize(id);
+        }
+        return 0;
+    }
 
     @Override
     public void onBackPressed() {

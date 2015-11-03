@@ -9,6 +9,21 @@ import com.peter.georeminder.utils.SettingsFragment;
  * Created by Peter on 10/9/15.
  * Simple settings page that loads the SettingsFragment
  */
+
+//        ."".    ."",
+//        |  |   /  /
+//        |  |  /  /
+//        |  | /  /
+//        |  |/  ;-._
+//        }  ` _/  / ;
+//        |  /` ) /  /
+//        | /  /_/\_/\
+//        |/  /      |
+//        (  ' \ '-  |
+//        \    `.  /
+//        |      |
+//        |      |
+
 public class SettingScreen extends AppCompatActivity{
 
     @Override
@@ -18,5 +33,7 @@ public class SettingScreen extends AppCompatActivity{
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+
+
     }
 }

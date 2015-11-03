@@ -14,6 +14,10 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Run at startup -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- For AutoComplete -->
+    <uses-permission android:name="android.permission.READ_PROFILE" /> <!-- TODO: This could be a problem -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -27,6 +31,10 @@
     <uses-permission-sdk-23 android:name="android.permission.CAMERA" />
     <uses-permission-sdk-23 android:name="android.permission.VIBRATE" />
     <uses-permission-sdk-23 android:name="android.permission.WAKE_LOCK" />
+    <uses-permission-sdk-23 android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission-sdk-23 android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission-sdk-23 android:name="android.permission.READ_PROFILE" />
+    <uses-permission-sdk-23 android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:name=".utils.GeoReminderApplication"
@@ -67,10 +75,18 @@
             android:name=".WholeMapScreen"
             android:label="@string/title_activity_whole_map_screen"
             android:parentActivityName=".MainScreen"
-            android:theme="@style/AppTheme.TransparentActionBar" >
+            android:theme="@style/AppTheme.TranslucentWindow" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainScreen" />
+        </activity>
+        <activity
+            android:name=".LoginScreen"
+            android:label="@string/title_activity_login_screen"
+            android:parentActivityName=".MainScreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.peter.georeminder.MainScreen" />
         </activity>
 
         <meta-data

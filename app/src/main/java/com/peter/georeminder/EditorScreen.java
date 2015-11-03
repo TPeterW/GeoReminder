@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Fade;
 import android.transition.Slide;
@@ -33,8 +34,9 @@ public class EditorScreen extends AppCompatActivity {
 
     private void initEvent() {
         if(Build.VERSION.SDK_INT >= 21) {
-            getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
-            getWindow().setReturnTransition(new Fade());
+            getWindow().setEnterTransition(new Slide(GravityCompat.END));
+            getWindow().setReturnTransition(new Slide(GravityCompat.END));
+            getWindow().setExitTransition(new Slide(GravityCompat.END));
         }
 
         getSpecifications();

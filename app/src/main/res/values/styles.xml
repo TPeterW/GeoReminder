@@ -7,16 +7,24 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        
+        <item name="android:fontFamily">sans-serif-thin</item>
     </style>
-    <style name="AppTheme.NoActionBar">
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-    <style name="AppTheme.TransparentActionBar" parent="AppTheme.NoActionBar">
+
+    <style name="AppTheme.TranslucentStatusBar" parent="AppTheme.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="AppTheme.TranslucentWindow" parent="AppTheme.TranslucentStatusBar">
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <!--CardView Ripple Effect-->
@@ -60,6 +68,13 @@
     <style name="TransparentActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid">
         <item name="android:background">@color/colorTransparent</item>
         <item name="background">@null</item>
+    </style>
+
+    <style name="SwipeBackLayout">
+        <item name="edge_size">50dip</item>
+        <item name="shadow_left">@drawable/shadow_left</item>
+        <item name="shadow_right">@drawable/shadow_right</item>
+        <item name="shadow_bottom">@drawable/shadow_bottom</item>
     </style>
     
 </resources>
