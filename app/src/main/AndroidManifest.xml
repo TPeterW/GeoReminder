@@ -14,9 +14,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />        <!--Run at startup-->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />                  <!--For AutoComplete-->
-    <uses-permission android:name="android.permission.READ_PROFILE" />                  <!--TODO: This could be a problem-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Run at startup -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- For AutoComplete -->
+    <uses-permission android:name="android.permission.READ_PROFILE" /> <!-- TODO: This could be a problem -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
