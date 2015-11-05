@@ -1,10 +1,10 @@
-package com.peter.georeminder.utils;
+package com.peter.georeminder.utils.intro;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.peter.georeminder.utils.fabmenu.ColorFragment;
+import com.peter.georeminder.utils.intro.ColorFragment;
 
 import java.util.Random;
 

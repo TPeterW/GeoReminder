@@ -2,11 +2,12 @@ package com.peter.georeminder;
 
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 
 import com.ToxicBakery.viewpager.transforms.CubeOutTransformer;
-import com.peter.georeminder.utils.IntroViewPagerAdapter;
+import com.peter.georeminder.utils.intro.IntroViewPagerAdapter;
 import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
 import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
 
@@ -78,5 +79,14 @@ public class IntroScreen extends SwipeBackActivity {
                 swipeBackLayout.scrollToFinishActivity();
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch(keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                return true;                // you can't exit by pressing back key
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

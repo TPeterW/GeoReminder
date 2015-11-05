@@ -1,4 +1,4 @@
-package com.peter.georeminder.utils.fabmenu;
+package com.peter.georeminder.utils.intro;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

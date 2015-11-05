@@ -1,4 +1,4 @@
-package com.peter.georeminder.utils;
+package com.peter.georeminder.utils.login;
 
 
 //        ("`-''-/").___..--''"`-._
