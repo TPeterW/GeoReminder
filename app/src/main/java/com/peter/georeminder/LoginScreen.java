@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
 import android.content.CursorLoader;
@@ -26,7 +25,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -37,7 +35,7 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.dd.processbutton.iml.ActionProcessButton;
-import com.peter.georeminder.utils.ProgressGenerator;
+import com.peter.georeminder.utils.login.ProgressGenerator;
 import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
 import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
 
@@ -63,7 +61,8 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     private Button btnRegister;
 
     // login
-    private boolean isSigningIn;
+    private boolean isSigningIn;                // user is signing in, button animation on
+    private boolean isRegistering;              // user chooses to register
 
     // Swipe Back
     private SwipeBackLayout swipeBackLayout;
@@ -130,7 +129,16 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         btnRegister.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(LoginScreen.this, "Temp: go register", Toast.LENGTH_SHORT).show();
+                if(!isSigningIn){
+                    if(!isRegistering){             // user chooses to sign in
+                        btnRegister.setText(getString(R.string.login));
+                        btnLogIn.setText(getString(R.string.register));
+                    } else {                        // user chooses to register
+                        btnRegister.setText(getString(R.string.register));
+                        btnLogIn.setText(getString(R.string.login));
+                    }
+                }
+                // else nothing
             }
         });
     }
@@ -215,8 +223,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             YoYo.with(Techniques.Shake)
                     .duration(100)
                     .playOn(emailLoginForm);
-        }
-        else if (!isPasswordValid(password)){
+        } else if (!isPasswordValid(password)){
             inputPasswd.setError(getString(R.string.error_invalid_password));
             cancel = true;
             inputPasswd.requestFocus();
@@ -309,6 +316,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         //TODO: implement login, if parse login success, then call this method
         btnLogIn.setEnabled(true);
         btnLogIn.setText(R.string.action_sign_in_short);
+        isSigningIn = false;
         inputEmail.setEnabled(true);
         inputPasswd.setEnabled(true);
         Log.i("ProgressGen", "OnComplete");
@@ -318,6 +326,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     public void onCancel() {
         btnLogIn.setProgress(0);
         btnLogIn.setText(R.string.action_sign_in_short);
+        isSigningIn = false;
         Log.i("ProgressGen", "OnCancel");
     }
 
@@ -339,15 +348,6 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         inputEmail.setAdapter(adapter);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode){
-
-        }
-
-        return super.onKeyDown(keyCode, event);
     }
 }
 

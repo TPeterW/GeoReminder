@@ -38,10 +38,10 @@ public class EditItemFragment extends Fragment {
 
         View view;
         if(withMap){
-            view = inflater.inflate(R.layout.geo_reminder_edit_screen, container, false);
+            view = inflater.inflate(R.layout.reminder_geo_edit_screen, container, false);
         }
         else {
-            view = inflater.inflate(R.layout.normal_reminder_edit_screen, container, false);
+            view = inflater.inflate(R.layout.reminder_normal_edit_screen, container, false);
         }
 
         return view;

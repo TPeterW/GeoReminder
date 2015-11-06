@@ -88,6 +88,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.peter.georeminder.MainScreen" />
         </activity>
+        <activity
+            android:name=".IntroScreen"
+            android:theme="@style/AppTheme.FullScreen"
+            android:parentActivityName=".MainScreen"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

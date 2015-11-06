@@ -43,6 +43,11 @@
     <string name="nav_desc_switch">Switch to Another Account</string>
     <string name="nav_desc_manage">Manage Your Account</string>
 
+    <!--Content Description-->
+    <string name="img_avatar">Avatar</string>
+    <string name="img_map">Map</string>
+    <string name="img_logo">LOGO</string>
+
     <!--Reminder fields-->
     <string name="rem_def_title">Untitled</string>
 
@@ -58,6 +63,8 @@
     <string name="logout">Log Out</string>
     <string name="cancel">Cancel</string>
     <string name="register">Register</string>
+    <string name="skip">Skip</string>
+    <string name="proceed">Proceed</string>
 
     <!--Settings-->
     <string name="cat_general">General</string>

@@ -1,4 +1,4 @@
-package com.peter.georeminder.utils;
+package com.peter.georeminder.utils.recyclerview;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;

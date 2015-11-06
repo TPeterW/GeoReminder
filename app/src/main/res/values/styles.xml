@@ -27,6 +27,11 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
+    <style name="AppTheme.FullScreen" parent="AppTheme.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsTranslucent">true</item>            <!--This is specific to Intro Screen-->
+    </style>
+
     <!--CardView Ripple Effect-->
     <style name="CardView.Ripple" parent="CardView.Light">
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
