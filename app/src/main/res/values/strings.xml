@@ -3,6 +3,7 @@
 
     <!--Page Titles-->
     <string name="title_syncing">Syncing</string>
+    <string name="title_location">Locations</string>
 
     <!--Action Bar-->
     <string name="action_settings">Settings</string>
@@ -81,6 +82,10 @@
     <string name="pref_map_dialog_title">Map Service</string>
     <string name="pref_about_me">About Me</string>
     <string name="pref_anim_dialog_msg">Changes will take effect after next launch</string>
+    <string name="pref_is_refreshing">Is Refreshing</string>
+    <string name="pref_refresh_enabled">Refresh Enabled</string>
+    <string name="pref_back_to_top">Back To Top</string>
+    <string name="pref_app_bar_enabled">AppBar Enabled</string>
 
     <!--Color Themes-->
     <string name="theme_green">Green</string>
