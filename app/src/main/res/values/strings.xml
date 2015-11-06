@@ -48,6 +48,8 @@
     <string name="img_avatar">Avatar</string>
     <string name="img_map">Map</string>
     <string name="img_logo">LOGO</string>
+    <string name="img_no_location">No Location</string>
+    <string name="img_no_reminder">No Reminder</string>
 
     <!--Reminder fields-->
     <string name="rem_def_title">Untitled</string>
@@ -102,6 +104,7 @@
 
     <!--TextBoxes-->
     <string name="main_no_reminder">Your reminder list is empty.</string>
+    <string name="main_no_location">Your location list is empty.</string>
 
     <!--Dialog-->
     <string name="dialog_delete_title">Delete</string>

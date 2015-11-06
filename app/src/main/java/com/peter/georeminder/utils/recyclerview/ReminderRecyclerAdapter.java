@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by Peter on 10/6/15.
  */
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerViewHolder> {
+public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecyclerAdapter.RecyclerViewHolder> {
     private List<Reminder> reminderList;
     private Context context;
     private LayoutInflater inflater;
@@ -37,14 +37,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
         this.listener = listener;
     }
 
-    public RecyclerAdapter (Context context, List<Reminder> reminderList){
+    public ReminderRecyclerAdapter(Context context, List<Reminder> reminderList){
         this.reminderList = reminderList;
         this.context = context;
         inflater = LayoutInflater.from(context);
     }
 
     @Override
-    public RecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ReminderRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.reminder_recycler_item, parent, false);
         RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
         //TODO:

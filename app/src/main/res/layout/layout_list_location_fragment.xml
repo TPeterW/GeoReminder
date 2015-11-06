@@ -1,17 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="fill_vertical">
+    android:layout_gravity="fill_vertical"
+    tools:context=".MainScreen">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/location_recycler_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/image_no_location"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:src="@drawable/empty_location"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"
+        android:contentDescription="@string/img_no_location"/>
 
     <TextView
-        android:id="@+id/text_Temp"
+        android:id="@+id/text_no_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Temporary"
-        android:textSize="80sp"
-        android:layout_centerInParent="true"/>
+        android:text="@string/main_no_location"
+        android:textSize="26sp"
+        android:layout_below="@id/image_no_location"
+        android:layout_centerHorizontal="true" />
+
+
 
 </RelativeLayout>

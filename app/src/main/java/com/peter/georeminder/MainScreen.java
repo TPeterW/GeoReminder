@@ -46,6 +46,7 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseObject;
+import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
 import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderListener;
@@ -88,6 +89,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
     // Importante
     // DataList
     private List<Reminder> reminderList;
+    private List<Location> locationList;
 
     // For custom Nav Drawer
     private AccountHeader drawerHeader = null;
@@ -155,7 +157,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
         analyticsTrackers = AnalyticsTrackers.getInstance();
 
         reminderList = new LinkedList<>();
-        // TODO: remove these and actually get the reminders
+        // TODO: remove these and actually get the reminders from local data storage
         reminderList.add(new Reminder(this).setTitle("Reminder 1"));
         reminderList.add(new Reminder(this).setTitle("Reminder 2"));
         reminderList.add(new Reminder(this).setTitle("Reminder 3"));
@@ -164,6 +166,11 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
         reminderList.add(new Reminder(this).setTitle("Reminder 6"));
         reminderList.add(new Reminder(this).setTitle("Reminder 7"));
         reminderList.add(new Reminder(this).setTitle("Reminder 8"));
+
+
+        locationList = new LinkedList<>();
+        // TODO: remove these and actually get the reminders from local data storage
+        locationList.add(new Location());
 
 
         // Nav Drawer
@@ -374,15 +381,11 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
             public void onPageSelected(int position) {
                 switch (position){
                     case 0:
-                        if(Build.VERSION.SDK_INT >= 21)
-                            appBarLayout.setNestedScrollingEnabled(sharedPreferences.getBoolean(getString(R.string.pref_app_bar_enabled), true));
-                        toolbar.setSubtitle(getString(R.string.app_name));
+                        toolbar.setTitle(getString(R.string.app_name));
                         break;
                     case 1:
-                        appBarLayout.setExpanded(false, true);
-                        if(Build.VERSION.SDK_INT >= 21)
-                            appBarLayout.setNestedScrollingEnabled(false);
-                        toolbar.setSubtitle(getString(R.string.title_location));
+//                        appBarLayout.setExpanded(false, true);
+                        toolbar.setTitle(getString(R.string.title_location));
                         break;
                 }
             }
@@ -454,6 +457,8 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
 //                break;
 //        }
         //TODO: check if the user wants to use Amap first, before checking google play services
+
+        //TODO: make sure Toast only appears once
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -630,7 +635,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
     // listener methods
     // TODO: move to above
     @Override
-    public void onItemClicked(View view, int position) {
+    public void onReminderClicked(View view, int position) {
         if (newReminder.isOpened())
             newReminder.close(true);
         else {
@@ -639,13 +644,13 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
     }
 
     @Override
-    public void onItemLongClicked(View view, final int position) {
+    public void onReminderLongClicked(View view, final int position) {
         if (newReminder.isOpened())
             newReminder.close(true);
     }
 
     @Override
-    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+    public void onReminderListScrolled(RecyclerView recyclerView, int dx, int dy) {
         if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuHidden()) {
             newReminder.hideMenu(true);
             scrolledDistance = 0;               // if menu is hidden, reset the scrolledDistance
@@ -660,7 +665,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
     }
 
     @Override
-    public void onRefresh() {
+    public void onReminderListRefresh() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(getString(R.string.pref_is_refreshing), true)

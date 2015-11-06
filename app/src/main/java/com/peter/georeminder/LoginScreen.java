@@ -129,16 +129,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         btnRegister.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isSigningIn){
-                    if(!isRegistering){             // user chooses to sign in
-                        btnRegister.setText(getString(R.string.login));
-                        btnLogIn.setText(getString(R.string.register));
-                    } else {                        // user chooses to register
-                        btnRegister.setText(getString(R.string.register));
-                        btnLogIn.setText(getString(R.string.login));
-                    }
-                }
-                // else nothing
+                // TODO: go to register page
             }
         });
     }
