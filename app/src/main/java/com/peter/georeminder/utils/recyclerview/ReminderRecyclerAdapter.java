@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Created by Peter on 10/6/15.
+ * Adapter for the list of reminders on the first tap of ViewPager
  */
 public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecyclerAdapter.RecyclerViewHolder> {
     private List<Reminder> reminderList;
@@ -37,6 +38,10 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         this.listener = listener;
     }
 
+
+
+
+
     public ReminderRecyclerAdapter(Context context, List<Reminder> reminderList){
         this.reminderList = reminderList;
         this.context = context;
@@ -45,9 +50,9 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
     @Override
     public ReminderRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.reminder_recycler_item, parent, false);
+        View view = inflater.inflate(R.layout.layout_reminder_recycler_item, parent, false);
         RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
-        //TODO:
+        //TODO: do what? figure out later
         return viewHolder;
     }
 
@@ -122,10 +127,10 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         public RecyclerViewHolder(View itemView) {
             super(itemView);
 
-            cardView = (CardView) itemView.findViewById(R.id.geo_holder_cardview);
-            mapScreenshot = (ImageView) itemView.findViewById(R.id.recycler_item_map_screenshot);
-            reminderTitle = (TextView) itemView.findViewById(R.id.recycler_item_title);
-            reminderContent = (TextView) itemView.findViewById(R.id.recycler_item_content);
+            cardView = (CardView) itemView.findViewById(R.id.reminder_holder_cardview);
+            mapScreenshot = (ImageView) itemView.findViewById(R.id.reminder_item_map_screenshot);
+            reminderTitle = (TextView) itemView.findViewById(R.id.reminder_recycler_item_title);
+            reminderContent = (TextView) itemView.findViewById(R.id.reminder_recycler_item_content);
         }
     }
 }

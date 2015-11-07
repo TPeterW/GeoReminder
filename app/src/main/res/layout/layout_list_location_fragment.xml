@@ -12,7 +12,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/location_recycler_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:spanCount="2" />
 
     <ImageView
         android:id="@+id/image_no_location"

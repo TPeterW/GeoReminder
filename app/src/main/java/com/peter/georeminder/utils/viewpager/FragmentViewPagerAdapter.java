@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
 
 import java.util.List;
@@ -15,10 +16,12 @@ import java.util.List;
 public class FragmentViewPagerAdapter extends FragmentPagerAdapter {
 
     private List<Reminder> reminderList;
+    private List<Location> locationList;
 
-    public FragmentViewPagerAdapter(FragmentManager fm, List<Reminder> reminderList) {
+    public FragmentViewPagerAdapter(FragmentManager fm, List<Reminder> reminderList, List<Location> locationList) {
         super(fm);
         this.reminderList = reminderList;
+        this.locationList = locationList;
     }
 
     @Override
@@ -26,7 +29,7 @@ public class FragmentViewPagerAdapter extends FragmentPagerAdapter {
         if(position == 0)
             return ListReminderFragment.getInstance(reminderList);
         else
-            return ListLocationFragment.getInstance();
+            return ListLocationFragment.getInstance(locationList);
     }
 
     @Override

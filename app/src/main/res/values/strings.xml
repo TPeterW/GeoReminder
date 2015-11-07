@@ -52,7 +52,8 @@
     <string name="img_no_reminder">No Reminder</string>
 
     <!--Reminder fields-->
-    <string name="rem_def_title">Untitled</string>
+    <string name="reminder_default_title">Untitled Reminder</string>
+    <string name="location_default_title">Untitled Location</string>
 
 
     <!--Bundle Keys-->

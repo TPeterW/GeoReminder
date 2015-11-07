@@ -206,7 +206,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 
     @Override
     public void onAttach(Context context) {
-        listener = (ListReminderListener) context;
+        this.listener = (ListReminderListener) context;
         super.onAttach(context);
     }
 

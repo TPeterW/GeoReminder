@@ -49,12 +49,14 @@ import com.parse.ParseObject;
 import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
+import com.peter.georeminder.utils.viewpager.ListLocationFragment.ListLocationListener;
 import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderListener;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class MainScreen extends AppCompatActivity implements ListReminderListener{
+public class MainScreen extends AppCompatActivity implements
+        ListReminderListener, ListLocationListener, SharedPreferences.OnSharedPreferenceChangeListener{
     //TODO: put Build.VERSION.SDK_INT into shared preference so that it wouldn't have to check every time
 
     // Analytics Tracker
@@ -151,6 +153,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
 
     private void initData() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         // TODO: get data from shared preferences
 
         // Trackers
@@ -170,7 +173,17 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
 
         locationList = new LinkedList<>();
         // TODO: remove these and actually get the reminders from local data storage
-        locationList.add(new Location());
+        locationList.add(new Location(this).setTitle("Location 1"));
+        locationList.add(new Location(this).setTitle("Location 2"));
+        locationList.add(new Location(this).setTitle("Location 3"));
+        locationList.add(new Location(this).setTitle("Location 4"));
+        locationList.add(new Location(this).setTitle("Location 5"));
+        locationList.add(new Location(this).setTitle("Location 6"));
+        locationList.add(new Location(this).setTitle("Location 7"));
+        locationList.add(new Location(this).setTitle("Location 8"));
+
+        //TODO: add list of reminders
+
 
 
         // Nav Drawer
@@ -185,7 +198,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
 
     private void initView(Bundle savedInstanceState) {
         viewPager = (ViewPager) findViewById(R.id.main_view_pager);
-        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager(), reminderList);
+        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager(), reminderList, locationList);
         viewPager.setAdapter(adapter);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -194,7 +207,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
 
         // initialise StatusBar color
-        if(Build.VERSION.SDK_INT >= 21){
+        if(Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
             //TODO: decide whether to change the navigation bar color or not
 //            getWindow().setNavigationBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
@@ -334,15 +347,14 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
                                 break;
                             case FEEDBACK_IDENTIFIER:
                                 String uriText = "mailto:peterwangtao0@hotmail.com"
-                                                + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
-                                                + "&body=" + Uri.encode(getString(R.string.feedback_content));
+                                        + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
+                                        + "&body=" + Uri.encode(getString(R.string.feedback_content));
                                 Uri emailUri = Uri.parse(uriText);
                                 Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
                                 sendFeedbackEmail.setData(emailUri);                                             // do not use setType, it messes things up
                                 try {
                                     startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
-                                }
-                                catch (ActivityNotFoundException e){
+                                } catch (ActivityNotFoundException e) {
                                     Snackbar.make(newReminder, getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
                                             .setAction("Action", null)
                                             .show();
@@ -379,7 +391,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
 
             @Override
             public void onPageSelected(int position) {
-                switch (position){
+                switch (position) {
                     case 0:
                         toolbar.setTitle(getString(R.string.app_name));
                         break;
@@ -543,14 +555,16 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        switch (keyCode){
+        switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 if(drawer.isDrawerOpen() || newReminder.isOpened()){
                     drawer.closeDrawer();
                     newReminder.close(true);
                     return true;
-                }
-                else {
+                } else if (viewPager.getCurrentItem() == 1){            // on the location page
+                    viewPager.setCurrentItem(0, true);
+                    return true;
+                } else {
                     if(sharedPreferences.getBoolean(getString(R.string.pref_is_refreshing), false)){
                         appBarLayout.setExpanded(true, true);
                         setTitle(getString(R.string.app_name));     // change title back
@@ -563,8 +577,7 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
 
                         editor.putBoolean(getString(R.string.pref_app_bar_enabled), true);
                         return true;
-                    }
-                    else {
+                    } else {
                         // if two presses differ from each other in time for more than 2 seconds
                         long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                         if((currentBackPress - firstBackPress) > 2000){
@@ -620,10 +633,9 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
         //TODO: to check all the reminders and drafts
 
         if (Build.VERSION.SDK_INT >= 21) {
-            if(animateExit){
+            if(animateExit) {
                 getWindow().setExitTransition(new Explode());
-            }
-            else {
+            } else {
                 getWindow().setExitTransition(null);
             }
             getWindow().setReenterTransition(new Explode());
@@ -651,6 +663,59 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
 
     @Override
     public void onReminderListScrolled(RecyclerView recyclerView, int dx, int dy) {
+        onScroll(dx, dy);
+    }
+
+    @Override
+    public void onReminderListRefresh() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.pref_is_refreshing), true)
+                .apply();
+
+        appBarLayout.setExpanded(false, true);
+
+        editor.putBoolean(getString(R.string.pref_app_bar_enabled), false);     // disable AppBar
+        //TODO: figure out how to disable app bar
+    }
+
+    @Override
+    public void onLocationClicked(View view, int position) {
+        if (newReminder.isOpened())
+            newReminder.close(true);
+        else {
+            // TODO: what do we do when user clicks on a location
+        }
+
+//        Log.i("MainScreen", "onLocationClicked");
+    }
+
+    @Override
+    public void onLocationLongClicked(View view, int position) {
+        if (newReminder.isOpened())
+            newReminder.close(true);
+
+//        Log.i("MainScreen", "onLocationLongClicked");
+    }
+
+    @Override
+    public void onLocationListScrolled(RecyclerView recyclerView, int dx, int dy) {
+        onScroll(dx, dy);
+    }
+
+    @Override
+    public void onLocationListRefresh() {
+        // presumably nothing
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_app_bar_enabled))){
+            appBarLayout.setEnabled(sharedPreferences.getBoolean(getString(R.string.pref_app_bar_enabled), true));
+        }
+    }
+
+    private void onScroll(int dx, int dy) {
         if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuHidden()) {
             newReminder.hideMenu(true);
             scrolledDistance = 0;               // if menu is hidden, reset the scrolledDistance
@@ -662,20 +727,6 @@ public class MainScreen extends AppCompatActivity implements ListReminderListene
         if ((!newReminder.isMenuHidden() && dy > 0) || (newReminder.isMenuHidden() && dy < 0)) {
             scrolledDistance += dy;
         }
-    }
-
-    @Override
-    public void onReminderListRefresh() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(getString(R.string.pref_is_refreshing), true)
-                .apply();
-
-        appBarLayout.setExpanded(false, true);
-        setTitle(getString(R.string.title_syncing));
-        toolbar.setTitle(getString(R.string.title_syncing));
-
-        editor.putBoolean(getString(R.string.pref_app_bar_enabled), false);
     }
 
     // Below: code for testing and debugging

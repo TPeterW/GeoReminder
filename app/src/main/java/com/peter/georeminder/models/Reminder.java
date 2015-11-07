@@ -57,7 +57,7 @@ public class Reminder {
         startingDate = cal.getTime();
 //        endDate
 
-        setTitle(context.getString(R.string.rem_def_title));
+        setTitle(context.getString(R.string.reminder_default_title));
 
 
 
