@@ -142,9 +142,12 @@
     <string name="map_night">Night</string>
     <string name="map_my_position">To My Position</string>
 
-    <!--Map Service-->
+    <!--Map-->
     <string name="google_map">Google Map</string>
     <string name="amap_map">AMap</string>
+    <string name="reminder_location">Reminder Location</string>
+    <string name="my_location">Current Location</string>
+    <string name="marker_dragging">Pick a location</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

@@ -519,6 +519,9 @@ public class MainScreen extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (newReminder.isOpened())         // close fam if is open
+            newReminder.close(true);
+
         switch (item.getItemId()){
             case R.id.action_settings:
                 Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);

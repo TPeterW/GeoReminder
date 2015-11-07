@@ -25,6 +25,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +36,6 @@ import android.widget.Toast;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.LocationSource.OnLocationChangedListener;
-import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.CameraPosition;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -66,8 +66,9 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     private GoogleMap googleMap;
 
-    private MapView mapView;
+//    private MapView mapView;
     private AMap aMap;
+    com.amap.api.maps.SupportMapFragment aMapFragment;
 
     private SearchBox searchBox;
 
@@ -176,11 +177,14 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         }
         else {
             // Initialise AMAP
-            mapView = (MapView) findViewById(R.id.whole_amap_map);
-            mapView.onCreate(savedInstanceState);
-            aMap = mapView.getMap();
+            aMapFragment = (com.amap.api.maps.SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.whole_amap_map);
+//            mapView = (MapView) findViewById(R.id.whole_amap_map);
+//            mapView.onCreate(savedInstanceState);
+            aMapFragment.onCreate(savedInstanceState);
+            aMap = aMapFragment.getMap();
 
-            setUpAmap();
+            setUpAMap();
         }
 
     }
@@ -373,7 +377,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 //        }
     }
 
-    private void setUpAmap() {
+    private void setUpAMap() {
         aMap.setLocationSource(this);                   // TODO: implement methods
         aMap.setMyLocationEnabled(true);
         aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);          // ROTATE follows and rotates as user moves, FOLLOW only follows
@@ -506,7 +510,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         switch (requestCode){
             case COARSE_LOCATION_PERMISSION_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    // all good, do nothing
+                    Log.i("Permission Granted: ", "ACCESS_COARSE_LOCATION");
                 }
                 else {
                     Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
@@ -515,7 +519,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
             case FINE_LOCATION_PERMISSION_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    // all good, do nothing
+                    Log.i("Permission Granted: ", "ACCESS_FINE_LOCATION");
                 }
                 else {
                     Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
@@ -579,27 +583,27 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     protected void onResume() {
         super.onResume();
         if(!useGoogleMap)
-            mapView.onResume();
+            aMapFragment.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         if(!useGoogleMap)
-            mapView.onPause();
+            aMapFragment.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if(!useGoogleMap)
-            mapView.onSaveInstanceState(outState);
+            aMapFragment.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if(!useGoogleMap)
-            mapView.onDestroy();
+            aMapFragment.onDestroyView();
     }
 }
