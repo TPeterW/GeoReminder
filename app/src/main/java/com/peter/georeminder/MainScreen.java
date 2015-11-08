@@ -1,27 +1,23 @@
 package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
@@ -33,9 +29,6 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -53,15 +46,17 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseObject;
+import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
-import com.peter.georeminder.utils.recyclerview.RecyclerAdapter;
+import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
+import com.peter.georeminder.utils.viewpager.ListLocationFragment.ListLocationListener;
+import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderListener;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
-
-public class MainScreen extends AppCompatActivity{
+public class MainScreen extends AppCompatActivity implements
+        ListReminderListener, ListLocationListener, SharedPreferences.OnSharedPreferenceChangeListener{
     //TODO: put Build.VERSION.SDK_INT into shared preference so that it wouldn't have to check every time
 
     // Analytics Tracker
@@ -84,17 +79,6 @@ public class MainScreen extends AppCompatActivity{
     private static final int SHOW_THRESHOLD = 20;
     private static final int HIDE_THRESHOLD = 50;
 
-    // Main content (RecyclerView)
-    private RecyclerView recyclerView;
-    private RecyclerAdapter adapter;
-//    private SwipeRefreshLayout swipeRefreshLayout;
-    private WaveSwipeRefreshLayout swipeRefreshLayout;
-
-    // Empty list
-    private ImageView imageNoReminder;
-    private TextView textNoReminder;
-    private Button borderlessNewReminder;
-
     // Preferences
     private boolean useAnimation;
 
@@ -107,6 +91,7 @@ public class MainScreen extends AppCompatActivity{
     // Importante
     // DataList
     private List<Reminder> reminderList;
+    private List<Location> locationList;
 
     // For custom Nav Drawer
     private AccountHeader drawerHeader = null;
@@ -129,6 +114,10 @@ public class MainScreen extends AppCompatActivity{
     private long firstBackPress;
 
     private static boolean isDark = false;          // the colour of the StatusBar
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private static int reminderListOffset = 0;      // to get back to same place when coming back from the right panel (location list)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,13 +153,14 @@ public class MainScreen extends AppCompatActivity{
 
     private void initData() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         // TODO: get data from shared preferences
 
         // Trackers
         analyticsTrackers = AnalyticsTrackers.getInstance();
 
         reminderList = new LinkedList<>();
-        // TODO: remove these and actually get the reminders
+        // TODO: remove these and actually get the reminders from local data storage
         reminderList.add(new Reminder(this).setTitle("Reminder 1"));
         reminderList.add(new Reminder(this).setTitle("Reminder 2"));
         reminderList.add(new Reminder(this).setTitle("Reminder 3"));
@@ -179,6 +169,21 @@ public class MainScreen extends AppCompatActivity{
         reminderList.add(new Reminder(this).setTitle("Reminder 6"));
         reminderList.add(new Reminder(this).setTitle("Reminder 7"));
         reminderList.add(new Reminder(this).setTitle("Reminder 8"));
+
+
+        locationList = new LinkedList<>();
+        // TODO: remove these and actually get the reminders from local data storage
+        locationList.add(new Location(this).setTitle("Location 1"));
+        locationList.add(new Location(this).setTitle("Location 2"));
+        locationList.add(new Location(this).setTitle("Location 3"));
+        locationList.add(new Location(this).setTitle("Location 4"));
+        locationList.add(new Location(this).setTitle("Location 5"));
+        locationList.add(new Location(this).setTitle("Location 6"));
+        locationList.add(new Location(this).setTitle("Location 7"));
+        locationList.add(new Location(this).setTitle("Location 8"));
+
+        //TODO: add list of reminders
+
 
 
         // Nav Drawer
@@ -192,26 +197,24 @@ public class MainScreen extends AppCompatActivity{
     }
 
     private void initView(Bundle savedInstanceState) {
+        viewPager = (ViewPager) findViewById(R.id.main_view_pager);
+        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager(), reminderList, locationList);
+        viewPager.setAdapter(adapter);
+
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+
         // initialise StatusBar color
-        if(Build.VERSION.SDK_INT >= 21){
+        if(Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
             //TODO: decide whether to change the navigation bar color or not
 //            getWindow().setNavigationBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
         }
 
-        // The main layout ------ RecyclerView
+        // The main layout
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coor_layout);
-
-//        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
-//        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
-        swipeRefreshLayout = (WaveSwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
-        swipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);        // color scheme
-        swipeRefreshLayout.setMaxDropHeight(300);           // TODO: figure out why this doesn't work
-        swipeRefreshLayout.setWaveColor(Color.parseColor("#8bc34a"));       // that's colorPrimary
-        swipeRefreshLayout.setShadowRadius(7);
-        swipeRefreshLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.colorTransparent));
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_layout);
 
 
         // this buttons takes user to a page
@@ -233,11 +236,6 @@ public class MainScreen extends AppCompatActivity{
                 newReminder.setMenuButtonHideAnimation(AnimationUtils.loadAnimation(MainScreen.this, R.anim.jump_to_down));
             }
         }, 300);
-
-        // Empty list
-        imageNoReminder = (ImageView) findViewById(R.id.image_no_reminder);
-        textNoReminder = (TextView) findViewById(R.id.text_no_reminder);
-        borderlessNewReminder = (Button) findViewById(R.id.borderless_btn_new_reminder);
 
         // Toolbar, preferably not make any changes to that
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -266,12 +264,20 @@ public class MainScreen extends AppCompatActivity{
             });
         }
 
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         // AppBar Layout, the top area
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {        // when collapsed, do not enbale
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                swipeRefreshLayout.setEnabled(verticalOffset == 0);
+                reminderListOffset = verticalOffset;
+
+//                Log.i("Offset", verticalOffset + "");
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(getString(R.string.pref_refresh_enabled), verticalOffset == 0)
+                        .apply();
+//                swipeRefreshLayout.setEnabled(verticalOffset == 0);
+
                 // only version higher than 21 (Lollipop) will be getting this status bar animation
                 if (Build.VERSION.SDK_INT >= 21) {
                     if (verticalOffset < -150) {                // negative indicates it has been moved up
@@ -341,15 +347,14 @@ public class MainScreen extends AppCompatActivity{
                                 break;
                             case FEEDBACK_IDENTIFIER:
                                 String uriText = "mailto:peterwangtao0@hotmail.com"
-                                                + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
-                                                + "&body=" + Uri.encode(getString(R.string.feedback_content));
+                                        + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
+                                        + "&body=" + Uri.encode(getString(R.string.feedback_content));
                                 Uri emailUri = Uri.parse(uriText);
                                 Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
                                 sendFeedbackEmail.setData(emailUri);                                             // do not use setType, it messes things up
                                 try {
                                     startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
-                                }
-                                catch (ActivityNotFoundException e){
+                                } catch (ActivityNotFoundException e) {
                                     Snackbar.make(newReminder, getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
                                             .setAction("Action", null)
                                             .show();
@@ -374,106 +379,34 @@ public class MainScreen extends AppCompatActivity{
     }
 
     private void initEvent() {
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         firstBackPress = System.currentTimeMillis() - 2000;             // in case some idiot just presses back button when they enters the app
 
-        // use linear layout manager to set Recycler view
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        adapter = new RecyclerAdapter(MainScreen.this, reminderList);
-        adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {              // click event for each reminder item
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                if(newReminder.isOpened())
-                    newReminder.close(true);
-                else {
-                    // TODO: do a check, which edit screen to go to
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        toolbar.setTitle(getString(R.string.app_name));
+                        break;
+                    case 1:
+//                        appBarLayout.setExpanded(false, true);
+                        toolbar.setTitle(getString(R.string.title_location));
+                        break;
                 }
             }
 
             @Override
-            public void onItemLongClick(View view, final int position) {
-                if(newReminder.isOpened())
-                    newReminder.close(true);
+            public void onPageScrollStateChanged(int state) {
 
-                // get the reminder
-                String currentTitle = adapter.getItem(position).getTitle();
-
-                // to alert the user about deleting by vibrating
-                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-                // TODO: add code
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
-                builder.setTitle(currentTitle)
-                        .setItems(new String[]{getString(R.string.dialog_edit_title), getString(R.string.dialog_share_title), getString(R.string.dialog_delete_title)},
-                                new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch (which) {
-                                    case 0:     // edit button
-                                        Toast.makeText(MainScreen.this, "Edit", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case 1:     // share button
-                                        showShareDialog(position);
-                                        break;
-                                    case 2:     // delete button
-                                        showDeleteDialog(position);
-                                        break;
-                                }
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                // vibrate, TODO: check disable vibration
-                vibrator.vibrate(20);
-                dialog.show();
-
-                //TODO: also after adding one, remember to hide these two views
             }
         });
-
-        recyclerView.setAdapter(adapter);
-        // set hide and show animation when user scrolls
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuHidden()) {
-                    newReminder.hideMenu(true);
-                    scrolledDistance = 0;               // if menu is hidden, reset the scrolledDistance
-                } else if (scrolledDistance < -SHOW_THRESHOLD && newReminder.isMenuHidden()) {
-                    newReminder.showMenu(true);
-                    scrolledDistance = 0;               // ditto here
-                }
-
-                if ((!newReminder.isMenuHidden() && dy > 0) || (newReminder.isMenuHidden() && dy < 0)) {
-                    scrolledDistance += dy;
-                }
-            }
-        });
-
-
-        // add dividers
-        // Currently not needed
-
-
-        // Set up Swipe to Refresh
-        swipeRefreshLayout.setEnabled(false);
-        swipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {           // this is a very dirty workaround for the build tool support problem
-                appBarLayout.setExpanded(false, true);
-                recyclerView.setNestedScrollingEnabled(false);
-                setTitle(getString(R.string.title_syncing));
-                toolbar.setTitle(getString(R.string.title_syncing));
-            }
-        });
-
 
         // this buttons takes user to a page
         // the blue one with a map icon
@@ -495,12 +428,11 @@ public class MainScreen extends AppCompatActivity{
                 //TODO: add specifications about the reminder to be created
 
                 // activity transition animation
-                if(Build.VERSION.SDK_INT >= 21){
+                if (Build.VERSION.SDK_INT >= 21) {
                     getWindow().setExitTransition(new Fade());
                     getWindow().setReenterTransition(new Fade());
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                }
-                else
+                } else
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
             }
         });
@@ -521,30 +453,6 @@ public class MainScreen extends AppCompatActivity{
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
-
-        // Empty list
-        borderlessNewReminder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent newReminder = new Intent(MainScreen.this, EditorScreen.class);       // default is a new GeoReminder
-                newReminder.putExtra(getString(R.string.bundle_with_map), true);
-                //TODO: more specifications
-
-                if(Build.VERSION.SDK_INT >= 21){
-                    getWindow().setExitTransition(new Fade());
-                    getWindow().setReenterTransition(new Fade());
-                    startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                }
-                else
-                    startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
-            }
-        });
-        if(reminderList.size() != 0) {
-            imageNoReminder.setVisibility(View.INVISIBLE);
-            textNoReminder.setVisibility(View.INVISIBLE);
-            borderlessNewReminder.setVisibility(View.INVISIBLE);
-            borderlessNewReminder.setClickable(false);
-        }
     }
 
     private void loadPref() {
@@ -561,6 +469,8 @@ public class MainScreen extends AppCompatActivity{
 //                break;
 //        }
         //TODO: check if the user wants to use Amap first, before checking google play services
+
+        //TODO: make sure Toast only appears once
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -609,6 +519,9 @@ public class MainScreen extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (newReminder.isOpened())         // close fam if is open
+            newReminder.close(true);
+
         switch (item.getItemId()){
             case R.id.action_settings:
                 Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
@@ -643,24 +556,31 @@ public class MainScreen extends AppCompatActivity{
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 if(drawer.isDrawerOpen() || newReminder.isOpened()){
                     drawer.closeDrawer();
                     newReminder.close(true);
                     return true;
-                }
-                else {
-                    if(swipeRefreshLayout.isRefreshing()){
-                        swipeRefreshLayout.setRefreshing(false);
-                        recyclerView.setNestedScrollingEnabled(true);
-                        recyclerView.setScrollY(0);
+                } else if (viewPager.getCurrentItem() == 1){            // on the location page
+                    viewPager.setCurrentItem(0, true);
+                    return true;
+                } else {
+                    if(sharedPreferences.getBoolean(getString(R.string.pref_is_refreshing), false)){
                         appBarLayout.setExpanded(true, true);
                         setTitle(getString(R.string.app_name));     // change title back
                         toolbar.setTitle(getString(R.string.app_name));
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean(getString(R.string.pref_is_refreshing), false)        // SwipeRefresh is refreshing
+                                .apply();
+//                        editor.putBoolean(getString(R.string.pref_back_to_top), true)           // recycler view back to top
+//                                .apply();
+
+                        editor.putBoolean(getString(R.string.pref_app_bar_enabled), true);
                         return true;
-                    }
-                    else {
+                    } else {
                         // if two presses differ from each other in time for more than 2 seconds
                         long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
                         if((currentBackPress - firstBackPress) > 2000){
@@ -693,11 +613,10 @@ public class MainScreen extends AppCompatActivity{
                             @Override
                             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                                 Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
-                                if(Build.VERSION.SDK_INT >= 21)
-                                    getWindow().setExitTransition(null);
+                                if(Build.VERSION.SDK_INT >= 21){ getWindow().setExitTransition(null); }
                                 startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                                Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
+
+                                new Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
                                         drawer.closeDrawer();
@@ -707,14 +626,6 @@ public class MainScreen extends AppCompatActivity{
                             }
                         })
                 )
-//                .withOnAccountHeaderSelectionViewClickListener(new AccountHeader.OnAccountHeaderSelectionViewClickListener() {
-//                    // this is on little triangle click listener
-//                    @Override
-//                    public boolean onClick(View view, IProfile profile) {
-//
-//                        return false;
-//                    }
-//                })
                 .withSavedInstance(savedInstanceState)
                 .withCloseDrawerOnProfileListClick(false)
                 .build();
@@ -725,10 +636,9 @@ public class MainScreen extends AppCompatActivity{
         //TODO: to check all the reminders and drafts
 
         if (Build.VERSION.SDK_INT >= 21) {
-            if(animateExit){
+            if(animateExit) {
                 getWindow().setExitTransition(new Explode());
-            }
-            else {
+            } else {
                 getWindow().setExitTransition(null);
             }
             getWindow().setReenterTransition(new Explode());
@@ -737,37 +647,89 @@ public class MainScreen extends AppCompatActivity{
             startActivity(toViewWholeMap);
     }
 
-    private void showDeleteDialog(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.dialog_delete_title))
-                .setIcon(ContextCompat.getDrawable(MainScreen.this, R.drawable.ic_dialog_warning))
-                .setMessage(getString(R.string.dialog_delete_msg))
-                .setPositiveButton(getString(R.string.dialog_pos_btn), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        adapter.deleteReminder(position);
-                        if (reminderList.size() == 0) {
-                            imageNoReminder.setVisibility(View.VISIBLE);
-                            textNoReminder.setVisibility(View.VISIBLE);
-                            borderlessNewReminder.setVisibility(View.VISIBLE);
-                            borderlessNewReminder.setClickable(true);
-                        }
-                    }
-                })
-                .setNegativeButton(getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // let's do nothing
-                    }
-                });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    // listener methods
+    // TODO: move to above
+    @Override
+    public void onReminderClicked(View view, int position) {
+        if (newReminder.isOpened())
+            newReminder.close(true);
+        else {
+            // TODO: do a check, which edit screen to go to
+        }
     }
 
-    private void showShareDialog(final int position){
-        Intent shareWith = new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, "This is totally temporary").setType("text/plain");
-        startActivity(Intent.createChooser(shareWith, getString(R.string.dialog_share_msg)));
+    @Override
+    public void onReminderLongClicked(View view, final int position) {
+        if (newReminder.isOpened())
+            newReminder.close(true);
+    }
+
+    @Override
+    public void onReminderListScrolled(RecyclerView recyclerView, int dx, int dy) {
+        onScroll(dx, dy);
+    }
+
+    @Override
+    public void onReminderListRefresh() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.pref_is_refreshing), true)
+                .apply();
+
+        appBarLayout.setExpanded(false, true);
+
+        editor.putBoolean(getString(R.string.pref_app_bar_enabled), false);     // disable AppBar
+        //TODO: figure out how to disable app bar
+    }
+
+    @Override
+    public void onLocationClicked(View view, int position) {
+        if (newReminder.isOpened())
+            newReminder.close(true);
+        else {
+            // TODO: what do we do when user clicks on a location
+        }
+
+//        Log.i("MainScreen", "onLocationClicked");
+    }
+
+    @Override
+    public void onLocationLongClicked(View view, int position) {
+        if (newReminder.isOpened())
+            newReminder.close(true);
+
+//        Log.i("MainScreen", "onLocationLongClicked");
+    }
+
+    @Override
+    public void onLocationListScrolled(RecyclerView recyclerView, int dx, int dy) {
+        onScroll(dx, dy);
+    }
+
+    @Override
+    public void onLocationListRefresh() {
+        // presumably nothing
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_app_bar_enabled))){
+            appBarLayout.setEnabled(sharedPreferences.getBoolean(getString(R.string.pref_app_bar_enabled), true));
+        }
+    }
+
+    private void onScroll(int dx, int dy) {
+        if (scrolledDistance > HIDE_THRESHOLD && !newReminder.isMenuHidden()) {
+            newReminder.hideMenu(true);
+            scrolledDistance = 0;               // if menu is hidden, reset the scrolledDistance
+        } else if (scrolledDistance < -SHOW_THRESHOLD && newReminder.isMenuHidden()) {
+            newReminder.showMenu(true);
+            scrolledDistance = 0;               // ditto here
+        }
+
+        if ((!newReminder.isMenuHidden() && dy > 0) || (newReminder.isMenuHidden() && dy < 0)) {
+            scrolledDistance += dy;
+        }
     }
 
     // Below: code for testing and debugging
@@ -804,7 +766,6 @@ public class MainScreen extends AppCompatActivity{
         Log.i("MainScreen", "Stop");
         super.onStop();
     }
-
     @Override
     protected void onDestroy() {
         Log.i("MainScreen", "Destroy");
@@ -814,19 +775,16 @@ public class MainScreen extends AppCompatActivity{
                 .apply();
         super.onDestroy();
     }
-
     @Override
     protected void onStart() {
         Log.i("MainScreen", "Start");
         super.onStart();
     }
-
     @Override
     protected void onRestart() {
         Log.i("MainScreen", "Restart");
         super.onRestart();
     }
-
     @Override
     protected void onPause() {
         Log.i("MainScreen", "Pause");

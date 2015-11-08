@@ -7,18 +7,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.peter.georeminder.R;
-import com.peter.georeminder.models.Reminder;
+import com.peter.georeminder.models.Location;
 
 import java.util.List;
 
 /**
- * Created by Peter on 10/6/15.
+ * Created by Peter on 11/6/15.
+ * Adapter for the list of locations on the second tap of ViewPager
  */
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerViewHolder> {
-    private List<Reminder> reminderList;
+public class LocationRecyclerAdapter extends RecyclerView.Adapter<LocationRecyclerAdapter.RecyclerViewHolder> {
+    private List<Location> locationList;
     private Context context;
     private LayoutInflater inflater;
 
@@ -33,36 +35,40 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     // implement onItemClick and onItemLongClick
     private OnItemClickListener listener;
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
+    public void setOnItemClickListener(OnItemClickListener listener){
         this.listener = listener;
     }
 
-    public RecyclerAdapter (Context context, List<Reminder> reminderList){
-        this.reminderList = reminderList;
+
+
+
+
+    public LocationRecyclerAdapter(Context context, List<Location> locationList){
+        this.locationList = locationList;
         this.context = context;
         inflater = LayoutInflater.from(context);
     }
 
     @Override
-    public RecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.reminder_recycler_item, parent, false);
+    public LocationRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.layout_location_recycler_item, parent, false);
         RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
-        //TODO:
+        //TODO: do what? figure out later
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-        holder.mapScreenshot.setImageResource(R.mipmap.ic_launcher);
-        holder.reminderTitle.setText(getItem(position).getTitle());
-        holder.reminderContent.setText("Content Content Content Content Content");
-        // TODO: Change this to use information from reminderList
-
+        holder.mapScreenshot.setImageResource(R.drawable.location_default_icon);
+        holder.locationTitle.setText(getItem(position).getTitle());
+        // TODO: initialise the list view of all reminders
+        // TODO: Change this to use information from locationList
 
         // set OnItemClick/LongClick listener
         // implement in calling activity (in this case, MainScreen)
 
-        if(listener != null){
+        holder.cardView.setLongClickable(true);
+        if (listener != null){
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -78,37 +84,32 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
                 }
             });
         }
-
     }
 
     @Override
     public int getItemCount() {
-        return reminderList.size();
+        return locationList.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return position;    //TODO: might want to change this later
     }
 
-    public Reminder getItem(int position){
-        return reminderList.get(position);
+    public Location getItem(int position){
+        return locationList.get(position);
     }
 
-    public void addReminder(int position, Reminder addedReminder){
-        //TODO: what kind of reminder and where to add them
-        reminderList.add(position, addedReminder);
+    public void addLocation(int position, Location addLocation){
+        locationList.add(position, addLocation);
         notifyItemInserted(position);
     }
 
-    public void deleteReminder(int position){
-        reminderList.remove(position);
+    public void deleteLocation(int position){
+        locationList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged((int) getItemId(position), getItemCount() + 1);
     }
-
-
-
 
     /**
      * ViewHolder
@@ -116,16 +117,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     public static class RecyclerViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
         ImageView mapScreenshot;
-        TextView reminderTitle;
-        TextView reminderContent;
+        TextView locationTitle;
+        ListView listReminders;             // list of reminders at this location
+        //TODO: inplement this listReminders later (Maybe in version 2)
 
         public RecyclerViewHolder(View itemView) {
             super(itemView);
 
-            cardView = (CardView) itemView.findViewById(R.id.geo_holder_cardview);
-            mapScreenshot = (ImageView) itemView.findViewById(R.id.recycler_item_map_screenshot);
-            reminderTitle = (TextView) itemView.findViewById(R.id.recycler_item_title);
-            reminderContent = (TextView) itemView.findViewById(R.id.recycler_item_content);
+            cardView = (CardView) itemView.findViewById(R.id.location_holder_cardview);
+            mapScreenshot = (ImageView) itemView.findViewById(R.id.location_item_map_screenshot);
+            locationTitle = (TextView) itemView.findViewById(R.id.location_recycler_item_title);
         }
     }
 }

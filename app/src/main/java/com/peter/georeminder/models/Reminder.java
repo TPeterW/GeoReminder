@@ -14,6 +14,9 @@ import java.util.Date;
  * TODO: encapsulate all fields
  */
 public class Reminder {
+
+    private String Uid;             // Uid = title_lat_lng_createDate_createTime
+
     private Date createDate;
     private Date startingDate;
     private Date endDate;
@@ -54,7 +57,7 @@ public class Reminder {
         startingDate = cal.getTime();
 //        endDate
 
-        setTitle(context.getString(R.string.rem_def_title));
+        setTitle(context.getString(R.string.reminder_default_title));
 
 
 

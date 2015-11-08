@@ -3,6 +3,7 @@
 
     <!--Page Titles-->
     <string name="title_syncing">Syncing</string>
+    <string name="title_location">Locations</string>
 
     <!--Action Bar-->
     <string name="action_settings">Settings</string>
@@ -47,9 +48,12 @@
     <string name="img_avatar">Avatar</string>
     <string name="img_map">Map</string>
     <string name="img_logo">LOGO</string>
+    <string name="img_no_location">No Location</string>
+    <string name="img_no_reminder">No Reminder</string>
 
     <!--Reminder fields-->
-    <string name="rem_def_title">Untitled</string>
+    <string name="reminder_default_title">Untitled Reminder</string>
+    <string name="location_default_title">Untitled Location</string>
 
 
     <!--Bundle Keys-->
@@ -81,6 +85,10 @@
     <string name="pref_map_dialog_title">Map Service</string>
     <string name="pref_about_me">About Me</string>
     <string name="pref_anim_dialog_msg">Changes will take effect after next launch</string>
+    <string name="pref_is_refreshing">Is Refreshing</string>
+    <string name="pref_refresh_enabled">Refresh Enabled</string>
+    <string name="pref_back_to_top">Back To Top</string>
+    <string name="pref_app_bar_enabled">AppBar Enabled</string>
 
     <!--Color Themes-->
     <string name="theme_green">Green</string>
@@ -97,6 +105,7 @@
 
     <!--TextBoxes-->
     <string name="main_no_reminder">Your reminder list is empty.</string>
+    <string name="main_no_location">Your location list is empty.</string>
 
     <!--Dialog-->
     <string name="dialog_delete_title">Delete</string>
@@ -133,9 +142,12 @@
     <string name="map_night">Night</string>
     <string name="map_my_position">To My Position</string>
 
-    <!--Map Service-->
+    <!--Map-->
     <string name="google_map">Google Map</string>
     <string name="amap_map">AMap</string>
+    <string name="reminder_location">Reminder Location</string>
+    <string name="my_location">Current Location</string>
+    <string name="marker_dragging">Pick a location</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
