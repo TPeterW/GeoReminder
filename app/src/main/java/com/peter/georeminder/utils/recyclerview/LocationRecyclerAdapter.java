@@ -59,7 +59,7 @@ public class LocationRecyclerAdapter extends RecyclerView.Adapter<LocationRecycl
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-        holder.mapScreenshot.setImageResource(R.mipmap.ic_launcher);
+        holder.mapScreenshot.setImageResource(R.drawable.location_default_icon);
         holder.locationTitle.setText(getItem(position).getTitle());
         // TODO: initialise the list view of all reminders
         // TODO: Change this to use information from locationList

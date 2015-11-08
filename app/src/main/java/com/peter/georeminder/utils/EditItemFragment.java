@@ -146,10 +146,15 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         com.google.android.gms.maps.model.MarkerOptions markerOptions = new com.google.android.gms.maps.model.MarkerOptions();
         markerOptions.flat(false)
                 .draggable(true)
-                .title(getString(R.string.my_location))
-                .position(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
-        googleMapMarker = googleMap.addMarker(markerOptions);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
+                .title(getString(R.string.my_location));
+        try {           // in case GPS is not available
+            markerOptions.position(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
+            googleMapMarker = googleMap.addMarker(markerOptions);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
+        }
+        catch (NullPointerException e) {
+            Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
+        }
 
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -201,10 +206,15 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         markerOptions.setFlat(false)
                 .setGps(false)
                 .draggable(true)
-                .title(getString(R.string.my_location))
-                .position(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
-        aMap.addMarker(markerOptions);
-        aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newLatLng(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
+                .title(getString(R.string.my_location));
+        try {           // in case GPS is not available
+            markerOptions.position(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
+            aMap.addMarker(markerOptions);
+            aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newLatLng(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
+        }
+        catch (NullPointerException e) {
+            Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
+        }
 
         aMap.setOnMapClickListener(new AMap.OnMapClickListener() {
             @Override

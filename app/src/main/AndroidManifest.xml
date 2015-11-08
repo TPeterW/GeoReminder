@@ -83,7 +83,8 @@
         <activity
             android:name=".LoginScreen"
             android:label="@string/title_activity_login_screen"
-            android:parentActivityName=".MainScreen" >
+            android:parentActivityName=".MainScreen"
+            android:theme="@style/AppTheme.SwipeBackWindow" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.peter.georeminder.MainScreen" />

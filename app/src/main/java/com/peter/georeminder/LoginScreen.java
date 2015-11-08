@@ -259,12 +259,10 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     }
 
     private boolean isEmailValid(String email) {
-
         return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private boolean isPasswordValid(String password) {
-
         return password.length() >= 6;
     }
 
@@ -339,6 +337,17 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         inputEmail.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                swipeBackLayout.scrollToFinishActivity();
+                return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 }
 

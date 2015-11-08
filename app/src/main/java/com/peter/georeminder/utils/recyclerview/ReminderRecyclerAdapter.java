@@ -58,11 +58,10 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-        holder.mapScreenshot.setImageResource(R.mipmap.ic_launcher);
+        holder.mapScreenshot.setImageResource(R.drawable.reminder_default_icon);
         holder.reminderTitle.setText(getItem(position).getTitle());
         holder.reminderContent.setText("Content Content Content Content Content");
         // TODO: Change this to use information from reminderList
-
 
         // set OnItemClick/LongClick listener
         // implement in calling activity (in this case, MainScreen)
@@ -83,7 +82,6 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
                 }
             });
         }
-
     }
 
     @Override

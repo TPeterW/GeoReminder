@@ -24,14 +24,14 @@
             android:layout_width="match_parent"
             android:layout_height="120dp">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/reminder_item_map_screenshot"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_margin="10dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentStart="true"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/reminder_default_icon"
                 android:contentDescription="@string/img_map"/>
 
             <RelativeLayout
