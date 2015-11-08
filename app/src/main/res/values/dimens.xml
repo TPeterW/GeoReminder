@@ -23,4 +23,7 @@
     <!--Map Screen-->
     <dimen name="compass_padding">75dp</dimen>
 
+    <!--Staggered Grid Layout-->
+    <dimen name="staggered_space">5dp</dimen>
+
 </resources>

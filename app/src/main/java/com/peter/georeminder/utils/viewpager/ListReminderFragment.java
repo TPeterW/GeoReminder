@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.peter.georeminder.EditorScreen;
 import com.peter.georeminder.R;
 import com.peter.georeminder.models.Reminder;
-import com.peter.georeminder.utils.recyclerview.RecyclerAdapter;
+import com.peter.georeminder.utils.recyclerview.ReminderRecyclerAdapter;
 
 import java.util.List;
 
@@ -46,7 +46,6 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 
     private List<Reminder> reminderList;
 
-
     private RecyclerView recyclerView;
     private WaveSwipeRefreshLayout swipeRefreshLayout;
 
@@ -55,7 +54,8 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     private Button btnNoReminder;
 
 
-    private RecyclerAdapter recyclerAdapter;
+    private ReminderRecyclerAdapter recyclerAdapter;
+    private LinearLayoutManager layoutManager;
 
 
     public static ListReminderFragment getInstance(List<Reminder> reminderList){
@@ -71,8 +71,8 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_list_reminder_fragment, container, false);
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_layout);
-        swipeRefreshLayout = (WaveSwipeRefreshLayout) rootView.findViewById(R.id.swipe_to_refresh_layout);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.reminder_recycler_layout);
+        swipeRefreshLayout = (WaveSwipeRefreshLayout) rootView.findViewById(R.id.reminder_swipe_to_refresh_layout);
 
         imgNoReminder = (ImageView) rootView.findViewById(R.id.image_no_reminder);
         txtNoReminder = (TextView) rootView.findViewById(R.id.text_no_reminder);
@@ -92,16 +92,16 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     private void setUpRecyclerView() {
 
         // Main content (RecyclerView)
-        recyclerAdapter = new RecyclerAdapter(getActivity(), reminderList);
-        recyclerAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {              // click event for each reminder item
+        recyclerAdapter = new ReminderRecyclerAdapter(getActivity(), reminderList);
+        recyclerAdapter.setOnItemClickListener(new ReminderRecyclerAdapter.OnItemClickListener() {              // click event for each reminder item
             @Override
             public void onItemClick(View view, int position) {
-                listener.onItemClicked(view, position);
+                listener.onReminderClicked(view, position);
             }
 
             @Override
             public void onItemLongClick(View view, final int position) {
-                listener.onItemLongClicked(view, position);
+                listener.onReminderLongClicked(view, position);
                 // get the reminder
                 String currentTitle = recyclerAdapter.getItem(position).getTitle();
 
@@ -139,7 +139,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 
 
         // use linear layout manager to set Recycler view
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
         recyclerView.setAdapter(recyclerAdapter);
@@ -153,7 +153,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                listener.onScrolled(recyclerView, dx, dy);
+                listener.onReminderListScrolled(recyclerView, dx, dy);
             }
         });
     }
@@ -172,7 +172,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
             @Override
             public void onRefresh() {           // this is a very dirty workaround for the build tool support problem
                 recyclerView.setNestedScrollingEnabled(false);      // so wouldn't pull AppBar out
-                listener.onRefresh();
+                listener.onReminderListRefresh();
             }
         });
 
@@ -206,17 +206,17 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 
     @Override
     public void onAttach(Context context) {
-        listener = (ListReminderListener) context;
+        this.listener = (ListReminderListener) context;
         super.onAttach(context);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals(getString(R.string.pref_is_refreshing))){
-            if(!sharedPreferences.getBoolean(getString(R.string.pref_is_refreshing), false)){
+            if(!sharedPreferences.getBoolean(getString(R.string.pref_is_refreshing), false)){               // is not refreshing any more
                 swipeRefreshLayout.setRefreshing(false);
                 recyclerView.setNestedScrollingEnabled(true);
-                recyclerView.setScrollY(0);
+                layoutManager.smoothScrollToPosition(recyclerView, null, 0);        // scrolls back up to 0
             }
         }
         else if(key.equals(getString(R.string.pref_refresh_enabled))){
@@ -228,17 +228,6 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 //            if(sharedPreferences.getBoolean(getString(R.string.pref_back_to_top), true))
 //                recyclerView.setScrollY(-180);
 //        }
-    }
-
-    public interface ListReminderListener {
-
-        void onItemClicked(View view, int position);
-
-        void onItemLongClicked(View view, final int position);
-
-        void onScrolled(RecyclerView recyclerView, int dx, int dy);
-
-        void onRefresh();
     }
 
     private void showDeleteDialog(final int position) {
@@ -284,5 +273,16 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     public void onPause() {
         PreferenceManager.getDefaultSharedPreferences(getActivity()).unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
+    }
+
+    public interface ListReminderListener {
+
+        void onReminderClicked(View view, int position);
+
+        void onReminderLongClicked(View view, final int position);
+
+        void onReminderListScrolled(RecyclerView recyclerView, int dx, int dy);
+
+        void onReminderListRefresh();
     }
 }
