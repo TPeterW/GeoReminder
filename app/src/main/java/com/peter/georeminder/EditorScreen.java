@@ -45,7 +45,9 @@ public class EditorScreen extends SwipeBackActivity implements MapListener{
 
     private void initEvent() {
         if(Build.VERSION.SDK_INT >= 21) {
-            getWindow().setEnterTransition(new Slide(GravityCompat.END));
+            getWindow().setEnterTransition(new Slide(GravityCompat.END)
+                    .excludeTarget(android.R.id.statusBarBackground, true)
+                    .excludeTarget(android.R.id.navigationBarBackground, true));
 //            getWindow().setReturnTransition(new Slide(GravityCompat.END));
 //            getWindow().setExitTransition(new Slide(GravityCompat.END));
         }
@@ -79,7 +81,7 @@ public class EditorScreen extends SwipeBackActivity implements MapListener{
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode){
+        switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 // TODO: if has content
                 // save to cache
@@ -117,7 +119,7 @@ public class EditorScreen extends SwipeBackActivity implements MapListener{
         currentLongitude = longitude;
     }
 
-    private void animateLatLngChange(double latitude, double longitude){
+    private void animateLatLngChange(double latitude, double longitude) {
         final ValueAnimator latitudeAnimator = ValueAnimator.ofFloat((float) currentLatitude, (float) latitude).setDuration(600);
         final ValueAnimator longitudeAnimator = ValueAnimator.ofFloat((float) currentLongitude, (float) longitude).setDuration(600);
 

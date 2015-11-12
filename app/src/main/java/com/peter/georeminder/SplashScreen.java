@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
+import static android.view.View.*;
+
 /**
  * Created by Peter on 10/11/15.
  * After launch, this screen will appear for 1.5 seconds, then head off to MainScreen and destroy itself
@@ -27,7 +29,7 @@ public class SplashScreen extends Activity {
 
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        int uiOptions = SYSTEM_UI_FLAG_FULLSCREEN | SYSTEM_UI_FLAG_HIDE_NAVIGATION; //TODO: try remove the word "layout"
         decorView.setSystemUiVisibility(uiOptions);
 
         DisplayMetrics metrics = new DisplayMetrics();
@@ -41,7 +43,7 @@ public class SplashScreen extends Activity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                splashLogo.setVisibility(View.VISIBLE);
+                splashLogo.setVisibility(VISIBLE);
             }
         }, 500);
 
@@ -63,12 +65,5 @@ public class SplashScreen extends Activity {
                 finish();
             }
         }, SPLASH_TIME_OUT);
-
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                splashLogo.setVisibility(View.GONE);
-//            }
-//        }, SPLASH_TIME_OUT + 500);
     }
 }

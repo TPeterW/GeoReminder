@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class FragmentViewPagerAdapter extends FragmentPagerAdapter {
 
+    private final static int VIEW_PAGER_NUM_PAGES = 2;
+
     private List<Reminder> reminderList;
     private List<Location> locationList;
 
@@ -34,58 +36,6 @@ public class FragmentViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return VIEW_PAGER_NUM_PAGES;
     }
-
-    // below is obsolete
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    @Override
-//    public Object instantiateItem(ViewGroup container, int position) {
-//        Fragment fragment = (Fragment) super.instantiateItem(container, position);
-//        registeredFragments.put(position, fragment);
-//        return fragment;
-//    }
-//
-//    @Override
-//    public void destroyItem(ViewGroup container, int position, Object object) {
-//        registeredFragments.remove(position);
-//        super.destroyItem(container, position, object);
-//    }
-//
-//    public Fragment getRegisteredFragments(int position) {
-//        return registeredFragments.valueAt(position);
-//    }
-//
-//    @Override
-//    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-//        currentFragment = (ListReminderFragment) object;
-//        super.setPrimaryItem(container, position, object);
-//    }
 }

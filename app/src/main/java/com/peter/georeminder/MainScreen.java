@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,7 +57,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MainScreen extends AppCompatActivity implements
-        ListReminderListener, ListLocationListener, SharedPreferences.OnSharedPreferenceChangeListener{
+        ListReminderListener, ListLocationListener, OnSharedPreferenceChangeListener{
     //TODO: put Build.VERSION.SDK_INT into shared preference so that it wouldn't have to check every time
 
     // Analytics Tracker
@@ -124,10 +125,8 @@ public class MainScreen extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        // TODO: delete when implementing actual back functions
-//        sendParseTestObject();
-
         // TODO: check if the intro page has been shown before
+        // implement in the method, not here
         showIntro(true);
 
         initData();             // load from sharedPreferences list of reminders
@@ -183,7 +182,6 @@ public class MainScreen extends AppCompatActivity implements
         locationList.add(new Location(this).setTitle("Location 8"));
 
         //TODO: add list of reminders
-
 
 
         // Nav Drawer
@@ -248,7 +246,7 @@ public class MainScreen extends AppCompatActivity implements
 
         // Changes the color of status bar, with animation (using ValueAnimator)
         // will only happen if higher than Lollipop
-        if(Build.VERSION.SDK_INT >= 21){
+        if(Build.VERSION.SDK_INT >= 21) {
             statusBarAnimator = ValueAnimator.ofArgb
                     (ContextCompat.getColor(MainScreen.this, R.color.colorPrimary),
                             ContextCompat.getColor(MainScreen.this, R.color.colorPrimaryDark));
@@ -361,7 +359,7 @@ public class MainScreen extends AppCompatActivity implements
                                 }
                                 break;
                             case SETTINGS_IDENTIFIER:
-                                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
+                                Intent toSettingScreen = new Intent(MainScreen.this, SettingsScreen.class);
                                 startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
                                 break;
                         }
@@ -464,7 +462,7 @@ public class MainScreen extends AppCompatActivity implements
 
     private void checkServices() {
         // not sure which version of code is correct
-//        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)){
+//        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)) {
 //            case ConnectionResult.API_UNAVAILABLE:
 //                break;
 //        }
@@ -474,7 +472,7 @@ public class MainScreen extends AppCompatActivity implements
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext())){
+        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext())) {
             case ConnectionResult.SUCCESS:
                 editor.putBoolean(getString(R.string.shared_pref_google_avail), true);
                 break;
@@ -522,9 +520,9 @@ public class MainScreen extends AppCompatActivity implements
         if (newReminder.isOpened())         // close fam if is open
             newReminder.close(true);
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent toSettingScreen = new Intent(MainScreen.this, SettingScreen.class);
+                Intent toSettingScreen = new Intent(MainScreen.this, SettingsScreen.class);
                 startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
                 return true;
         }
@@ -533,7 +531,7 @@ public class MainScreen extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             // TODO: check if list is till empty, otherwise hide the new reminder button and text
             case CREATE_NEW_GEO_REMINDER_REQUEST_CODE:
 //                Bundle resultFromCreating = data.getExtras();
@@ -560,11 +558,11 @@ public class MainScreen extends AppCompatActivity implements
 
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                if(drawer.isDrawerOpen() || newReminder.isOpened()){
+                if(drawer.isDrawerOpen() || newReminder.isOpened()) {
                     drawer.closeDrawer();
                     newReminder.close(true);
                     return true;
-                } else if (viewPager.getCurrentItem() == 1){            // on the location page
+                } else if (viewPager.getCurrentItem() == 1) {            // on the location page
                     viewPager.setCurrentItem(0, true);
                     return true;
                 } else {
@@ -583,7 +581,7 @@ public class MainScreen extends AppCompatActivity implements
                     } else {
                         // if two presses differ from each other in time for more than 2 seconds
                         long currentBackPress = System.currentTimeMillis();         // then user has to press one more time
-                        if((currentBackPress - firstBackPress) > 2000){
+                        if((currentBackPress - firstBackPress) > 2000) {
                             Snackbar snackbar = Snackbar.make(newReminder, getString(R.string.press_again_exit), Snackbar.LENGTH_SHORT)
                                     .setAction("Action", null);
                             firstBackPress = currentBackPress;
@@ -713,7 +711,7 @@ public class MainScreen extends AppCompatActivity implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.pref_app_bar_enabled))){
+        if (key.equals(getString(R.string.pref_app_bar_enabled))) {         // this one doesn't really do anything
             appBarLayout.setEnabled(sharedPreferences.getBoolean(getString(R.string.pref_app_bar_enabled), true));
         }
     }

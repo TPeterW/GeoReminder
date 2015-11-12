@@ -2,8 +2,8 @@ package com.peter.georeminder.utils.viewpager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.peter.georeminder.R;
 import com.peter.georeminder.models.Location;
@@ -27,7 +26,7 @@ import java.util.List;
  * Created by Peter on 11/5/15.
  *
  */
-public class ListLocationFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class ListLocationFragment extends Fragment implements OnSharedPreferenceChangeListener {
 
     private ListLocationListener listener;
 
@@ -42,7 +41,7 @@ public class ListLocationFragment extends Fragment implements SharedPreferences.
     private LocationRecyclerAdapter recyclerAdapter;
     private StaggeredGridLayoutManager layoutManager;
 
-    public static ListLocationFragment getInstance(List<Location> locationList){
+    public static ListLocationFragment getInstance(List<Location> locationList) {
         return new ListLocationFragment(locationList);
     }
 
@@ -126,7 +125,7 @@ public class ListLocationFragment extends Fragment implements SharedPreferences.
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.pref_is_refreshing))){
+        if (key.equals(getString(R.string.pref_is_refreshing))) {
             if(!sharedPreferences.getBoolean(getString(R.string.pref_is_refreshing), false)){       // not refreshing
                 recyclerView.setNestedScrollingEnabled(true);
                 layoutManager.smoothScrollToPosition(recyclerView, null, 0);
@@ -167,6 +166,6 @@ public class ListLocationFragment extends Fragment implements SharedPreferences.
 
         void onLocationListScrolled(RecyclerView recyclerView, int dx, int dy);
 
-        void onLocationListRefresh();
+        void onLocationListRefresh();           // TODO: if not needed in the end, just remove it
     }
 }

@@ -69,6 +69,7 @@
     <string name="register">Register</string>
     <string name="skip">Skip</string>
     <string name="proceed">Proceed</string>
+    <string name="success">Success</string>
 
     <!--Settings-->
     <string name="cat_general">General</string>

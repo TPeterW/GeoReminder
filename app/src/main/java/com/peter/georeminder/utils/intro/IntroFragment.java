@@ -8,21 +8,21 @@ import android.view.ViewGroup;
 
 import com.peter.georeminder.R;
 
-public class ColorFragment extends Fragment {
+public class IntroFragment extends Fragment {
 
     private static final String ARG_COLOR = "color";
 
     private int mColor;
 
-    public static ColorFragment newInstance(int param1) {
-        ColorFragment fragment = new ColorFragment();
+    public static IntroFragment newInstance(int param1) {
+        IntroFragment fragment = new IntroFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLOR, param1);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public ColorFragment() {
+    public IntroFragment() {
 
     }
 

@@ -39,6 +39,7 @@ public class ProgressGenerator {
     public interface OnCompleteListener {
         void onComplete();
         void onCancel();
+        void onFail();
     }
 }
 

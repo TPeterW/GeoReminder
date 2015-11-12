@@ -113,7 +113,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         supportAMapFragment = (com.amap.api.maps.SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.edit_amap_map);
 
-        if(useGoogleMap){
+        if(useGoogleMap) {
             aMapContainer.setVisibility(View.GONE);
             supportAMapFragment.onDestroy();        // hide AMap
             supportGoogleMapFragment.getMapAsync(this);
@@ -151,8 +151,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             markerOptions.position(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
             googleMapMarker = googleMap.addMarker(markerOptions);
             googleMap.animateCamera(CameraUpdateFactory.newLatLng(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
         }
 
@@ -211,8 +210,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             markerOptions.position(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
             aMap.addMarker(markerOptions);
             aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newLatLng(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
         }
 
@@ -251,17 +249,17 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         });
     }
 
-    private Location getLastKnownLocation(){
+    private Location getLastKnownLocation() {
         int coarseLocation = ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION);
         int fineLocation = ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if(coarseLocation == PackageManager.PERMISSION_DENIED){
+        if(coarseLocation == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     COARSE_LOCATION_PERMISSION_REQUEST_CODE);
         }
 
-        if(fineLocation == PackageManager.PERMISSION_DENIED){
+        if(fineLocation == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     FINE_LOCATION_PERMISSION_REQUEST_CODE);
@@ -279,12 +277,11 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case COARSE_LOCATION_PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.i("Permission Granted: ", "ACCESS_COARSE_LOCATION");
-                }
-                else {
+                } else {
                     Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -292,8 +289,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             case FINE_LOCATION_PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.i("Permission Granted: ", "ACCESS_FINE_LOCATION");
-                }
-                else {
+                } else {
                     Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                 }
                 break;

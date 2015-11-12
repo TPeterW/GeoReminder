@@ -24,7 +24,7 @@ import com.peter.georeminder.utils.SettingsFragment;
 //        |      |
 //        |      |
 
-public class SettingScreen extends AppCompatActivity{
+public class SettingsScreen extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,5 @@ public class SettingScreen extends AppCompatActivity{
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
-
-
     }
 }

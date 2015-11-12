@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -75,37 +74,37 @@ public class SettingsFragment extends PreferenceFragment {
 
     @Override
     public void onAttach(Context context) {
-        Log.i("Fragment", "Attach");
+        Log.i("SettingsFragment", "Attach");
         super.onAttach(context);
     }
 
     @Override
     public void onDetach() {
-        Log.i("Fragment", "Detach");
+        Log.i("SettingsFragment", "Detach");
         super.onDetach();
     }
 
     @Override
     public void onDestroy() {
-        Log.i("Fragment", "Destroy");
+        Log.i("SettingsFragment", "Destroy");
         super.onDestroy();
     }
 
     @Override
     public void onPause() {
-        Log.i("Fragment", "Pause");
+        Log.i("SettingsFragment", "Pause");
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Log.i("Fragment", "Stop");
+        Log.i("SettingsFragment", "Stop");
         super.onStop();
     }
 
     @Override
     public void onDestroyView() {
-        Log.i("Fragment", "DestroyView");
+        Log.i("SettingsFragment", "DestroyView");
         super.onDestroyView();
     }
 }

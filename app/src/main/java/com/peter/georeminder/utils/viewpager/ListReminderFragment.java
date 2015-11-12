@@ -212,22 +212,17 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(getString(R.string.pref_is_refreshing))){
-            if(!sharedPreferences.getBoolean(getString(R.string.pref_is_refreshing), false)){               // is not refreshing any more
+        if(key.equals(getString(R.string.pref_is_refreshing))) {
+            if(!sharedPreferences.getBoolean(getString(R.string.pref_is_refreshing), false)) {              // is not refreshing any more
                 swipeRefreshLayout.setRefreshing(false);
                 recyclerView.setNestedScrollingEnabled(true);
                 layoutManager.smoothScrollToPosition(recyclerView, null, 0);        // scrolls back up to 0
             }
         }
-        else if(key.equals(getString(R.string.pref_refresh_enabled))){
+
+        if(key.equals(getString(R.string.pref_refresh_enabled))) {
             swipeRefreshLayout.setEnabled(sharedPreferences.getBoolean(getString(R.string.pref_refresh_enabled), true));
         }
-        // doesn't do anything
-//        else if(key.equals(getString(R.string.pref_back_to_top))){
-//            Toast.makeText(getActivity(), "Back To Top", Toast.LENGTH_SHORT).show();
-//            if(sharedPreferences.getBoolean(getString(R.string.pref_back_to_top), true))
-//                recyclerView.setScrollY(-180);
-//        }
     }
 
     private void showDeleteDialog(final int position) {
@@ -258,7 +253,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
         dialog.show();
     }
 
-    private void showShareDialog(final int position){
+    private void showShareDialog(final int position) {
         Intent shareWith = new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, "This is totally temporary").setType("text/plain");
         getActivity().startActivity(Intent.createChooser(shareWith, getString(R.string.dialog_share_msg)));
     }

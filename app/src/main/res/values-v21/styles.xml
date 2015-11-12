@@ -9,4 +9,15 @@
     <style name="CardView.Ripple" parent="CardView.Light">
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <!--Shared Element Transition-->
+        <item name="android:windowSharedElementEnterTransition">@transition/shared_image_transition</item>
+        <item name="android:windowSharedElementExitTransition">@transition/shared_image_transition</item>
+    </style>
 </resources>

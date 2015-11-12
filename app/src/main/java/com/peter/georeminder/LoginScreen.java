@@ -79,10 +79,10 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     }
 
     private void initView() {
-        if(Build.VERSION.SDK_INT >= 21){
-            getWindow().setEnterTransition(new Slide(GravityCompat.END));
-            getWindow().setReturnTransition(new Slide(GravityCompat.END));
-            getWindow().setExitTransition(new Slide(GravityCompat.END));
+        if(Build.VERSION.SDK_INT >= 21) {
+            getWindow().setEnterTransition(new Slide(GravityCompat.END).excludeTarget(android.R.id.statusBarBackground, true));
+            getWindow().setReturnTransition(new Slide(GravityCompat.END).excludeTarget(android.R.id.statusBarBackground, true));
+            getWindow().setExitTransition(new Slide(GravityCompat.END).excludeTarget(android.R.id.statusBarBackground, true));
         }
 
         swipeBackLayout = getSwipeBackLayout();
@@ -214,7 +214,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             YoYo.with(Techniques.Shake)
                     .duration(100)
                     .playOn(emailLoginForm);
-        } else if (!isPasswordValid(password)){
+        } else if (!isPasswordValid(password)) {
             inputPasswd.setError(getString(R.string.error_invalid_password));
             cancel = true;
             inputPasswd.requestFocus();
@@ -304,7 +304,8 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     public void onComplete() {
         //TODO: implement login, if parse login success, then call this method
         btnLogIn.setEnabled(true);
-        btnLogIn.setText(R.string.action_sign_in_short);
+        btnLogIn.setText(R.string.success);
+        btnLogIn.setProgress(100);
         isSigningIn = false;
         inputEmail.setEnabled(true);
         inputPasswd.setEnabled(true);
@@ -317,6 +318,12 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         btnLogIn.setText(R.string.action_sign_in_short);
         isSigningIn = false;
         Log.i("ProgressGen", "OnCancel");
+    }
+
+    @Override
+    public void onFail() {
+        btnLogIn.setProgress(-1);
+        //TODO:
     }
 
     private interface ProfileQuery {

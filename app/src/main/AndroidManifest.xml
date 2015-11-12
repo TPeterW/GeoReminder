@@ -46,7 +46,7 @@
         <activity
             android:name=".SplashScreen"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
+            android:theme="@style/AppTheme.FullScreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -66,7 +66,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".SettingScreen"
+            android:name=".SettingsScreen"
             android:label="@string/page_settings"
             android:parentActivityName=".MainScreen"
             android:screenOrientation="portrait" >
