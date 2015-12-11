@@ -8,7 +8,7 @@
     <!--Action Bar-->
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
-    
+
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>
     <string name="activity_not_fonud">Necessary Application Not Found</string>
@@ -190,5 +190,6 @@
     </string>
     <string name="title_activity_whole_map_screen">All Events</string>
     <string name="title_activity_login_screen">Sign in</string>
+    <string name="title_activity_test">Map</string>
 
 </resources>

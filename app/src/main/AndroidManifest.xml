@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.peter.georeminder" >
+    package="com.peter.georeminder">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -14,9 +14,12 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Run at startup -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- For AutoComplete -->
-    <uses-permission android:name="android.permission.READ_PROFILE" /> <!-- TODO: This could be a problem -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Run at startup -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- For AutoComplete -->
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <!-- TODO: This could be a problem -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -42,11 +45,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".SplashScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.FullScreen" >
+            android:theme="@style/AppTheme.FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,25 +60,22 @@
             android:name=".MainScreen"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".EditorScreen"
             android:label="@string/page_create_new_title"
             android:parentActivityName=".MainScreen"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".SettingsScreen"
             android:label="@string/page_settings"
             android:parentActivityName=".MainScreen"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".WholeMapScreen"
             android:label="@string/title_activity_whole_map_screen"
             android:parentActivityName=".MainScreen"
-            android:theme="@style/AppTheme.TranslucentWindow" >
+            android:theme="@style/AppTheme.TranslucentWindow">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainScreen" />
@@ -84,15 +84,15 @@
             android:name=".LoginScreen"
             android:label="@string/title_activity_login_screen"
             android:parentActivityName=".MainScreen"
-            android:theme="@style/AppTheme.SwipeBackWindow" >
+            android:theme="@style/AppTheme.SwipeBackWindow">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.peter.georeminder.MainScreen" />
         </activity>
         <activity
             android:name=".IntroScreen"
-            android:theme="@style/AppTheme.FullScreen"
-            android:parentActivityName=".MainScreen"/>
+            android:parentActivityName=".MainScreen"
+            android:theme="@style/AppTheme.FullScreen" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -118,6 +118,7 @@
         <service
             android:name=".utils.BackgroundService"
             android:icon="@mipmap/ic_launcher" />
+
     </application>
 
 </manifest>
