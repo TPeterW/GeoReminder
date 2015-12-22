@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.peter.georeminder">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -22,7 +21,7 @@
     <!-- TODO: This could be a problem -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -60,17 +59,17 @@
             android:name=".MainScreen"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".EditorScreen"
             android:label="@string/page_create_new_title"
             android:parentActivityName=".MainScreen"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".SettingsScreen"
             android:label="@string/page_settings"
             android:parentActivityName=".MainScreen"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".WholeMapScreen"
             android:label="@string/title_activity_whole_map_screen"

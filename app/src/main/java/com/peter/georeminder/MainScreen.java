@@ -434,6 +434,7 @@ public class MainScreen extends AppCompatActivity implements
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
             }
         });
+        // TODO: check permission here
         addGeoReminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

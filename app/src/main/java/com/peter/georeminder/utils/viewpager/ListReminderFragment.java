@@ -62,6 +62,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
         return new ListReminderFragment(reminderList);
     }
 
+    @SuppressWarnings("All")
     public ListReminderFragment(List<Reminder> reminderList){
         this.reminderList = reminderList;
     }
