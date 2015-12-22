@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.peter.georeminder.EditorScreen;
+import com.peter.georeminder.MainScreen;
 import com.peter.georeminder.R;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.recyclerview.ReminderRecyclerAdapter;
@@ -58,13 +60,12 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     private LinearLayoutManager layoutManager;
 
 
-    public static ListReminderFragment getInstance(List<Reminder> reminderList){
-        return new ListReminderFragment(reminderList);
+    public static ListReminderFragment getInstance(){
+        return new ListReminderFragment();
     }
 
-    @SuppressWarnings("All")
-    public ListReminderFragment(List<Reminder> reminderList){
-        this.reminderList = reminderList;
+    public ListReminderFragment() {
+        this.reminderList = MainScreen.getReminderList();
     }
 
     @Nullable

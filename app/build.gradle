@@ -61,7 +61,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile files('libs/Android_Map_V2.7.20151124.jar')
+    compile files('libs/AMap_Android_3DMapSDK_V3.1.1.jar')
     compile project(':searchbox')
     compile('com.mikepenz:materialdrawer:4.6.1@aar') {
         transitive = true

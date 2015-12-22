@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.peter.georeminder.MainScreen;
 import com.peter.georeminder.R;
 import com.peter.georeminder.models.Location;
 import com.peter.georeminder.utils.recyclerview.LocationRecyclerAdapter;
@@ -41,12 +42,13 @@ public class ListLocationFragment extends Fragment implements OnSharedPreference
     private LocationRecyclerAdapter recyclerAdapter;
     private StaggeredGridLayoutManager layoutManager;
 
-    public static ListLocationFragment getInstance(List<Location> locationList) {
-        return new ListLocationFragment(locationList);
+
+    public static ListLocationFragment getInstance() {
+        return new ListLocationFragment();
     }
 
-    public ListLocationFragment(List<Location> locationList){
-        this.locationList = locationList;
+    public ListLocationFragment() {
+        this.locationList = MainScreen.getLocationList();
     }
 
     @Nullable

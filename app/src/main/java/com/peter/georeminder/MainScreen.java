@@ -91,8 +91,8 @@ public class MainScreen extends AppCompatActivity implements
 
     // Importante
     // DataList
-    private List<Reminder> reminderList;
-    private List<Location> locationList;
+    private static List<Reminder> reminderList;
+    private static List<Location> locationList;
 
     // For custom Nav Drawer
     private AccountHeader drawerHeader = null;
@@ -196,7 +196,7 @@ public class MainScreen extends AppCompatActivity implements
 
     private void initView(Bundle savedInstanceState) {
         viewPager = (ViewPager) findViewById(R.id.main_view_pager);
-        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager(), reminderList, locationList);
+        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -729,6 +729,14 @@ public class MainScreen extends AppCompatActivity implements
         if ((!newReminder.isMenuHidden() && dy > 0) || (newReminder.isMenuHidden() && dy < 0)) {
             scrolledDistance += dy;
         }
+    }
+
+    public static List<Reminder> getReminderList() {
+        return reminderList;
+    }
+
+    public static List<Location> getLocationList() {
+        return locationList;
     }
 
     // Below: code for testing and debugging
