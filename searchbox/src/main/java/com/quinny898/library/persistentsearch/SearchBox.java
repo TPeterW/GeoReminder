@@ -4,6 +4,7 @@ import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -56,12 +57,12 @@ public class SearchBox extends RelativeLayout {
 
 	private MaterialMenuView materialMenu;
 	private TextView logo;
-	private com.quinny898.library.persistentsearch.BackEventEditText search;
+	private EditText search;
 	private Context context;
 	private ListView results;
 	private ArrayList<SearchResult> resultList;
 	private ArrayList<SearchResult> searchables;
-	public boolean searchOpen;
+	private boolean searchOpen;
 	private boolean animate;
 	private View tint;
 	private boolean isMic;
@@ -85,10 +86,11 @@ public class SearchBox extends RelativeLayout {
 	private android.support.v4.app.Fragment mContainerSupportFragment;
 	private SearchFilter mSearchFilter;
 	private ArrayAdapter<? extends SearchResult> mAdapter;
+	private boolean revealedFromMenuItem;
+	private Activity activity;
 
 
-
-    /**
+	/**
 	 * Create a new searchbox
 	 * @param context Context
 	 */
@@ -114,12 +116,12 @@ public class SearchBox extends RelativeLayout {
 	public SearchBox(final Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		inflate(context, R.layout.searchbox, this);
+		activity = scanForActivity(getContext());
 		this.searchOpen = false;
 		this.isMic = true;
 		this.materialMenu = (MaterialMenuView) findViewById(R.id.material_menu_button);
 		this.logo = (TextView) findViewById(R.id.logo);
-		this.search = (BackEventEditText) findViewById(R.id.search);
-        search.setSearchBox(this);
+		this.search = (EditText) findViewById(R.id.search);
 		this.results = (ListView) findViewById(R.id.results);
 		this.context = context;
 		this.pb = (ProgressBar) findViewById(R.id.pb);
@@ -275,6 +277,7 @@ public class SearchBox extends RelativeLayout {
                         activity, this);
 			}
 		}
+		revealedFromMenuItem = true;
 	}
 	
 	/***
@@ -291,7 +294,7 @@ public class SearchBox extends RelativeLayout {
 				int[] location = new int[2];
 				menuButton.getLocationInWindow(location);
 				hideCircularly(location[0] + menuButton.getWidth() * 2 / 3, location[1],
-                        activity);
+						activity);
 			}
 		}
 	}
@@ -324,6 +327,7 @@ public class SearchBox extends RelativeLayout {
             @Override
             public void onAnimationEnd() {
                 setVisibility(View.GONE);
+				revealedFromMenuItem = false;
             }
 
             @Override
@@ -394,6 +398,17 @@ public class SearchBox extends RelativeLayout {
 				mContainerSupportFragment.startActivityForResult(intent, VOICE_RECOGNITION_CODE);
 			}
 		}
+	}
+
+	private Activity scanForActivity(Context cont) {
+		if (cont == null)
+			return null;
+		else if (cont instanceof Activity)
+			return (Activity)cont;
+		else if (cont instanceof ContextWrapper)
+			return scanForActivity(((ContextWrapper)cont).getBaseContext());
+
+		return null;
 	}
 
 	/***
@@ -841,9 +856,11 @@ public class SearchBox extends RelativeLayout {
 		}
 	}
 
+	
 
+	
 
-	public void closeSearch() {
+	private void closeSearch() {
         if(animateDrawerLogo){
             this.materialMenu.animateState(IconState.BURGER);
             this.drawerLogo.setVisibility(View.VISIBLE);
@@ -943,8 +960,18 @@ public class SearchBox extends RelativeLayout {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.KEYCODE_BACK && getVisibility() == View.VISIBLE){
-            hideCircularly((Activity) getContext());
+        if(e.getKeyCode() == KeyEvent.KEYCODE_BACK &&
+				e.getAction() == KeyEvent.ACTION_UP &&
+				getVisibility() == View.VISIBLE &&
+				searchOpen) {
+			if (revealedFromMenuItem) {
+				if (activity != null) {
+					closeSearch();
+					hideCircularly(activity);
+				}
+			} else {
+				toggleSearch();
+			}
             return true;
         }
 
@@ -1007,14 +1034,4 @@ public class SearchBox extends RelativeLayout {
 		public boolean onFilter(SearchResult searchResult ,String searchTerm);
 	}
 
-    @Override
-    public boolean onKeyPreIme(int keyCode, KeyEvent event) {
-        switch (keyCode){
-            case KeyEvent.KEYCODE_BACK:
-                // do nothing
-                return true;
-        }
-
-        return super.onKeyPreIme(keyCode, event);
-    }
 }
