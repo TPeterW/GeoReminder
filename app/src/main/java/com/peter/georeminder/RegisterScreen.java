@@ -1,35 +1,29 @@
 package com.peter.georeminder;
 
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.text.TextUtils;
 import android.transition.Slide;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -40,6 +34,7 @@ import com.dd.processbutton.iml.ActionProcessButton;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 import com.peter.georeminder.utils.login.ProgressGenerator;
 import com.peter.georeminder.utils.login.ProgressGenerator.OnCompleteListener;
 import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
@@ -51,26 +46,25 @@ import java.util.List;
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
- * A login screen that offers login via email/password.
+ * Created by Peter on 1/5/16.
+ *
  */
-public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cursor>, OnCompleteListener {
+public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks<Cursor>, OnCompleteListener {
 
     // TODO: log in through google play and other social media
     // TODO: enable registration
 
     private static final int READ_CONTACTS_REQUEST_CODE = 0x001;
 
-    private static final int REGISTER_REQUEST_CODE      = 0x010;
-
     // UI references.
-    private LinearLayout emailLoginForm;
+    private LinearLayout emailRegisterForm;
     private AutoCompleteTextView inputEmail;
     private EditText inputPasswd;
-    private ActionProcessButton btnLogIn;
-    private Button btnRegister;
+    private EditText inputConfirmPasswd;
+    private ActionProcessButton btnRegister;
 
     // login
-    private boolean isSigningIn;                // user is signing in, button animation on
+    private boolean isRegistering;                // user is signing in, button animation on
 
     // Swipe Back
     private SwipeBackLayout swipeBackLayout;
@@ -79,7 +73,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_screen);
+        setContentView(R.layout.activity_register_screen);
 
         initView();
 
@@ -90,7 +84,6 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(new Slide(GravityCompat.END).excludeTarget(android.R.id.statusBarBackground, true));
             getWindow().setReturnTransition(new Slide(GravityCompat.END).excludeTarget(android.R.id.statusBarBackground, true));
-            getWindow().setReenterTransition(new Slide(GravityCompat.END).excludeTarget(android.R.id.statusBarBackground, true));
             getWindow().setExitTransition(new Slide(GravityCompat.END).excludeTarget(android.R.id.statusBarBackground, true));
         }
 
@@ -100,73 +93,40 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         setupActionBar();
 
         // Set up the login form.
-        emailLoginForm = (LinearLayout) findViewById(R.id.email_login_form);
+        emailRegisterForm = (LinearLayout) findViewById(R.id.email_register_form);
 
-        inputEmail = (AutoCompleteTextView) findViewById(R.id.login_email);
+        inputEmail = (AutoCompleteTextView) findViewById(R.id.register_email);
         populateAutoComplete();
-        inputPasswd = (EditText) findViewById(R.id.login_password);
+        inputPasswd = (EditText) findViewById(R.id.register_password);
+        inputConfirmPasswd = (EditText) findViewById(R.id.register_confirm_password);
 
-        btnLogIn = (ActionProcessButton) findViewById(R.id.sign_in_button);
-        btnLogIn.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-
-        btnRegister = (Button) findViewById(R.id.btn_register_screen);
+        btnRegister = (ActionProcessButton) findViewById(R.id.register_button);
+        btnRegister.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     private void initEvent() {
-        isSigningIn = false;
+        setResult(RESULT_CANCELED);
+        isRegistering = false;
 
-        btnLogIn.setMode(ActionProcessButton.Mode.ENDLESS);
-        btnLogIn.setOnClickListener(new OnClickListener() {
+        btnRegister.setMode(ActionProcessButton.Mode.ENDLESS);
+        btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isSigningIn)               // is not currently signing in
-                    attemptLogin();
+                if (isRegistering) {           // has been clicked
+                    isRegistering = false;
+                    inputEmail.setEnabled(true);
+                    inputPasswd.setEnabled(true);
+                    btnRegister.setText(R.string.action_sign_in_short);
+                    btnRegister.setMode(ActionProcessButton.Mode.PROGRESS);            // cheeky workaround
+                    btnRegister.setProgress(100);
+                } else {                      // not currently signing in
+                    attemptRegister();
+                }
                 // NOTE: setProgress(-1)显示Error
             }
         });
-
-        btnRegister.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent toRegisterScreen = new Intent(LoginScreen.this, RegisterScreen.class);
-                if (Build.VERSION.SDK_INT > 21) {
-                    getWindow().setExitTransition(null);
-                }
-                startActivityForResult(toRegisterScreen, REGISTER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(LoginScreen.this).toBundle());
-            }
-        });
-    }
-
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(inputEmail, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, READ_CONTACTS_REQUEST_CODE);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, READ_CONTACTS_REQUEST_CODE);
-        }
-        return false;
     }
 
     /**
@@ -198,7 +158,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptRegister() {
         final ProgressGenerator progressGenerator = new ProgressGenerator(this);
 
         // Reset errors.
@@ -208,6 +168,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         // Store values at the time of the login attempt.
         String email = inputEmail.getText().toString();
         String password = inputPasswd.getText().toString();
+        String confirmPassword = inputConfirmPasswd.getText().toString();
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
@@ -230,30 +191,41 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             return;
         }
 
+        // Check if passwords match
+        if (!confirmPassword.equals(password)) {
+            inputConfirmPasswd.setError(getString(R.string.error_password_does_not_match));
+            inputConfirmPasswd.requestFocus();
+            shake();
+            return;
+        }
+
         // Show a progress spinner, and kick off a background task to
         // perform the user login attempt.
-        isSigningIn = true;
-        btnLogIn.requestFocus();
+        isRegistering = true;
+        btnRegister.requestFocus();
 
-        // TODO: add check here, don't run after progress is -1
-        progressGenerator.start(btnLogIn);
-        btnLogIn.setEnabled(false);
+        progressGenerator.start(btnRegister);
+        btnRegister.setEnabled(false);
         inputEmail.setEnabled(false);
         inputPasswd.setEnabled(false);
+        inputConfirmPasswd.setEnabled(false);
 
-        // TODO: need to deal with lag, not cancel
-
-        ParseUser.logInInBackground(email, password, new LogInCallback() {
+        // TODO: register
+        ParseUser user = new ParseUser();
+        user.setEmail(email);
+        user.setUsername(email);
+        user.setPassword(password);
+        user.signUpInBackground(new SignUpCallback() {
             @Override
-            public void done(ParseUser user, ParseException e) {
-                if (user != null) {         // logged in
-                    Log.e("Log in", "Complete");
+            public void done(ParseException e) {
+                if (e == null) {        // sign up successful
+                    setResult(RESULT_OK);
                     finish();
-                } else {                    // failed
-                    Log.e("Log in", "Failed");
+                } else {
+                    Log.e("Sign up", "Failed");
                     e.printStackTrace();
                     showErrorMessage(e);
-                    progressGenerator.stop(btnLogIn);
+                    progressGenerator.stop(btnRegister);
                 }
             }
         });
@@ -281,27 +253,42 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             case ParseException.VALIDATION_ERROR:
                 Toast.makeText(this, R.string.exception_validation_error, Toast.LENGTH_SHORT).show();
                 break;
-            case ParseException.INVALID_EMAIL_ADDRESS:
-                Toast.makeText(this, R.string.exception_invalid_email, Toast.LENGTH_SHORT).show();
+            case ParseException.ACCOUNT_ALREADY_LINKED:
+                Toast.makeText(this, R.string.exception_email_already_linked, Toast.LENGTH_SHORT).show();
                 break;
             default:
                 Toast.makeText(this, R.string.exception_invalid_login_param, Toast.LENGTH_SHORT).show();
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REGISTER_REQUEST_CODE:
-                if (resultCode == RESULT_OK) {
-                    Log.d("Register Result Code", "Success" + resultCode);
-                    setResult(RESULT_OK);
-                    finish();                   // TODO: check, returns to MainScreen
-                }
-                break;
+    private void populateAutoComplete() {
+        if (!mayRequestContacts()) {
+            return;
         }
 
-        super.onActivityResult(requestCode, resultCode, data);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    private boolean mayRequestContacts() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
+            Snackbar.make(inputEmail, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(new String[]{READ_CONTACTS}, READ_CONTACTS_REQUEST_CODE);
+                        }
+                    });
+        } else {
+            requestPermissions(new String[]{READ_CONTACTS}, READ_CONTACTS_REQUEST_CODE);
+        }
+        return false;
     }
 
     /***
@@ -340,18 +327,19 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
 
     }
 
     @Override
     public void onComplete() {
-        btnLogIn.setEnabled(true);
-        btnLogIn.setText(R.string.success);
-        btnLogIn.setProgress(100);
-        isSigningIn = false;
+        btnRegister.setEnabled(true);
+        btnRegister.setText(R.string.success);
+        btnRegister.setProgress(100);
+        isRegistering = false;
         inputEmail.setEnabled(true);
         inputPasswd.setEnabled(true);
+        inputConfirmPasswd.setEnabled(true);
         Log.i("ProgressGen", "onComplete");
     }
 
@@ -359,13 +347,14 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     public void onFail() {
         inputEmail.setEnabled(true);
         inputPasswd.setEnabled(true);
-        isSigningIn = false;
+        inputConfirmPasswd.setEnabled(true);
+        isRegistering = false;
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                btnLogIn.setEnabled(true);
-                btnLogIn.setProgress(0);
+                btnRegister.setEnabled(true);
+                btnRegister.setProgress(0);
             }
         }, 2000);           // change back to normal button in two seconds
 
@@ -374,8 +363,9 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
 
     @Override
     public void onCancel() {
-        btnLogIn.setProgress(0);
-        isSigningIn = false;
+        btnRegister.setProgress(0);
+        btnRegister.setText(R.string.action_sign_in_short);
+        isRegistering = false;
         Log.i("ProgressGen", "onCancel");
     }
 
@@ -393,7 +383,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginScreen.this,
+                new ArrayAdapter<>(RegisterScreen.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         inputEmail.setAdapter(adapter);
@@ -402,7 +392,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     private void shake() {
         YoYo.with(Techniques.Shake)
                 .duration(100)
-                .playOn(emailLoginForm);
+                .playOn(emailRegisterForm);
     }
 
     @Override
@@ -415,5 +405,5 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
 
         return super.onKeyDown(keyCode, event);
     }
-}
 
+}

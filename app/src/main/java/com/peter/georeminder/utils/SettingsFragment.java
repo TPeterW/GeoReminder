@@ -49,7 +49,7 @@ public class SettingsFragment extends PreferenceFragment {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 switch (key) {
                     case "showAnim":
-                        if(isAdded()){
+                        if (isAdded()) {
                             getPreferenceScreen().findPreference(key).setEnabled(false);        // make sure user wouldn't be able to click on it next time
                             SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -65,6 +65,11 @@ public class SettingsFragment extends PreferenceFragment {
                             dialog.show();
                             break;
                         }
+                        // TODO: re-enable at exit()
+//                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//                        SharedPreferences.Editor editor = sharedPreferences.edit();
+//                        editor.putBoolean(getString(R.string.shared_pref_anim_pref_enabled), true)
+//                                .apply();
                 }
             }
         });

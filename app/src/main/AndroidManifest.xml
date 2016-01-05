@@ -62,12 +62,12 @@
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".EditorScreen"
-            android:label="@string/page_create_new_title"
+            android:label="@string/title_create_new"
             android:parentActivityName=".MainScreen"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".SettingsScreen"
-            android:label="@string/page_settings"
+            android:label="@string/title_page_settings"
             android:parentActivityName=".MainScreen"
             android:screenOrientation="portrait"/>
         <activity
@@ -87,6 +87,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.peter.georeminder.MainScreen" />
+        </activity>
+        <activity
+            android:name=".RegisterScreen"
+            android:label="@string/title_activity_register_screen"
+            android:parentActivityName=".LoginScreen"
+            android:theme="@style/AppTheme.SwipeBackWindow">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.peter.georeminder.LoginScreen" />
         </activity>
         <activity
             android:name=".IntroScreen"

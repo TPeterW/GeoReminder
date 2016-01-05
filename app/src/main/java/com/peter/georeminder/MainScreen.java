@@ -47,6 +47,7 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
@@ -125,9 +126,7 @@ public class MainScreen extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        // TODO: check if the intro page has been shown before
-        // implement in the method, not here
-        showIntro(true);
+        showIntro();
 
         initData();             // load from sharedPreferences list of reminders
 
@@ -138,14 +137,18 @@ public class MainScreen extends AppCompatActivity implements
         checkServices();
 
         loadPref();             //using SharedPreferences
-
-        Log.i("MainScreen", "Create");  //TODO: delete
     }
 
-    private void showIntro(boolean toShow) {
-        //TODO: this is temporary
-        if(toShow){
+    private void showIntro() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainScreen.this);
+        if (!sharedPreferences.getBoolean(getString(R.string.shared_pref_tutorial_shown), false)) {
+            // first time launch
             Intent toIntroScreen = new Intent(MainScreen.this, IntroScreen.class);
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(getString(R.string.shared_pref_tutorial_shown), true)
+                    .apply();
+
             startActivity(toIntroScreen);
         }
     }
@@ -389,6 +392,7 @@ public class MainScreen extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
+                // TODO: this might not work, check later, if not delete
                 switch (position) {
                     case 0:
                         toolbar.setTitle(getString(R.string.app_name));
@@ -452,6 +456,8 @@ public class MainScreen extends AppCompatActivity implements
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }
         });
+
+        Log.i("MainScreen", "Create");
     }
 
     private void loadPref() {
@@ -544,6 +550,7 @@ public class MainScreen extends AppCompatActivity implements
             case LOGIN_REQUEST_CODE:
                 loadPref();
                 //TODO: change avatar and sync all reminders
+
                 return;
 
             case SETTINGS_REQUEST_CODE:
@@ -611,8 +618,12 @@ public class MainScreen extends AppCompatActivity implements
                                 .withIcon(R.drawable.ic_nav_manage).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                             @Override
                             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                // TODO: change to jump to UserInfoPage
+                                if (ParseUser.getCurrentUser() != null)
+                                    Toast.makeText(MainScreen.this, "Already Logged In", Toast.LENGTH_SHORT).show();
+
                                 Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
-                                if(Build.VERSION.SDK_INT >= 21){ getWindow().setExitTransition(null); }
+                                if(Build.VERSION.SDK_INT >= 21) { getWindow().setExitTransition(null); }
                                 startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
 
                                 new Handler().postDelayed(new Runnable() {
@@ -621,6 +632,7 @@ public class MainScreen extends AppCompatActivity implements
                                         drawer.closeDrawer();
                                     }
                                 }, 200);        // wait for the activity to start then close the drawer
+
                                 return false;
                             }
                         })
@@ -776,10 +788,6 @@ public class MainScreen extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         Log.i("MainScreen", "Destroy");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(getString(R.string.shared_pref_anim_pref_enabled), true)
-                .apply();
         super.onDestroy();
     }
     @Override

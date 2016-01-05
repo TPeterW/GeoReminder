@@ -2,13 +2,12 @@ package com.peter.georeminder.utils;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.parse.Parse;
+//import com.parse.ParseFacebookUtils;
 import com.peter.georeminder.AnalyticsTrackers;
 import com.peter.georeminder.R;
 import com.twitter.sdk.android.Twitter;
@@ -21,20 +20,22 @@ import io.fabric.sdk.android.Fabric;
  * Custom Application class
  */
 public class GeoReminderApplication extends Application {
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "DMsWio2hohKMIz1dq065X82vQ";
-    private static final String TWITTER_SECRET = "CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS";
 
     @Override
     public void onCreate() {
         super.onCreate();
-        // Set up Parse Environment TODO: add backup for reminders
+        // Set up Parse Environment
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "j5LhuXf9kpeP81DZkf2MFFqhTGZijntJoT290hLY", "pcbALD79URPIFzwjZm4oitYsatmRsLljSFHpsbRq");
+        Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_key));
+
+        // TODO: test this out
+        // Set up Facebook Environment
+//        ParseFacebookUtils.initialize(this);
 
         // Set up Twitter Environment
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_consumer_key),
+                                                            getString(R.string.twitter_consumer_secret));
         Fabric.with(this, new Twitter(authConfig), new Crashlytics());
 
         // Set up Google Analytics

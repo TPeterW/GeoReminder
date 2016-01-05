@@ -310,10 +310,11 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
      * installed Google Play services and returned to the app.
      */
     @Override
+    @SuppressWarnings("all")
     public void onMapReady(GoogleMap inputMap) {
         googleMap = inputMap;
-        googleMap.setBuildingsEnabled(true);             // enable 3D building view
-        googleMap.setMyLocationEnabled(true);
+        googleMap.setBuildingsEnabled(true);                // enable 3D building view
+        googleMap.setMyLocationEnabled(true);               // TODO: add permission check
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);

@@ -11,7 +11,7 @@
     tools:context="com.peter.georeminder.LoginScreen" >
 
     <LinearLayout
-        android:id="@+id/email_login_form"
+        android:id="@+id/email_register_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content">
 
             <AutoCompleteTextView
-                android:id="@+id/login_email"
+                android:id="@+id/register_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_email"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content">
 
             <EditText
-                android:id="@+id/login_password"
+                android:id="@+id/register_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_password"
@@ -49,26 +49,34 @@
 
         </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/register_confirm_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_confirm_password"
+                android:imeActionId="@+id/login"
+                android:imeActionLabel="@string/action_register_short"
+                android:imeOptions="actionUnspecified"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
         <com.dd.processbutton.iml.ActionProcessButton
-            android:id="@+id/sign_in_button"
+            android:id="@+id/register_button"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/action_sign_in_short"
+            android:text="@string/action_register_short"
             android:textColor="@color/tw__solid_white"
             android:textStyle="bold" />
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btn_register_screen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/register"
-        android:textColor="@color/colorPrimary"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        style="?android:attr/borderlessButtonStyle"/>
 
 </RelativeLayout>

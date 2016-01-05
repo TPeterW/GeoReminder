@@ -1,22 +1,94 @@
 <resources>
     <string name="app_name">GeoReminder</string>
 
-    <!--Page Titles-->
-    <string name="title_syncing">Syncing</string>
-    <string name="title_location">Locations</string>
-
     <!--Action Bar-->
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
 
-    <!--Snack Bar-->
-    <string name="press_again_exit">Press again to exit</string>
-    <string name="activity_not_fonud">Necessary Application Not Found</string>
+    <!--Bundle Keys-->
+    <string name="bundle_with_map">withMap</string>
 
-    <!--Toast-->
-    <string name="support_thank_msg">Thank you! Mental support is sufficient at this point!</string>
-    <string name="GPS_unavail">GPS Service Unavailable</string>
-    <string name="cannot_find_location">Sorry, cannot find your location</string>
+    <!--Buttons-->
+    <string name="new_geo">Geo Reminder</string>
+    <string name="new_nor">Normal Reminder</string>
+    <string name="empty_create_new">Create a new reminder</string>
+    <string name="login">Log In</string>
+    <string name="logout">Log Out</string>
+    <string name="cancel">Cancel</string>
+    <string name="register">Register</string>
+    <string name="skip">Skip</string>
+    <string name="proceed">Proceed</string>
+    <string name="success">Success</string>
+
+    <!--Color Themes-->
+    <string name="theme_green">Green</string>
+    <string name="theme_blue">Blue</string>
+    <string name="theme_yellow">Yellow</string>
+    <string name="theme_red">Red</string>
+    <string name="theme_black">Dark</string>
+
+    <!--Content Description-->
+    <string name="img_avatar">Avatar</string>
+    <string name="img_map">Map</string>
+    <string name="img_logo">LOGO</string>
+    <string name="img_no_location">No Location</string>
+    <string name="img_no_reminder">No Reminder</string>
+
+    <!--Dialog-->
+    <string name="dialog_delete_title">Delete</string>
+    <string name="dialog_share_title">Share</string>
+    <string name="dialog_edit_title">Edit</string>
+    <string name="dialog_pos_btn">Yes</string>
+    <string name="dialog_neg_btn">Cancel</string>
+    <string name="dialog_confirm_btn">OK</string>
+    <string name="dialog_delete_msg">Do you want to delete this reminder?</string>
+    <string name="dialog_share_msg">Share with&#8230;</string>
+    <string name="dialog_new_geo">New Geo Reminder</string>
+
+    <!--Intent-->
+    <string name="feedback_subject">Feedback on GeoReminder</string>
+    <string name="feedback_content">Hi Peter,\n\nI would like to say a few words about GeoReminder: \n</string>
+    <string name="feedback_content_map">Hi Peter,\n\nI would like to say a few words about the map section of GeoReminder: \n</string>
+    <string name="send_feedback">Send Feedback&#8230;</string>
+
+    <!--Keys-->
+    <string name="parse_app_id">j5LhuXf9kpeP81DZkf2MFFqhTGZijntJoT290hLY</string>
+    <string name="parse_client_key">pcbALD79URPIFzwjZm4oitYsatmRsLljSFHpsbRq</string>
+    
+    <string name="twitter_consumer_key">DMsWio2hohKMIz1dq065X82vQ</string>
+    <string name="twitter_consumer_secret">CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS</string>
+    <string name="twitter_app_id">8794708</string>
+
+    <string name="facebook_app_id">884536681641610</string>
+    <string name="facebook_app_secret">5640a219ba68cf7e8dc05f22c75f06d1</string>
+
+    <!-- Login & register -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_confirm_password">Confirm Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="action_register_short">Register</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="error_password_does_not_match">Password does not match</string>
+    <string name="exception_connection_failed">Connection Failed</string>
+    <string name="exception_internal_server_error">Internal Server Error</string>
+    <string name="exception_timeout">Connection Timeout</string>
+    <string name="exception_validation_error">Validation Error</string>
+    <string name="exception_invalid_email">Email not found</string>
+    <string name="exception_email_already_linked">Email already linked</string>
+    <string name="exception_invalid_login_param">Invalid log in parameter</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+
+    <!--Map-->
+    <string name="google_map">Google Map</string>
+    <string name="amap_map">AMap</string>
+    <string name="reminder_location">Reminder Location</string>
+    <string name="my_location">Current Location</string>
+    <string name="marker_dragging">Pick a location</string>
 
     <!--Navigation Drawer-->
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
@@ -44,32 +116,41 @@
     <string name="nav_desc_switch">Switch to Another Account</string>
     <string name="nav_desc_manage">Manage Your Account</string>
 
-    <!--Content Description-->
-    <string name="img_avatar">Avatar</string>
-    <string name="img_map">Map</string>
-    <string name="img_logo">LOGO</string>
-    <string name="img_no_location">No Location</string>
-    <string name="img_no_reminder">No Reminder</string>
+    <!--Overflow Menu-->
+    <string name="map_normal">Normal</string>
+    <string name="map_hybrid">Hybrid</string>
+    <string name="map_terrain">Terrain</string>
+    <string name="map_satellite">Satellite</string>
+    <string name="map_night">Night</string>
+    <string name="map_my_position">To My Position</string>
+
+    <!--Page Titles-->
+    <string name="title_syncing">Syncing</string>
+    <string name="title_location">Locations</string>
+    <string name="title_create_new">New Reminder</string>
+    <string name="title_edit_existing">Edit</string>
+    <string name="title_page_settings">Preferences</string>
+    <string name="title_view_whole_map">All Pins</string>
+    <string name="title_activity_whole_map_screen">All Events</string>
+    <string name="title_activity_login_screen">Sign in</string>
+    <string name="title_activity_register_screen">Register</string>
+    <string name="title_activity_test">Map</string>
 
     <!--Reminder fields-->
     <string name="reminder_default_title">Untitled Reminder</string>
     <string name="location_default_title">Untitled Location</string>
 
-
-    <!--Bundle Keys-->
-    <string name="bundle_with_map">withMap</string>
-
-    <!--Buttons-->
-    <string name="new_geo">Geo Reminder</string>
-    <string name="new_nor">Normal Reminder</string>
-    <string name="empty_create_new">Create a new reminder</string>
-    <string name="login">Log In</string>
-    <string name="logout">Log Out</string>
-    <string name="cancel">Cancel</string>
-    <string name="register">Register</string>
-    <string name="skip">Skip</string>
-    <string name="proceed">Proceed</string>
-    <string name="success">Success</string>
+    <!--Service Availability Dialog-->
+    <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>
+    <string name="svcs_cancel">Connection to Google Play Service is cancelled</string>
+    <string name="svcs_acct_invalid">Your Google Account is invalid</string>
+    <string name="svcs_missing">Google Play Service is missing on your device, this might result in the unavailability of geolocation function for reminders</string>
+    <string name="svcs_updating">Google Play Service on this device is currently updating, please try later</string>
+    <string name="svcs_disabled">Google Play Service on this device is disabled, please enable Google map function</string>
+    <string name="svcs_signin">Please sign in to Google Play Service before using geolocation function</string>
+    <string name="svcs_req_update">Google Play Service version is too old</string>
+    <string name="svcs_other">Ran into some problems when initialising Google Play Service</string>
+    <!--https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult-->
 
     <!--Settings-->
     <string name="cat_general">General</string>
@@ -91,81 +172,28 @@
     <string name="pref_back_to_top">Back To Top</string>
     <string name="pref_app_bar_enabled">AppBar Enabled</string>
 
-    <!--Color Themes-->
-    <string name="theme_green">Green</string>
-    <string name="theme_blue">Blue</string>
-    <string name="theme_yellow">Yellow</string>
-    <string name="theme_red">Red</string>
-    <string name="theme_black">Dark</string>
+    <!--SharedPreferences-->
+    <string name="shared_pref_google_avail">GoogleMapAvailable</string>
+    <string name="shared_pref_anim_pref_enabled">AnimPrefAnabled</string>
+    <string name="shared_pref_tutorial_shown">TutorialAlreadyShown</string>
 
-    <!--Page Titles-->
-    <string name="page_create_new_title">New Reminder</string>
-    <string name="page_edit_existing_title">Edit</string>
-    <string name="page_settings">Preferences</string>
-    <string name="page_view_whole_map_title">All Pins</string>
+    <!--Snack Bar-->
+    <string name="press_again_exit">Press again to exit</string>
+    <string name="activity_not_fonud">Necessary Application Not Found</string>
 
     <!--TextBoxes-->
     <string name="main_no_reminder">Your reminder list is empty.</string>
     <string name="main_no_location">Your location list is empty.</string>
 
-    <!--Dialog-->
-    <string name="dialog_delete_title">Delete</string>
-    <string name="dialog_share_title">Share</string>
-    <string name="dialog_edit_title">Edit</string>
-    <string name="dialog_pos_btn">Yes</string>
-    <string name="dialog_neg_btn">Cancel</string>
-    <string name="dialog_confirm_btn">OK</string>
-    <string name="dialog_delete_msg">Do you want to delete this reminder?</string>
-    <string name="dialog_share_msg">Share with&#8230;</string>
-    <string name="dialog_new_geo">New Geo Reminder</string>
+    <!--Toast-->
+    <string name="support_thank_msg">Thank you! Mental support is sufficient at this point!</string>
+    <string name="GPS_unavail">GPS Service Unavailable</string>
+    <string name="cannot_find_location">Sorry, cannot find your location</string>
 
-    <!--Service Availability Dialog-->
-    <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>
-    <string name="svcs_cancel">Connection to Google Play Service is cancelled</string>
-    <string name="svcs_acct_invalid">Your Google Account is invalid</string>
-    <string name="svcs_missing">Google Play Service is missing on your device, this might result in the unavailability of geolocation function for reminders</string>
-    <string name="svcs_updating">Google Play Service on this device is currently updating, please try later</string>
-    <string name="svcs_disabled">Google Play Service on this device is disabled, please enable Google map function</string>
-    <string name="svcs_signin">Please sign in to Google Play Service before using geolocation function</string>
-    <string name="svcs_req_update">Google Play Service version is too old</string>
-    <string name="svcs_other">Ran into some problems when initialising Google Play Service</string>
-    <!--https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult-->
 
-    <!--SharedPreferences-->
-    <string name="shared_pref_google_avail">GoogleMapAvailable</string>
-    <string name="shared_pref_anim_pref_enabled">AnimPrefAnabled</string>
 
-    <!--Overflow Menu-->
-    <string name="map_normal">Normal</string>
-    <string name="map_hybrid">Hybrid</string>
-    <string name="map_terrain">Terrain</string>
-    <string name="map_satellite">Satellite</string>
-    <string name="map_night">Night</string>
-    <string name="map_my_position">To My Position</string>
 
-    <!--Map-->
-    <string name="google_map">Google Map</string>
-    <string name="amap_map">AMap</string>
-    <string name="reminder_location">Reminder Location</string>
-    <string name="my_location">Current Location</string>
-    <string name="marker_dragging">Pick a location</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
-
-    <!--Intent-->
-    <string name="feedback_subject">Feedback on GeoReminder</string>
-    <string name="feedback_content">Hi Peter,\n\nI would like to say a few words about GeoReminder: \n</string>
-    <string name="feedback_content_map">Hi Peter,\n\nI would like to say a few words about the map section of GeoReminder: \n</string>
-    <string name="send_feedback">Send Feedback&#8230;</string>
 
     <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
@@ -188,8 +216,5 @@
         A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
         A lot of words A lot of words A lot of words A lot of words
     </string>
-    <string name="title_activity_whole_map_screen">All Events</string>
-    <string name="title_activity_login_screen">Sign in</string>
-    <string name="title_activity_test">Map</string>
 
 </resources>

@@ -26,13 +26,14 @@ public class ProgressGenerator {
 
     public void start(final ProcessButton button) {
         final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mProgress += 10;
-                button.setProgress(mProgress);
-            }
-        }, 200);
+
+        mProgress += 10;
+        button.setProgress(mProgress);
+    }
+
+    public void stop(final ProcessButton button) {
+        button.setProgress(-1);
+        logInCompleteListener.onFail();
     }
 
 
