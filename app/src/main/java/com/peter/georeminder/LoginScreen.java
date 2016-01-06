@@ -38,9 +38,11 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.dd.processbutton.iml.ActionProcessButton;
 import com.facebook.login.widget.LoginButton;
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseQuery;
 import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
 import com.peter.georeminder.utils.login.FBLoginButton;
@@ -49,6 +51,7 @@ import com.peter.georeminder.utils.login.ProgressGenerator.OnCompleteListener;
 import com.peter.georeminder.utils.login.TWLoginButton;
 import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
 import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,12 +156,16 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             @Override
             public void onClick(View v) {
                 Log.d("Login Button", "Facebook");
-//                ParseFacebookUtils.logInWithReadPermissionsInBackground(LoginScreen.this, null, new LogInCallback() {
-//                    @Override
-//                    public void done(ParseUser user, ParseException e) {
-//
-//                    }
-//                });
+                ParseFacebookUtils.logInWithReadPermissionsInBackground(LoginScreen.this, null, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException e) {
+                        if (e == null) {                // success
+                            // TODO:
+                        } else {                        // failure
+                            showErrorMessage(e);
+                        }
+                    }
+                });
             }
         });
 
@@ -166,27 +173,19 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             @Override
             public void onClick(View v) {
                 Log.d("Login Button", "Twitter");
-//                ParseTwitterUtils.getTwitter().setScreenName(getString(R.string.app_name));
-//                ParseTwitterUtils.logIn(LoginScreen.this, new LogInCallback() {
-//                    @Override
-//                    public void done(ParseUser user, ParseException e) {
-//
-//                    }
-//                });
+                ParseTwitterUtils.getTwitter().setScreenName(getString(R.string.app_name));
+                ParseTwitterUtils.logIn(LoginScreen.this, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException e) {
+                        if (e == null) {                // success
+                            // TODO:
+                        } else {                        // failure
+                            showErrorMessage(e);
+                        }
+                    }
+                });
             }
         });
-
-//        twitterLoginButton.setCallback(new Callback<TwitterSession>() {
-//            @Override
-//            public void success(Result<TwitterSession> result) {
-//
-//            }
-//
-//            @Override
-//            public void failure(TwitterException e) {
-//
-//            }
-//        });
     }
 
     private void populateAutoComplete() {

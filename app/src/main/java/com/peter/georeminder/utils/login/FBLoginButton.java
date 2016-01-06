@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.facebook.login.widget.LoginButton;
+import com.peter.georeminder.R;
 
 /**
  * Created by Peter on 1/5/16.
@@ -27,5 +28,6 @@ public class FBLoginButton extends LoginButton {
     public void setOnClickListener(OnClickListener l) {
         super.setInternalOnClickListener(null);
         super.setOnClickListener(l);
+        setText(R.string.login_with_facebook);
     }
 }

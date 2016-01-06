@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 
+import com.peter.georeminder.R;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.lang.ref.WeakReference;
@@ -42,7 +43,8 @@ public class TWLoginButton extends Button {
         Resources res = this.getResources();
         super.setCompoundDrawablesWithIntrinsicBounds(res.getDrawable(com.twitter.sdk.android.core.R.drawable.tw__ic_logo_default), (Drawable) null, (Drawable) null, (Drawable) null);
         super.setCompoundDrawablePadding(res.getDimensionPixelSize(com.twitter.sdk.android.core.R.dimen.tw__login_btn_drawable_padding));
-        super.setText(com.twitter.sdk.android.core.R.string.tw__login_btn_txt);
+//        super.setText(com.twitter.sdk.android.core.R.string.tw__login_btn_txt);
+        super.setText(R.string.login_with_twitter);
         super.setTextColor(res.getColor(com.twitter.sdk.android.core.R.color.tw__solid_white));
         super.setTextSize(0, (float) res.getDimensionPixelSize(com.twitter.sdk.android.core.R.dimen.tw__login_btn_text_size));
         super.setTypeface(Typeface.DEFAULT_BOLD);

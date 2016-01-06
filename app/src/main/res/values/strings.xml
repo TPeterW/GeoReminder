@@ -55,10 +55,8 @@
     <string name="parse_app_id">j5LhuXf9kpeP81DZkf2MFFqhTGZijntJoT290hLY</string>
     <string name="parse_client_key">pcbALD79URPIFzwjZm4oitYsatmRsLljSFHpsbRq</string>
     
-    <!--<string name="twitter_consumer_key">DMsWio2hohKMIz1dq065X82vQ</string>-->
-    <!--<string name="twitter_consumer_secret">CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS</string>-->
-    <string name="twitter_consumer_key">TdUUVIDAnjL9AiHz9P7ZLeIN6</string>
-    <string name="twitter_consumer_secret">DjBchJ9wNvWsO8lAsWSji0PG81lvs8uMnpE7NduSfCdY4zIJDh</string>
+    <string name="twitter_consumer_key">DMsWio2hohKMIz1dq065X82vQ</string>
+    <string name="twitter_consumer_secret">CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS</string>
     <string name="twitter_app_id">8794708</string>
 
     <string name="facebook_app_id">884536681641610</string>
@@ -84,6 +82,8 @@
     <string name="exception_email_already_linked">Email already linked</string>
     <string name="exception_invalid_login_param">Invalid log in parameter</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+    <string name="login_with_facebook">Log in with Facebook</string>
+    <string name="login_with_twitter">Log in with Twitter</string>
 
     <!--Map-->
     <string name="google_map">Google Map</string>
@@ -118,7 +118,7 @@
     <string name="nav_acct_logout">Log Out</string>
     <string name="nav_desc_switch">Switch to Another Account</string>
     <string name="nav_desc_manage">Manage Your Account</string>
-    <string name="nav_desc_logout">Log Out of Your Account</string>
+    <string name="nav_desc_logout">Log out of Your Account</string>
 
     <!--Others-->
     <string name="facebook">Facebook</string>
