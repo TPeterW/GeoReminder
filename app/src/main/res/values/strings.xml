@@ -55,8 +55,10 @@
     <string name="parse_app_id">j5LhuXf9kpeP81DZkf2MFFqhTGZijntJoT290hLY</string>
     <string name="parse_client_key">pcbALD79URPIFzwjZm4oitYsatmRsLljSFHpsbRq</string>
     
-    <string name="twitter_consumer_key">DMsWio2hohKMIz1dq065X82vQ</string>
-    <string name="twitter_consumer_secret">CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS</string>
+    <!--<string name="twitter_consumer_key">DMsWio2hohKMIz1dq065X82vQ</string>-->
+    <!--<string name="twitter_consumer_secret">CfiiWkDfktGHVDeFfbMWqWC9daXISRJbDIpBlMkwb09M2uqkhS</string>-->
+    <string name="twitter_consumer_key">TdUUVIDAnjL9AiHz9P7ZLeIN6</string>
+    <string name="twitter_consumer_secret">DjBchJ9wNvWsO8lAsWSji0PG81lvs8uMnpE7NduSfCdY4zIJDh</string>
     <string name="twitter_app_id">8794708</string>
 
     <string name="facebook_app_id">884536681641610</string>
@@ -113,8 +115,14 @@
     <string name="nav_head_username">Local</string>
     <string name="nav_acct_switch">Switch Account</string>
     <string name="nav_acct_manage">Manage Account</string>
+    <string name="nav_acct_logout">Log Out</string>
     <string name="nav_desc_switch">Switch to Another Account</string>
     <string name="nav_desc_manage">Manage Your Account</string>
+    <string name="nav_desc_logout">Log Out of Your Account</string>
+
+    <!--Others-->
+    <string name="facebook">Facebook</string>
+    <string name="twitter">Twitter</string>
 
     <!--Overflow Menu-->
     <string name="map_normal">Normal</string>
@@ -135,6 +143,9 @@
     <string name="title_activity_login_screen">Sign in</string>
     <string name="title_activity_register_screen">Register</string>
     <string name="title_activity_test">Map</string>
+
+    <!--Parse keys-->
+    <string name="parse_user_identifier">identifier</string>
 
     <!--Reminder fields-->
     <string name="reminder_default_title">Untitled Reminder</string>
@@ -186,6 +197,7 @@
     <string name="main_no_location">Your location list is empty.</string>
 
     <!--Toast-->
+    <string name="login_success">Log in successful</string>
     <string name="support_thank_msg">Thank you! Mental support is sufficient at this point!</string>
     <string name="GPS_unavail">GPS Service Unavailable</string>
     <string name="cannot_find_location">Sorry, cannot find your location</string>

@@ -7,12 +7,14 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.parse.Parse;
-//import com.parse.ParseFacebookUtils;
+import com.facebook.FacebookSdk;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseTwitterUtils;
 import com.peter.georeminder.AnalyticsTrackers;
 import com.peter.georeminder.R;
+
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
-
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -29,13 +31,15 @@ public class GeoReminderApplication extends Application {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_client_key));
 
-        // TODO: test this out
         // Set up Facebook Environment
-//        ParseFacebookUtils.initialize(this);
+        FacebookSdk.sdkInitialize(this);
+        ParseFacebookUtils.initialize(this);
 
         // Set up Twitter Environment
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_consumer_key),
-                                                            getString(R.string.twitter_consumer_secret));
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_consumer_key), getString(R.string.twitter_consumer_secret));
+        ParseTwitterUtils.initialize(getString(R.string.twitter_consumer_key), getString(R.string.twitter_consumer_secret));
+
+        // Set up Crashlytics Environment
         Fabric.with(this, new Twitter(authConfig), new Crashlytics());
 
         // Set up Google Analytics

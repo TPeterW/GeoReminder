@@ -46,6 +46,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.peter.georeminder.models.Location;
@@ -190,11 +191,20 @@ public class MainScreen extends AppCompatActivity implements
         // Nav Drawer
         // create user profile
         //TODO: if user is registered and logged, skip this step and go ahead to load the profile as the user profile
-        userProfile = new ProfileDrawerItem()
-                .withName(getResources().getString(R.string.nav_head_appname))
-                .withEmail(getResources().getString(R.string.nav_local_email))
-                .withIcon(ContextCompat.getDrawable(MainScreen.this, R.mipmap.ic_default_avatar))
-                .withIdentifier(LOCAL_USER_IDENTIFIER);
+        if (ParseUser.getCurrentUser() == null) {
+            userProfile = new ProfileDrawerItem()
+                    .withName(getString(R.string.nav_head_appname))
+                    .withEmail(getString(R.string.nav_local_email))
+                    .withIcon(ContextCompat.getDrawable(MainScreen.this, R.mipmap.ic_default_avatar))
+                    .withIdentifier(LOCAL_USER_IDENTIFIER);
+        } else {
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            userProfile  = new ProfileDrawerItem()
+                    .withName(currentUser.getUsername())
+                    .withEmail(currentUser.getEmail())
+                    .withIcon(ContextCompat.getDrawable(MainScreen.this, R.mipmap.ic_default_avatar))
+                    .withIdentifier(currentUser.getInt(getString(R.string.parse_user_identifier)));
+        }
     }
 
     private void initView(Bundle savedInstanceState) {
@@ -557,6 +567,10 @@ public class MainScreen extends AppCompatActivity implements
                 loadPref();
                 return;
         }
+
+        // for Facebook integration
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -614,17 +628,22 @@ public class MainScreen extends AppCompatActivity implements
                         userProfile,        // TODO: figure out the click event for profile image
                         //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
 //                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_switch)).withDescription(getResources().getString(R.string.nav_desc_switch)).withIcon(R.drawable.ic_nav_add).withIdentifier(PROFILE_SETTING),
-                        new ProfileSettingDrawerItem().withName(getString(R.string.nav_acct_manage)).withDescription(getString(R.string.nav_desc_manage))
-                                .withIcon(R.drawable.ic_nav_manage).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                        new ProfileSettingDrawerItem()
+                                .withName(getString(R.string.nav_acct_manage))
+                                .withDescription(getString(R.string.nav_desc_manage))
+                                .withIcon(R.drawable.ic_nav_manage)
+                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                             @Override
                             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                                 // TODO: change to jump to UserInfoPage
-                                if (ParseUser.getCurrentUser() != null)
+                                if (ParseUser.getCurrentUser() != null) {
+                                    // TODO: delete this toast and jump to user page
                                     Toast.makeText(MainScreen.this, "Already Logged In", Toast.LENGTH_SHORT).show();
-
-                                Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
-                                if(Build.VERSION.SDK_INT >= 21) { getWindow().setExitTransition(null); }
-                                startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                                } else {
+                                    Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
+                                    if (Build.VERSION.SDK_INT >= 21) { getWindow().setExitTransition(null); }
+                                    startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                                }
 
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
@@ -635,11 +654,27 @@ public class MainScreen extends AppCompatActivity implements
 
                                 return false;
                             }
-                        })
+                        }),
+                        // TODO: remove this and create a new drawer
+                        new ProfileSettingDrawerItem()
+                                .withName(getString(R.string.nav_acct_logout))
+                                .withDescription(getString(R.string.nav_desc_logout))
+                                .withIcon(R.drawable.ic_nav_logout)
+                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                                    @Override
+                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                        if (ParseUser.getCurrentUser() != null)
+                                            ParseUser.logOutInBackground();
+                                        drawerHeader.removeProfileByIdentifier(ParseUser.getCurrentUser().getInt(getString(R.string.parse_user_identifier)));
+                                        return true;
+                                    }
+                                })
                 )
                 .withSavedInstance(savedInstanceState)
                 .withCloseDrawerOnProfileListClick(false)
                 .build();
+
+        // TODO: build another drawerHeader for logged in situation
     }
 
     private void toWholeMap(Boolean animateExit) {

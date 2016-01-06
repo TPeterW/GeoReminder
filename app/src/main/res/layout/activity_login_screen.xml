@@ -56,10 +56,27 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/action_sign_in_short"
-            android:textColor="@color/tw__solid_white"
+            android:textColor="@color/md_white_1000"
             android:textStyle="bold" />
 
     </LinearLayout>
+
+    <com.peter.georeminder.utils.login.FBLoginButton
+        android:id="@+id/facebook_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/twitter_login_button"
+        android:contentDescription="@string/facebook" />
+
+    <com.peter.georeminder.utils.login.TWLoginButton
+        android:id="@+id/twitter_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:src="@drawable/login_twitter"
+        android:layout_above="@+id/btn_register_screen"
+        android:contentDescription="@string/twitter" />
 
     <Button
         android:id="@+id/btn_register_screen"

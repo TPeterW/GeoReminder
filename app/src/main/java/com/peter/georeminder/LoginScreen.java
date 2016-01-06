@@ -37,11 +37,16 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.dd.processbutton.iml.ActionProcessButton;
+import com.facebook.login.widget.LoginButton;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
+import com.peter.georeminder.utils.login.FBLoginButton;
 import com.peter.georeminder.utils.login.ProgressGenerator;
 import com.peter.georeminder.utils.login.ProgressGenerator.OnCompleteListener;
+import com.peter.georeminder.utils.login.TWLoginButton;
 import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
 import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
 
@@ -69,8 +74,12 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     private ActionProcessButton btnLogIn;
     private Button btnRegister;
 
+    private FBLoginButton facebookLoginButton;
+    private TWLoginButton twitterLoginButton;
+
     // login
     private boolean isSigningIn;                // user is signing in, button animation on
+    private LogInCallback logInCallback;
 
     // Swipe Back
     private SwipeBackLayout swipeBackLayout;
@@ -111,6 +120,9 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
 
         btnRegister = (Button) findViewById(R.id.btn_register_screen);
 
+        facebookLoginButton = (FBLoginButton) findViewById(R.id.facebook_login_button);
+        twitterLoginButton = (TWLoginButton) findViewById(R.id.twitter_login_button);
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
@@ -131,30 +143,67 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             @Override
             public void onClick(View v) {
                 Intent toRegisterScreen = new Intent(LoginScreen.this, RegisterScreen.class);
-                if (Build.VERSION.SDK_INT > 21) {
-                    getWindow().setExitTransition(null);
-                }
+                if (Build.VERSION.SDK_INT > 21) { getWindow().setExitTransition(null); }
                 startActivityForResult(toRegisterScreen, REGISTER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(LoginScreen.this).toBundle());
             }
         });
+
+        // TODO: so much todo
+        facebookLoginButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Login Button", "Facebook");
+//                ParseFacebookUtils.logInWithReadPermissionsInBackground(LoginScreen.this, null, new LogInCallback() {
+//                    @Override
+//                    public void done(ParseUser user, ParseException e) {
+//
+//                    }
+//                });
+            }
+        });
+
+        twitterLoginButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Login Button", "Twitter");
+//                ParseTwitterUtils.getTwitter().setScreenName(getString(R.string.app_name));
+//                ParseTwitterUtils.logIn(LoginScreen.this, new LogInCallback() {
+//                    @Override
+//                    public void done(ParseUser user, ParseException e) {
+//
+//                    }
+//                });
+            }
+        });
+
+//        twitterLoginButton.setCallback(new Callback<TwitterSession>() {
+//            @Override
+//            public void success(Result<TwitterSession> result) {
+//
+//            }
+//
+//            @Override
+//            public void failure(TwitterException e) {
+//
+//            }
+//        });
     }
 
     private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
+        if (!mayRequestContacts())
             return;
-        }
 
         getLoaderManager().initLoader(0, null, this);
     }
 
     private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+
+        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
             return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
+
+        if (shouldShowRequestPermissionRationale(READ_CONTACTS))
             Snackbar.make(inputEmail, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
                     .setAction(android.R.string.ok, new View.OnClickListener() {
                         @Override
@@ -163,9 +212,9 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
                             requestPermissions(new String[]{READ_CONTACTS}, READ_CONTACTS_REQUEST_CODE);
                         }
                     });
-        } else {
+        else
             requestPermissions(new String[]{READ_CONTACTS}, READ_CONTACTS_REQUEST_CODE);
-        }
+
         return false;
     }
 
@@ -176,9 +225,8 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == READ_CONTACTS_REQUEST_CODE) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 populateAutoComplete();
-            }
         }
     }
 
@@ -187,10 +235,8 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void setupActionBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // Show the Up button in the action bar.
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);      // Show the Up button in the action bar.
     }
 
     /**
@@ -199,6 +245,10 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+        ParseTwitterUtils.getTwitter().setConsumerKey(getString(R.string.twitter_consumer_key))
+                                    .setConsumerSecret(getString(R.string.twitter_consumer_secret));
+        ParseTwitterUtils.logInInBackground(this);
+
         final ProgressGenerator progressGenerator = new ProgressGenerator(this);
 
         // Reset errors.
@@ -235,13 +285,12 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         isSigningIn = true;
         btnLogIn.requestFocus();
 
-        // TODO: add check here, don't run after progress is -1
         progressGenerator.start(btnLogIn);
         btnLogIn.setEnabled(false);
         inputEmail.setEnabled(false);
         inputPasswd.setEnabled(false);
 
-        // TODO: need to deal with lag, not cancel
+        // TODO: log in through facebook and twitter
 
         ParseUser.logInInBackground(email, password, new LogInCallback() {
             @Override
@@ -296,10 +345,14 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
                 if (resultCode == RESULT_OK) {
                     Log.d("Register Result Code", "Success" + resultCode);
                     setResult(RESULT_OK);
-                    finish();                   // TODO: check, returns to MainScreen
+                    Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                    finish();
                 }
                 break;
         }
+
+        // for Facebook integration
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
 
         super.onActivityResult(requestCode, resultCode, data);
     }

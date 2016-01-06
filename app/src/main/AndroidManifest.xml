@@ -101,6 +101,11 @@
             android:name=".IntroScreen"
             android:parentActivityName=".MainScreen"
             android:theme="@style/AppTheme.FullScreen" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -122,7 +127,9 @@
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="16d253c329acfc23af261d52a61969e6" />
-
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
         <service
             android:name=".utils.BackgroundService"
             android:icon="@mipmap/ic_launcher" />
