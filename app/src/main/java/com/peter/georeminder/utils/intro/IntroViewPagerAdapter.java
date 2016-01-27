@@ -4,8 +4,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.peter.georeminder.utils.intro.ColorFragment;
-
 import java.util.Random;
 
 /**
@@ -29,7 +27,7 @@ public class IntroViewPagerAdapter extends FragmentPagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-        return ColorFragment.newInstance(0xff000000 | random.nextInt(0x00ffffff));
+        return IntroFragment.newInstance(0xff000000 | random.nextInt(0x00ffffff));
 
     }
 }

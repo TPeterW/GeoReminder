@@ -34,6 +34,11 @@ public class IntroScreen extends SwipeBackActivity {
     }
 
     private void initView() {
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        decorView.setSystemUiVisibility(uiOptions);
+
         swipeBackLayout = getSwipeBackLayout();
         swipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_RIGHT);         // initialise swipe back layout
         swipeBackLayout.setEnableGesture(false);                                    // this is assuming I'm gonna have multiple intro pages, which I am
@@ -83,7 +88,7 @@ public class IntroScreen extends SwipeBackActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch(keyCode){
+        switch(keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 return true;                // you can't exit by pressing back key
         }

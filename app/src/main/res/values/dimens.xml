@@ -26,4 +26,9 @@
     <!--Staggered Grid Layout-->
     <dimen name="staggered_space">5dp</dimen>
 
+    <!--Login Button-->
+    <dimen name="qq_login_btn_left_padding">3dp</dimen>
+    <dimen name="qq_login_btn_right_padding">25dp</dimen>
+    <dimen name="qq_login_btn_drawable_padding">0dp</dimen>
+
 </resources>

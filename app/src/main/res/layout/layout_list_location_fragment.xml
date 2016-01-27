@@ -34,6 +34,4 @@
         android:layout_below="@id/image_no_location"
         android:layout_centerHorizontal="true" />
 
-
-
 </RelativeLayout>

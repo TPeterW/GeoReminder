@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 /**
  * Created by Peter on 10/6/15.
+ * TODO: Broadcast receiver maybe, this will be the last thing to implement
  */
 public class BackgroundService extends Service {
     @Nullable

@@ -19,6 +19,7 @@ import android.speech.RecognizerIntent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -62,7 +63,7 @@ import java.util.ArrayList;
 //        \/__/         \/__/         \/__/
 
 public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallback,
-        NavigationView.OnNavigationItemSelectedListener, LocationSource, OnLocationChangedListener{
+        OnNavigationItemSelectedListener, LocationSource, OnLocationChangedListener {
 
     private GoogleMap googleMap;
 
@@ -94,19 +95,17 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         useGoogleMap = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false)
                 && sharedPreferences.getString("whichMap", "0").equals("0");        // "0" is google map
 
-        if(useGoogleMap){
+        if(useGoogleMap) {
             setTheme(R.style.AppTheme_TranslucentWindow);
-        }
-        else {                  // use AMAP
+        } else {                  // use AMAP
             setTheme(R.style.AppTheme_TranslucentStatusBar);
         }
 
         super.onCreate(savedInstanceState);
 
-        if(useGoogleMap){
+        if(useGoogleMap) {
             setContentView(R.layout.activity_google_map_screen);
-        }
-        else {                  // use AMAP
+        } else {                  // use AMAP
             setContentView(R.layout.activity_amap_map_screen);
         }
 
@@ -122,15 +121,16 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initTransitions() {
-        if(Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(new Slide(Gravity.END));
             getWindow().setReturnTransition(new Slide(Gravity.START));
         }
     }
 
     private void initNavigationBar() {
-        if(useGoogleMap && Build.VERSION.SDK_INT >= 21){
-
+        if (useGoogleMap && Build.VERSION.SDK_INT >= 21) {
+            // TODO: I forgot what I was going to do here
+            // might have set it in styles.xml
         }
     }
 
@@ -139,13 +139,12 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         // Navigation Drawer
-        if(useGoogleMap){
+        if (useGoogleMap) {
             drawer = (DrawerLayout) findViewById(R.id.google_map_drawer_layout);
 
             navigationView = (NavigationView) findViewById(R.id.nav_google_map_view);
             navigationView.setNavigationItemSelectedListener(this);
-        }
-        else {
+        } else {
             drawer = (DrawerLayout) findViewById(R.id.amap_map_drawer_layout);
 
             navigationView = (NavigationView) findViewById(R.id.nav_amap_map_view);
@@ -169,13 +168,12 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initMap(Bundle savedInstanceState) {
-        if(useGoogleMap){
+        if(useGoogleMap) {
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.whole_google_map);
             mapFragment.getMapAsync(this);
-        }
-        else {
+        } else {
             // Initialise AMAP
             aMapFragment = (com.amap.api.maps.SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.whole_amap_map);
@@ -190,17 +188,16 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initSearchBox() {
-        if(useGoogleMap){
+        if (useGoogleMap) {
             searchBox = (SearchBox) findViewById(R.id.google_map_searchBox);
             searchBox.setOverflowMenu(R.menu.menu_gogole_map_search_overflow);
-        }
-        else {
+        } else {
             searchBox = (SearchBox) findViewById(R.id.amap_map_searchBox);
             searchBox.setOverflowMenu(R.menu.menu_amap_map_search_overflow);
         }
 
         searchBox.enableVoiceRecognition(this);
-        for(int x = 0; x < 5; x++){
+        for (int x = 0; x < 5; x++) {
             SearchResult option = new SearchResult("Result " + Integer.toString(x),
                     ContextCompat.getDrawable(WholeMapScreen.this, R.drawable.ic_search_history));
             searchBox.addSearchable(option);
@@ -252,6 +249,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
+
                     // Google Map
                     case R.id.google_map_type_normal:
                         navigationView.getMenu().getItem(0).setChecked(true);       // item 0: normal
@@ -275,13 +273,13 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                         int coarseLocation = ContextCompat.checkSelfPermission(WholeMapScreen.this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
                         int fineLocation = ContextCompat.checkSelfPermission(WholeMapScreen.this, android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-                        if(coarseLocation == PackageManager.PERMISSION_DENIED){
+                        if (coarseLocation == PackageManager.PERMISSION_DENIED) {
                             ActivityCompat.requestPermissions(WholeMapScreen.this,
                                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
                                     COARSE_LOCATION_PERMISSION_REQUEST_CODE);
                         }
 
-                        if(fineLocation == PackageManager.PERMISSION_DENIED){
+                        if (fineLocation == PackageManager.PERMISSION_DENIED) {
                             ActivityCompat.requestPermissions(WholeMapScreen.this,
                                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                                     FINE_LOCATION_PERMISSION_REQUEST_CODE);
@@ -289,12 +287,11 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
                         Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-                        if (myLocation != null){
+                        if (myLocation != null) {
                             aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.changeLatLng(
                                     new com.amap.api.maps.model.LatLng(myLocation.getLatitude(),
                                             myLocation.getLongitude())));
-                        }
-                        else {
+                        } else {
                             Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                         }
                         break;
@@ -314,10 +311,11 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
      * installed Google Play services and returned to the app.
      */
     @Override
+    @SuppressWarnings("all")
     public void onMapReady(GoogleMap inputMap) {
         googleMap = inputMap;
-        googleMap.setBuildingsEnabled(true);             // enable 3D building view
-        googleMap.setMyLocationEnabled(true);
+        googleMap.setBuildingsEnabled(true);                // enable 3D building view
+        googleMap.setMyLocationEnabled(true);               // TODO: add permission check
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setMapToolbarEnabled(true);
@@ -359,7 +357,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         });
 
 
-        //TODO: calculate screen height, change dip to pixels
+        // TODO: calculate screen height, change dip to pixels
         googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, getNavigationBarHeight(this, Configuration.ORIENTATION_PORTRAIT));           // compass not to be hidden by search bar
 
         // Add a marker in Sydney and move the camera
@@ -370,7 +368,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
         //TODO: can be used for edit screen
 //        if(ContextCompat.checkSelfPermission(WholeMapScreen.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-//            == PackageManager.PERMISSION_GRANTED){
+//            == PackageManager.PERMISSION_GRANTED) {
 //            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
 //                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude(),
 //                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
@@ -439,7 +437,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.nav_google_map_type_normal:
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 break;
@@ -470,7 +468,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
             case R.id.nav_amap_map_settings:
             case R.id.nav_google_map_settings:
-                Intent toSettingScreen = new Intent(WholeMapScreen.this, SettingScreen.class);
+                Intent toSettingScreen = new Intent(WholeMapScreen.this, SettingsScreen.class);
                 startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
                 break;
 
@@ -484,8 +482,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
                 sendFeedbackEmail.setData(uri);                                             // do not use setType, it messes things up
                 try {
                     startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
-                }
-                catch (ActivityNotFoundException e){
+                } catch (ActivityNotFoundException e){
                     Toast centreToast =  Toast.makeText(WholeMapScreen.this, getResources().getString(R.string.activity_not_fonud), Toast.LENGTH_SHORT);
                     centreToast.setGravity(Gravity.CENTER, 0, 0);
                     centreToast.show();
@@ -495,10 +492,9 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         }
 
         // close the drawer after clicking on an item
-        if(useGoogleMap){
+        if (useGoogleMap) {
             drawer = (DrawerLayout) findViewById(R.id.google_map_drawer_layout);
-        }
-        else {
+        } else {
             drawer = (DrawerLayout) findViewById(R.id.amap_map_drawer_layout);
         }
         drawer.closeDrawer(GravityCompat.START);
@@ -507,21 +503,19 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case COARSE_LOCATION_PERMISSION_REQUEST_CODE:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.i("Permission Granted: ", "ACCESS_COARSE_LOCATION");
-                }
-                else {
+                } else {
                     Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                 }
                 break;
 
             case FINE_LOCATION_PERMISSION_REQUEST_CODE:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.i("Permission Granted: ", "ACCESS_FINE_LOCATION");
-                }
-                else {
+                } else {
                     Toast.makeText(WholeMapScreen.this, getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -565,10 +559,10 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onBackPressed() {
-        if(searchBox.isFocused()){
+        if (searchBox.isFocused()) {
             searchBox.clearFocus();
         }
-        if(drawer.isDrawerOpen(GravityCompat.START)){
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
             return;
         }
@@ -582,28 +576,28 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
     @Override
     protected void onResume() {
         super.onResume();
-        if(!useGoogleMap)
+        if (!useGoogleMap)
             aMapFragment.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(!useGoogleMap)
+        if (!useGoogleMap)
             aMapFragment.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(!useGoogleMap)
+        if (!useGoogleMap)
             aMapFragment.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(!useGoogleMap)
+        if (!useGoogleMap)
             aMapFragment.onDestroyView();
     }
 }
