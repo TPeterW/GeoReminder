@@ -9,10 +9,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.text.TextUtils;
@@ -20,6 +20,7 @@ import android.transition.Slide;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -31,12 +32,12 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.dd.processbutton.iml.ActionProcessButton;
-import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+import com.peter.georeminder.utils.login.LoginAgent;
+import com.peter.georeminder.utils.login.LoginAgent.LoginListener;
 import com.peter.georeminder.utils.login.ProgressGenerator;
-import com.peter.georeminder.utils.login.ProgressGenerator.OnCompleteListener;
 import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
 import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
 
@@ -49,12 +50,15 @@ import static android.Manifest.permission.READ_CONTACTS;
  * Created by Peter on 1/5/16.
  *
  */
-public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks<Cursor>, OnCompleteListener {
+public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks<Cursor>, LoginListener {
 
     // TODO: log in through google play and other social media
     // TODO: enable registration
 
-    private static final int READ_CONTACTS_REQUEST_CODE = 0x001;
+    private static final int READ_CONTACTS_REQUEST_CODE     = 0x001;
+
+    public static final int REGISTER_SUCCESS                = 0x103;
+    public static final int REGISTER_CANCELLED              = 0x104;
 
     // UI references.
     private LinearLayout emailRegisterForm;
@@ -62,6 +66,8 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
     private EditText inputPasswd;
     private EditText inputConfirmPasswd;
     private ActionProcessButton btnRegister;
+
+    private ProgressGenerator progressGenerator;
 
     // login
     private boolean isRegistering;                // user is signing in, button animation on
@@ -149,7 +155,11 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
     private void setupActionBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             // Show the Up button in the action bar.
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            try {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            } catch (Exception e) {
+                // do nothing again
+            }
         }
     }
 
@@ -159,7 +169,7 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
      * errors are presented and no actual login attempt is made.
      */
     private void attemptRegister() {
-        final ProgressGenerator progressGenerator = new ProgressGenerator(this);
+        progressGenerator = new ProgressGenerator();
 
         // Reset errors.
         inputEmail.setError(null);
@@ -210,25 +220,7 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
         inputPasswd.setEnabled(false);
         inputConfirmPasswd.setEnabled(false);
 
-        // TODO: register
-        ParseUser user = new ParseUser();
-        user.setEmail(email);
-        user.setUsername(email);
-        user.setPassword(password);
-        user.signUpInBackground(new SignUpCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {        // sign up successful
-                    setResult(RESULT_OK);
-                    finish();
-                } else {
-                    Log.e("Sign up", "Failed");
-                    e.printStackTrace();
-                    showErrorMessage(e);
-                    progressGenerator.stop(btnRegister);
-                }
-            }
-        });
+        LoginAgent.getInstance().registerInBackground(email, password);
     }
 
     private boolean isEmailValid(String email) {
@@ -332,7 +324,28 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
     }
 
     @Override
-    public void onComplete() {
+    public void onLoginComplete() {
+        // nothing here
+    }
+
+    @Override
+    public void onLoginFail(ParseException e) {
+        // nothing here
+    }
+
+    @Override
+    public void onLoginCancelled() {
+        // nothing here
+    }
+
+    @Override
+    public void onLogoutComplete() {
+        // nothing here
+    }
+
+    @Override
+    public void onRegisterComplete() {
+        Log.i("RegisterScreen", "Register complete");
         btnRegister.setEnabled(true);
         btnRegister.setText(R.string.success);
         btnRegister.setProgress(100);
@@ -340,33 +353,21 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
         inputEmail.setEnabled(true);
         inputPasswd.setEnabled(true);
         inputConfirmPasswd.setEnabled(true);
-        Log.i("ProgressGen", "onComplete");
+
+        // set result and go back
+        setResult(REGISTER_CANCELLED);
+        swipeBackLayout.scrollToFinishActivity();
     }
 
     @Override
-    public void onFail() {
-        inputEmail.setEnabled(true);
-        inputPasswd.setEnabled(true);
-        inputConfirmPasswd.setEnabled(true);
-        isRegistering = false;
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                btnRegister.setEnabled(true);
-                btnRegister.setProgress(0);
-            }
-        }, 2000);           // change back to normal button in two seconds
-
-        Log.i("ProgressGen", "onFail");
-    }
-
-    @Override
-    public void onCancel() {
+    public void onRegisterFail(ParseException e) {
+        Log.i("RegisterScreen", "Register fail");
         btnRegister.setProgress(0);
         btnRegister.setText(R.string.action_sign_in_short);
         isRegistering = false;
-        Log.i("ProgressGen", "onCancel");
+
+        e.printStackTrace();
+        showErrorMessage(e);
     }
 
     private interface ProfileQuery {
@@ -396,6 +397,18 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                swipeBackLayout.scrollToFinishActivity();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
@@ -406,4 +419,17 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    protected void onResume() {
+        LoginAgent.getInstance().registerListener(this);
+        Log.d("RegisterScreen", "Registered listener");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        LoginAgent.getInstance().unregisterListener(this);
+        Log.d("RegisterScreen", "Unregistered listener");
+        super.onPause();
+    }
 }

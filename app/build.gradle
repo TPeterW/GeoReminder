@@ -4,7 +4,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+//        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.21.2'
     }
 }
 apply plugin: 'com.android.application'
@@ -56,10 +57,12 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile files('libs/AMap_Android_3DMapSDK_V3.1.1.jar')
+    compile files('AMap_3DMap_V3.2.0.1.jar')
+    compile files('mta-sdk-1.6.2.jar')
+    compile files('open_sdk_r5509.jar')
     compile project(':searchbox')
     compile 'com.android.support:multidex:1.0.1'
-    compile ('com.android.support:appcompat-v7:23.1.1')
+    compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
@@ -67,33 +70,30 @@ dependencies {
     compile 'com.android.support:support-annotations:23.1.1'
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     compile 'com.google.android.gms:play-services-identity:8.4.0'
-    compile 'com.google.android.gms:play-services-analytics:8.4.0'
-    compile ('com.parse:parse-android:1.12.0') {
-        exclude group: 'com.parse.bolts',
-                module: 'bolts-tasks'
-    }
-    compile ('com.parse:parsetwitterutils-android:1.10.3') {
-        exclude group: 'com.parse.bolts',
-                module: 'bolts-tasks'
-    }
-    compile 'com.parse:parsefacebookutils-v4-android:1.10.3@aar'
-    compile 'com.facebook.android:facebook-android-sdk:4.8.2'
     compile 'com.github.clans:fab:1.6.2'
     compile 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
-    compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.4'
+    compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.5'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.daimajia.easing:library:1.0.1@aar'
     compile 'com.daimajia.androidanimations:library:1.1.3@aar'
     compile 'de.hdodenhof:circleimageview:2.0.0'
-    compile 'me.relex:circleindicator:1.1.7@aar'
+    compile 'me.relex:circleindicator:1.1.8@aar'
     compile 'com.ToxicBakery.viewpager.transforms:view-pager-transforms:1.2.32@aar'
+    compile 'com.parse:parse-android:1.13.0'
+    compile 'com.parse.bolts:bolts-applinks:1.4.0'
+    compile 'com.parse.bolts:bolts-tasks:1.4.0'
+    compile 'com.parse:parsetwitterutils-android:1.10.5'
+    compile 'com.parse:parsefacebookutils-v4-android:1.10.4@aar'
+    compile ('com.facebook.android:facebook-android-sdk:4.9.0') {
+        exclude module: 'bolts-android'
+    }
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile('com.mikepenz:materialdrawer:4.6.3@aar') {
+    compile('com.mikepenz:materialdrawer:4.6.4@aar') {
         transitive = true
     }
-    compile('com.twitter.sdk.android:twitter:1.11.0@aar') {
+    compile('com.twitter.sdk.android:twitter:1.12.0@aar') {
         transitive = true;
     }
 }

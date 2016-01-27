@@ -10,7 +10,6 @@ import com.parse.Parse;
 import com.facebook.FacebookSdk;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseTwitterUtils;
-import com.peter.georeminder.AnalyticsTrackers;
 import com.peter.georeminder.R;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -41,9 +40,6 @@ public class GeoReminderApplication extends Application {
 
         // Set up Crashlytics Environment
         Fabric.with(this, new Twitter(authConfig), new Crashlytics());
-
-        // Set up Google Analytics
-        AnalyticsTrackers.initialize(this);
     }
 
     @Override

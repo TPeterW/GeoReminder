@@ -14,13 +14,11 @@ import java.util.Random;
 
 public class ProgressGenerator {
 
-    private OnCompleteListener logInCompleteListener;
     private int mProgress;
 
     public boolean isComplete;
 
-    public ProgressGenerator(OnCompleteListener listener) {
-        logInCompleteListener = listener;
+    public ProgressGenerator() {
         isComplete = false;
     }
 
@@ -33,14 +31,6 @@ public class ProgressGenerator {
 
     public void stop(final ProcessButton button) {
         button.setProgress(-1);
-        logInCompleteListener.onFail();
-    }
-
-
-    public interface OnCompleteListener {
-        void onComplete();
-        void onCancel();
-        void onFail();
     }
 }
 

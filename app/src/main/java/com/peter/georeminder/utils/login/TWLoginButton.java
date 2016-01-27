@@ -41,7 +41,7 @@ public class TWLoginButton extends Button {
     @TargetApi(21)
     private void setupButton() {
         Resources res = this.getResources();
-        super.setCompoundDrawablesWithIntrinsicBounds(res.getDrawable(com.twitter.sdk.android.core.R.drawable.tw__ic_logo_default), (Drawable) null, (Drawable) null, (Drawable) null);
+        super.setCompoundDrawablesWithIntrinsicBounds(res.getDrawable(com.twitter.sdk.android.core.R.drawable.tw__ic_logo_default), null, null, null);
         super.setCompoundDrawablePadding(res.getDimensionPixelSize(com.twitter.sdk.android.core.R.dimen.tw__login_btn_drawable_padding));
 //        super.setText(com.twitter.sdk.android.core.R.string.tw__login_btn_txt);
         super.setText(R.string.login_with_twitter);

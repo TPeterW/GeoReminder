@@ -50,10 +50,10 @@ public class SettingsFragment extends PreferenceFragment {
                 switch (key) {
                     case "showAnim":
                         if (isAdded()) {
-                            getPreferenceScreen().findPreference(key).setEnabled(false);        // make sure user wouldn't be able to click on it next time
+//                            getPreferenceScreen().findPreference(key).setEnabled(true);        // make sure user wouldn't be able to click on it next time
                             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                            editor.putBoolean(getString(R.string.shared_pref_anim_pref_enabled), false)
+                            editor.putBoolean(getString(R.string.shared_pref_anim_pref_enabled), true)
                                     .apply();
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

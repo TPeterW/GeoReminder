@@ -1,4 +1,5 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -74,9 +75,17 @@
         android:id="@+id/twitter_login_button"
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:src="@drawable/login_twitter"
-        android:layout_above="@+id/btn_register_screen"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/qq_login_button"
         android:contentDescription="@string/twitter" />
+
+    <com.peter.georeminder.utils.login.QQLoginButton
+        android:id="@+id/qq_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:textSize="18sp"
+        android:layout_above="@+id/btn_register_screen"
+        android:contentDescription="@string/qq"/>
 
     <Button
         android:id="@+id/btn_register_screen"

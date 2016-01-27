@@ -62,6 +62,11 @@
     <string name="facebook_app_id">884536681641610</string>
     <string name="facebook_app_secret">5640a219ba68cf7e8dc05f22c75f06d1</string>
 
+    <string name="tencent_app_id">1105087374</string>
+    <string name="tencent_app_key">3QJaMkVEEzLPut0B</string>
+
+    <string name="development_key_hash">PO6pIYq//0wDw3cu9uLKJfaeKTI=</string>
+
     <!-- Login & register -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -84,6 +89,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
     <string name="login_with_facebook">Log in with Facebook</string>
     <string name="login_with_twitter">Log in with Twitter</string>
+    <string name="login_with_qq">Log in with QQ</string>
 
     <!--Map-->
     <string name="google_map">Google Map</string>
@@ -123,6 +129,7 @@
     <!--Others-->
     <string name="facebook">Facebook</string>
     <string name="twitter">Twitter</string>
+    <string name="qq">QQ</string>
 
     <!--Overflow Menu-->
     <string name="map_normal">Normal</string>
@@ -146,6 +153,7 @@
 
     <!--Parse keys-->
     <string name="parse_user_identifier">identifier</string>
+    <string name="parse_user_userNameSet">userNameSet</string>
 
     <!--Reminder fields-->
     <string name="reminder_default_title">Untitled Reminder</string>
@@ -198,9 +206,12 @@
 
     <!--Toast-->
     <string name="login_success">Log in successful</string>
+    <string name="failed_fetch_email">Failed to fetch user email</string>
     <string name="support_thank_msg">Thank you! Mental support is sufficient at this point!</string>
     <string name="GPS_unavail">GPS Service Unavailable</string>
     <string name="cannot_find_location">Sorry, cannot find your location</string>
+
+    <string name="permission_need_fine_location">GeoReminder needs to access your location to provide Geo-reminding service</string>
 
 
 

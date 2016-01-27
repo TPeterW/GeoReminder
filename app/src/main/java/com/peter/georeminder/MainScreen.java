@@ -1,20 +1,25 @@
 package com.peter.georeminder;
 
+import android.Manifest;
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -32,6 +37,7 @@ import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -39,6 +45,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
@@ -54,6 +61,7 @@ import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
 import com.peter.georeminder.utils.viewpager.ListLocationFragment.ListLocationListener;
 import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderListener;
+import com.tencent.tauth.Tencent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -61,9 +69,6 @@ import java.util.List;
 public class MainScreen extends AppCompatActivity implements
         ListReminderListener, ListLocationListener, OnSharedPreferenceChangeListener{
     //TODO: put Build.VERSION.SDK_INT into shared preference so that it wouldn't have to check every time
-
-    // Analytics Tracker
-    AnalyticsTrackers analyticsTrackers;
 
     // ToolBar
     private FloatingActionButton seeMap;
@@ -85,11 +90,13 @@ public class MainScreen extends AppCompatActivity implements
     // Preferences
     private boolean useAnimation;
 
-    private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE = 0x001;
-    private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE = 0x002;
-    private static final int EDIT_EXISTING_REMINDER_REQUEST_CODE = 0x003;
-    private static final int SETTINGS_REQUEST_CODE = 0x004;
-    private static final int LOGIN_REQUEST_CODE = 0x005;
+    private static final int CREATE_NEW_GEO_REMINDER_REQUEST_CODE           = 0x001;
+    private static final int CREATE_NEW_NOR_REMINDER_REQUEST_CODE           = 0x002;
+    private static final int EDIT_EXISTING_REMINDER_REQUEST_CODE            = 0x003;
+    private static final int SETTINGS_REQUEST_CODE                          = 0x004;
+    private static final int LOGIN_REQUEST_CODE                             = 0x005;
+
+    private static final int PERMISSION_ACCESS_FINE_LOCATION_REQUEST_CODE   = 0x051;
 
     // Importante
     // DataList
@@ -101,17 +108,17 @@ public class MainScreen extends AppCompatActivity implements
     private Drawer drawer = null;
     private IProfile userProfile;
     // Identifiers
-    private static final int LOCAL_USER_IDENTIFIER =    101;
-    private static final int ONLINE_USER_IDENTIFIER =   102;
-    private static final int ALL_IDENTIFIER =           11;
-    private static final int GEO_IDENTIFIER =           12;
-    private static final int NOR_IDENTIFIER =           13;
-    private static final int DRAFT_IDENTIFIER =         14;
-    private static final int VIEW_MAP_IDENTIFIER =      15;
-    private static final int ABOUT_IDENTIFIER =         21;
-    private static final int SUPPORT_IDENTIFIER =       22;
-    private static final int FEEDBACK_IDENTIFIER =      51;
-    private static final int SETTINGS_IDENTIFIER =      52;
+    private static final int LOCAL_USER_IDENTIFIER                          = 101;
+    private static final int ONLINE_USER_IDENTIFIER                         = 102;
+    private static final int ALL_IDENTIFIER                                 = 11;
+    private static final int GEO_IDENTIFIER                                 = 12;
+    private static final int NOR_IDENTIFIER                                 = 13;
+    private static final int DRAFT_IDENTIFIER                               = 14;
+    private static final int VIEW_MAP_IDENTIFIER                            = 15;
+    private static final int ABOUT_IDENTIFIER                               = 21;
+    private static final int SUPPORT_IDENTIFIER                             = 22;
+    private static final int FEEDBACK_IDENTIFIER                            = 51;
+    private static final int SETTINGS_IDENTIFIER                            = 52;
 
     // Record the last time "Back" key was pressed, to implement "double-click-exit"
     private long firstBackPress;
@@ -159,9 +166,6 @@ public class MainScreen extends AppCompatActivity implements
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         // TODO: get data from shared preferences
 
-        // Trackers
-        analyticsTrackers = AnalyticsTrackers.getInstance();
-
         reminderList = new LinkedList<>();
         // TODO: remove these and actually get the reminders from local data storage
         reminderList.add(new Reminder(this).setTitle("Reminder 1"));
@@ -190,19 +194,19 @@ public class MainScreen extends AppCompatActivity implements
 
         // Nav Drawer
         // create user profile
-        //TODO: if user is registered and logged, skip this step and go ahead to load the profile as the user profile
+        //TODO: if user is registered and logged in, skip this step and go ahead to load the profile as the user profile
         if (ParseUser.getCurrentUser() == null) {
             userProfile = new ProfileDrawerItem()
                     .withName(getString(R.string.nav_head_appname))
                     .withEmail(getString(R.string.nav_local_email))
-                    .withIcon(ContextCompat.getDrawable(MainScreen.this, R.mipmap.ic_default_avatar))
+                    .withIcon(R.mipmap.ic_default_avatar)
                     .withIdentifier(LOCAL_USER_IDENTIFIER);
         } else {
             ParseUser currentUser = ParseUser.getCurrentUser();
             userProfile  = new ProfileDrawerItem()
                     .withName(currentUser.getUsername())
                     .withEmail(currentUser.getEmail())
-                    .withIcon(ContextCompat.getDrawable(MainScreen.this, R.mipmap.ic_default_avatar))
+                    .withIcon(R.mipmap.ic_default_avatar)
                     .withIdentifier(currentUser.getInt(getString(R.string.parse_user_identifier)));
         }
     }
@@ -316,7 +320,7 @@ public class MainScreen extends AppCompatActivity implements
                 .withAccountHeader(drawerHeader)
                 .withStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary))
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all),
+                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all).withBadge(8 + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary)),
                         new PrimaryDrawerItem().withIdentifier(GEO_IDENTIFIER).withName(getString(R.string.nav_opt_geo)).withIcon(R.drawable.ic_nav_geo),
                         new PrimaryDrawerItem().withIdentifier(NOR_IDENTIFIER).withName(getString(R.string.nav_opt_nor)).withIcon(R.drawable.ic_nav_nor),
                         new PrimaryDrawerItem().withIdentifier(DRAFT_IDENTIFIER).withName(getString(R.string.nav_opt_draft)).withIcon(R.drawable.ic_nav_draft),
@@ -326,67 +330,67 @@ public class MainScreen extends AppCompatActivity implements
                         new SecondaryDrawerItem().withIdentifier(ABOUT_IDENTIFIER).withName(getString(R.string.nav_opt_about)).withSelectable(false),
                         new SecondaryDrawerItem().withIdentifier(SUPPORT_IDENTIFIER).withName(getString(R.string.nav_opt_support)).withSelectable(false)
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        switch (drawerItem.getIdentifier()) {
-                            case ALL_IDENTIFIER:
+                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                                    @Override
+                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                        switch (drawerItem.getIdentifier()) {
+                                            case ALL_IDENTIFIER:
 
-                                break;
-                            case GEO_IDENTIFIER:
+                                                break;
+                                            case GEO_IDENTIFIER:
 
-                                break;
-                            case NOR_IDENTIFIER:
+                                                break;
+                                            case NOR_IDENTIFIER:
 
-                                break;
-                            case DRAFT_IDENTIFIER:
+                                                break;
+                                            case DRAFT_IDENTIFIER:
 
-                                break;
-                            case VIEW_MAP_IDENTIFIER:
-                                toWholeMap(false);
-                                break;
-                            case ABOUT_IDENTIFIER:
-                                Intent toMyWebsite = new Intent(Intent.ACTION_VIEW);
-                                Uri homePageUri = Uri.parse("http://tpeterw.github.io");
-                                toMyWebsite.setData(homePageUri);
-                                startActivity(toMyWebsite);
-                                break;
-                            case SUPPORT_IDENTIFIER:
-                                Toast thank_msg = Toast.makeText(MainScreen.this, getString(R.string.support_thank_msg), Toast.LENGTH_LONG);
-                                thank_msg.setGravity(Gravity.CENTER, 0, 0);
-                                thank_msg.show();
-                                break;
-                            case FEEDBACK_IDENTIFIER:
-                                String uriText = "mailto:peterwangtao0@hotmail.com"
-                                        + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
-                                        + "&body=" + Uri.encode(getString(R.string.feedback_content));
-                                Uri emailUri = Uri.parse(uriText);
-                                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
-                                sendFeedbackEmail.setData(emailUri);                                             // do not use setType, it messes things up
-                                try {
-                                    startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
-                                } catch (ActivityNotFoundException e) {
-                                    Snackbar.make(newReminder, getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
-                                            .setAction("Action", null)
-                                            .show();
-                                }
-                                break;
-                            case SETTINGS_IDENTIFIER:
-                                Intent toSettingScreen = new Intent(MainScreen.this, SettingsScreen.class);
-                                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
-                                break;
-                        }
+                                                break;
+                                            case VIEW_MAP_IDENTIFIER:
+                                                toWholeMap(false);
+                                                break;
+                                            case ABOUT_IDENTIFIER:
+                                                Intent toMyWebsite = new Intent(Intent.ACTION_VIEW);
+                                                Uri homePageUri = Uri.parse("http://tpeterw.github.io");
+                                                toMyWebsite.setData(homePageUri);
+                                                startActivity(toMyWebsite);
+                                                break;
+                                            case SUPPORT_IDENTIFIER:
+                                                Toast thank_msg = Toast.makeText(MainScreen.this, getString(R.string.support_thank_msg), Toast.LENGTH_LONG);
+                                                thank_msg.setGravity(Gravity.CENTER, 0, 0);
+                                                thank_msg.show();
+                                                break;
+                                            case FEEDBACK_IDENTIFIER:
+                                                String uriText = "mailto:peterwangtao0@hotmail.com"
+                                                        + "?subject=" + Uri.encode(getString(R.string.feedback_subject))
+                                                        + "&body=" + Uri.encode(getString(R.string.feedback_content));
+                                                Uri emailUri = Uri.parse(uriText);
+                                                Intent sendFeedbackEmail = new Intent(Intent.ACTION_SENDTO);                // this will only pop up the apps that can send e-mails
+                                                sendFeedbackEmail.setData(emailUri);                                             // do not use setType, it messes things up
+                                                try {
+                                                    startActivity(Intent.createChooser(sendFeedbackEmail, getString(R.string.send_feedback)));
+                                                } catch (ActivityNotFoundException e) {
+                                                    Snackbar.make(newReminder, getString(R.string.activity_not_fonud), Snackbar.LENGTH_SHORT)
+                                                            .setAction("Action", null)
+                                                            .show();
+                                                }
+                                                break;
+                                            case SETTINGS_IDENTIFIER:
+                                                Intent toSettingScreen = new Intent(MainScreen.this, SettingsScreen.class);
+                                                startActivityForResult(toSettingScreen, SETTINGS_REQUEST_CODE);
+                                                break;
+                                        }
 
-                        drawer.closeDrawer();
-                        return true;
-                    }
-                })
-                .addStickyDrawerItems(
-                        new PrimaryDrawerItem().withName(getString(R.string.nav_feedback)).withIdentifier(FEEDBACK_IDENTIFIER).withIcon(R.drawable.ic_nav_feedback).withSelectable(false),
-                        new PrimaryDrawerItem().withName(getString(R.string.nav_setting)).withIdentifier(SETTINGS_IDENTIFIER).withIcon(R.drawable.ic_nav_setting).withSelectable(false)
-                )
-                .withSavedInstance(savedInstanceState)
-                .build();
+                                        drawer.closeDrawer();
+                                        return true;
+                                    }
+                                })
+                                .addStickyDrawerItems(
+                                        new PrimaryDrawerItem().withName(getString(R.string.nav_feedback)).withIdentifier(FEEDBACK_IDENTIFIER).withIcon(R.drawable.ic_nav_feedback).withSelectable(false),
+                                        new PrimaryDrawerItem().withName(getString(R.string.nav_setting)).withIdentifier(SETTINGS_IDENTIFIER).withIcon(R.drawable.ic_nav_setting).withSelectable(false)
+                                )
+                                .withSavedInstance(savedInstanceState)
+                                .build();
     }
 
     private void initEvent() {
@@ -448,11 +452,19 @@ public class MainScreen extends AppCompatActivity implements
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
             }
         });
-        // TODO: check permission here
+
         addGeoReminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 newReminder.close(true);
+
+                if (Build.VERSION.SDK_INT >= 23)
+                    if (ContextCompat.checkSelfPermission(MainScreen.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_DENIED) {
+                        requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSION_ACCESS_FINE_LOCATION_REQUEST_CODE);
+                        return;
+                    }
+
                 Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
                 toEditScreen.putExtra(getString(R.string.bundle_with_map), true);
                 //TODO: add specifications about the reminder to be created
@@ -478,6 +490,12 @@ public class MainScreen extends AppCompatActivity implements
     }
 
     private void checkServices() {
+        // TODO: remove
+        if (Build.VERSION.SDK_INT >= 23) {
+            Log.i("Network Permission", (checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_GRANTED) + "");
+            Log.i("Internet Permission", (checkSelfPermission(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) + "");
+        }
+
         // not sure which version of code is correct
 //        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)) {
 //            case ConnectionResult.API_UNAVAILABLE:
@@ -525,6 +543,10 @@ public class MainScreen extends AppCompatActivity implements
         //TODO: check other availabilities such as Internet connection
     }
 
+    private void requestPermission(String permission, int requestCode) {
+        ActivityCompat.requestPermissions(MainScreen.this, new String[] { permission }, requestCode);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -559,8 +581,16 @@ public class MainScreen extends AppCompatActivity implements
 
             case LOGIN_REQUEST_CODE:
                 loadPref();
-                //TODO: change avatar and sync all reminders
 
+                //TODO: change avatar and sync all reminders
+                switch (resultCode) {
+                    case LoginScreen.LOGIN_CANCELLED:
+
+                        break;
+                    case LoginScreen.LOGIN_SUCCESS:
+
+                        break;
+                }
                 return;
 
             case SETTINGS_REQUEST_CODE:
@@ -572,6 +602,20 @@ public class MainScreen extends AppCompatActivity implements
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_ACCESS_FINE_LOCATION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // granted do nothing
+                } else {
+                    Toast.makeText(MainScreen.this, getString(R.string.permission_need_fine_location), Toast.LENGTH_SHORT).show();
+                }
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -633,28 +677,31 @@ public class MainScreen extends AppCompatActivity implements
                                 .withDescription(getString(R.string.nav_desc_manage))
                                 .withIcon(R.drawable.ic_nav_manage)
                                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                            @Override
-                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                // TODO: change to jump to UserInfoPage
-                                if (ParseUser.getCurrentUser() != null) {
-                                    // TODO: delete this toast and jump to user page
-                                    Toast.makeText(MainScreen.this, "Already Logged In", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
-                                    if (Build.VERSION.SDK_INT >= 21) { getWindow().setExitTransition(null); }
-                                    startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                                }
-
-                                new Handler().postDelayed(new Runnable() {
                                     @Override
-                                    public void run() {
-                                        drawer.closeDrawer();
-                                    }
-                                }, 200);        // wait for the activity to start then close the drawer
+                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                        // TODO: change to jump to UserInfoPage
+                                        if (ParseUser.getCurrentUser() != null) {
+                                            // TODO: delete this toast and jump to user page
+                                            Toast.makeText(MainScreen.this, "Already Logged In", Toast.LENGTH_SHORT).show();
+                                            return false;
+                                        } else {
+                                            Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
+                                            if (Build.VERSION.SDK_INT >= 21) {
+                                                getWindow().setExitTransition(null);
+                                            }
+                                            startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+                                        }
 
-                                return false;
-                            }
-                        }),
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                drawer.closeDrawer();
+                                            }
+                                        }, 200);        // wait for the activity to start then close the drawer
+
+                                        return false;
+                                    }
+                                }),
                         // TODO: remove this and create a new drawer
                         new ProfileSettingDrawerItem()
                                 .withName(getString(R.string.nav_acct_logout))
@@ -663,9 +710,14 @@ public class MainScreen extends AppCompatActivity implements
                                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                                     @Override
                                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                        if (ParseUser.getCurrentUser() != null)
+                                        if (ParseUser.getCurrentUser() != null) {
                                             ParseUser.logOutInBackground();
-                                        drawerHeader.removeProfileByIdentifier(ParseUser.getCurrentUser().getInt(getString(R.string.parse_user_identifier)));
+//                                            drawerHeader.removeProfileByIdentifier(ParseUser.getCurrentUser().getInt(getString(R.string.parse_user_identifier)));
+                                            drawerHeader.getActiveProfile().withEmail(getString(R.string.nav_local_email));
+                                            drawerHeader.getActiveProfile().withName(getString(R.string.nav_head_appname));
+                                            drawerHeader.getActiveProfile().withIcon(R.mipmap.ic_default_avatar);
+                                            drawerHeader.getActiveProfile().withIdentifier(LOCAL_USER_IDENTIFIER);
+                                        }
                                         return true;
                                     }
                                 })
@@ -678,8 +730,14 @@ public class MainScreen extends AppCompatActivity implements
     }
 
     private void toWholeMap(Boolean animateExit) {
+        if (Build.VERSION.SDK_INT >= 23)
+            if (ContextCompat.checkSelfPermission(MainScreen.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_DENIED) {
+                requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSION_ACCESS_FINE_LOCATION_REQUEST_CODE);
+                return;
+            }
+
         Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
-        //TODO: to check all the reminders and drafts
 
         if (Build.VERSION.SDK_INT >= 21) {
             if(animateExit) {
@@ -831,6 +889,12 @@ public class MainScreen extends AppCompatActivity implements
         super.onStart();
     }
     @Override
+    protected void onResume() {
+        Log.i("MainScreen", "Resume");
+        super.onResume();
+        AppEventsLogger.activateApp(this, getString(R.string.facebook_app_id));
+    }
+    @Override
     protected void onRestart() {
         Log.i("MainScreen", "Restart");
         super.onRestart();
@@ -839,5 +903,6 @@ public class MainScreen extends AppCompatActivity implements
     protected void onPause() {
         Log.i("MainScreen", "Pause");
         super.onPause();
+        AppEventsLogger.deactivateApp(this, getString(R.string.facebook_app_id));
     }
 }

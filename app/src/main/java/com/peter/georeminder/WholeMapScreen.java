@@ -129,7 +129,8 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     private void initNavigationBar() {
         if (useGoogleMap && Build.VERSION.SDK_INT >= 21) {
-
+            // TODO: I forgot what I was going to do here
+            // might have set it in styles.xml
         }
     }
 
@@ -356,7 +357,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         });
 
 
-        //TODO: calculate screen height, change dip to pixels
+        // TODO: calculate screen height, change dip to pixels
         googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.compass_padding), 0, getNavigationBarHeight(this, Configuration.ORIENTATION_PORTRAIT));           // compass not to be hidden by search bar
 
         // Add a marker in Sydney and move the camera
