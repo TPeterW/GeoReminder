@@ -17,21 +17,16 @@ public class FragmentViewPagerAdapter extends FragmentPagerAdapter {
 
     private final static int VIEW_PAGER_NUM_PAGES = 2;
 
-    private List<Reminder> reminderList;
-    private List<Location> locationList;
-
-    public FragmentViewPagerAdapter(FragmentManager fm, List<Reminder> reminderList, List<Location> locationList) {
+    public FragmentViewPagerAdapter(FragmentManager fm) {
         super(fm);
-        this.reminderList = reminderList;
-        this.locationList = locationList;
     }
 
     @Override
     public Fragment getItem(int position) {
         if(position == 0)
-            return ListReminderFragment.getInstance(reminderList);
+            return ListReminderFragment.getInstance();
         else
-            return ListLocationFragment.getInstance(locationList);
+            return ListLocationFragment.getInstance();
     }
 
     @Override

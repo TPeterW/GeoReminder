@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#33691e</color>
     <color name="colorAccent">#2196f3</color>
     <color name="colorTransparent">@android:color/transparent</color>
+
+    <color name="qqText">@android:color/white</color>
+    <color name="qqBackground">#212121</color>
+    <color name="qq_state_pressed">#424242</color>
+    <color name="qq_state_default">#212121</color>
 </resources>

@@ -14,32 +14,23 @@ import java.util.Random;
 
 public class ProgressGenerator {
 
-    private OnCompleteListener logInCompleteListener;
     private int mProgress;
 
     public boolean isComplete;
 
-    public ProgressGenerator(OnCompleteListener listener) {
-        logInCompleteListener = listener;
+    public ProgressGenerator() {
         isComplete = false;
     }
 
     public void start(final ProcessButton button) {
         final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mProgress += 10;
-                button.setProgress(mProgress);
-            }
-        }, 200);
+
+        mProgress += 10;
+        button.setProgress(mProgress);
     }
 
-
-    public interface OnCompleteListener {
-        void onComplete();
-        void onCancel();
-        void onFail();
+    public void stop(final ProcessButton button) {
+        button.setProgress(-1);
     }
 }
 
