@@ -193,7 +193,6 @@
 
     <!--SharedPreferences-->
     <string name="shared_pref_google_avail">GoogleMapAvailable</string>
-    <string name="shared_pref_anim_pref_enabled">AnimPrefAnabled</string>
     <string name="shared_pref_tutorial_shown">TutorialAlreadyShown</string>
 
     <!--Snack Bar-->
