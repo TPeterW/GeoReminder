@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -61,7 +60,6 @@ import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
 import com.peter.georeminder.utils.viewpager.ListLocationFragment.ListLocationListener;
 import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderListener;
-import com.tencent.tauth.Tencent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -72,7 +70,6 @@ public class MainScreen extends AppCompatActivity implements
 
     // ToolBar
     private FloatingActionButton seeMap;
-    private CoordinatorLayout coordinatorLayout;
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
 
@@ -227,10 +224,6 @@ public class MainScreen extends AppCompatActivity implements
             //TODO: decide whether to change the navigation bar color or not
 //            getWindow().setNavigationBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
         }
-
-        // The main layout
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coor_layout);
-
 
         // this buttons takes user to a page
         // the blue one with a map icon

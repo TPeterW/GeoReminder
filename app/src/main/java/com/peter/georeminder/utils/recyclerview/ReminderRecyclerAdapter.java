@@ -1,13 +1,12 @@
 package com.peter.georeminder.utils.recyclerview;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import com.blunderer.materialdesignlibrary.views.CardView;
 
 import com.peter.georeminder.R;
 import com.peter.georeminder.models.Reminder;
@@ -58,13 +57,34 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-        holder.mapScreenshot.setImageResource(R.drawable.reminder_default_icon);
-        holder.reminderTitle.setText(getItem(position).getTitle());
-        holder.reminderContent.setText("Content Content Content Content Content");
         // TODO: Change this to use information from reminderList
 
         // set OnItemClick/LongClick listener
         // implement in calling activity (in this case, MainScreen)
+
+        Reminder current = reminderList.get(position);
+        holder.cardView.setTitle(current.getTitle());
+        holder.cardView.setImageResource(R.drawable.reminder_default_icon);
+        holder.cardView.setNormalButtonText(context.getString(R.string.card_view_btn_edit));
+
+        if (current.isWithLocation()) {         // has location
+            holder.cardView.setDescription(context.getString(R.string.card_view_txt_distance_to_current) + current.getDistanceToHere());
+            holder.cardView.setHighlightButtonText(context.getString(R.string.card_view_btn_map));
+        } else {                                // has a time
+            if (current.isWithTime()) {
+                if (current.getEndDate() != null)
+                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getEndDate());
+                else
+                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getStartingDate());
+            } else {
+                holder.cardView.setDescription(context.getString(R.string.card_view_txt_no_hurry));
+            }
+
+            holder.cardView.setHighlightButtonText(null);
+        }
+
+        holder.cardView.setRadius(8);
+
 
         if(listener != null){
             holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -118,17 +138,11 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
      */
     public static class RecyclerViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
-        ImageView mapScreenshot;
-        TextView reminderTitle;
-        TextView reminderContent;
 
         public RecyclerViewHolder(View itemView) {
             super(itemView);
 
-            cardView = (CardView) itemView.findViewById(R.id.reminder_holder_cardview);
-            mapScreenshot = (ImageView) itemView.findViewById(R.id.reminder_item_map_screenshot);
-            reminderTitle = (TextView) itemView.findViewById(R.id.reminder_recycler_item_title);
-            reminderContent = (TextView) itemView.findViewById(R.id.reminder_recycler_item_content);
+            cardView = (CardView) itemView.findViewById(R.id.reminder_holder_card_view);
         }
     }
 }

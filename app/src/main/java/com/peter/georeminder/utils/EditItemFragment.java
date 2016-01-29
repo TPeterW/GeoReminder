@@ -64,12 +64,8 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE = 0x001;
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 0x002;
 
-    //TODO: so much
-
-    public EditItemFragment(Bundle savedInstanceState) {
-        withMap = false;
-        this.savedInstanceState = savedInstanceState;
-        //TODO: and other specifications of the reminder to check
+    public EditItemFragment() {
+        this.savedInstanceState = getArguments();
     }
 
     @Nullable
@@ -128,6 +124,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         }
     }
 
+    @SuppressWarnings("all")
     @Override
     public void onMapReady(GoogleMap inputMap) {
         googleMap = inputMap;
@@ -299,7 +296,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     }
 
     /**
-     * Standard override for AMAP
+     * Standard override for AMap
      */
 
     @Override

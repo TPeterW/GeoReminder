@@ -3,71 +3,24 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/reminder_holder_cardview"
+
+    <com.blunderer.materialdesignlibrary.views.CardView
+        android:id="@+id/reminder_holder_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="@dimen/cardview_compat_inset_shadow"
         android:layout_margin="5dp"
         android:clickable="true"
-        app:cardCornerRadius="10dp"
+        android:elevation="5dp"
+        style="@style/CardView.Ripple"
         app:cardBackgroundColor="@color/cardview_light_background"
-        style="@style/CardView.Ripple">
-
-
-        <!--TODO: add stars and other things, like clocks and distance to current location-->
-
-        <RelativeLayout
-            android:id="@+id/reminder_relative_layout"
-            android:layout_width="match_parent"
-            android:layout_height="120dp">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/reminder_item_map_screenshot"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_margin="10dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:src="@drawable/reminder_default_icon"
-                android:contentDescription="@string/img_map"/>
-
-            <RelativeLayout
-                android:id="@+id/content_reminder_relative_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_toEndOf="@+id/reminder_item_map_screenshot"
-                android:layout_centerVertical="true">
-
-                <TextView
-                    android:id="@+id/reminder_recycler_item_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Title"
-                    android:ellipsize="end"
-                    android:textSize="24sp"
-                    android:layout_marginTop="20dp"/>
-
-                <TextView
-                    android:id="@+id/reminder_recycler_item_content"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="20dp"
-                    android:text="This is the content for a geo reminder"
-                    android:ellipsize="marquee"
-                    android:textSize="12sp"
-                    />
-
-            </RelativeLayout>
-
-
-        </RelativeLayout>
-
-    </android.support.v7.widget.CardView>
+        app:mdl_title=""
+        app:mdl_description=""
+        app:mdl_normalButton=""
+        app:mdl_highlightButton=""
+        app:mdl_imagePosition="left"
+        app:mdl_image="@drawable/reminder_default_icon"/>
 
 </RelativeLayout>

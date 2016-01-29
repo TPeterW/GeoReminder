@@ -36,6 +36,8 @@ import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 
+import static android.support.v4.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
+
 /**
  * Created by Peter on 11/5/15.
  *
@@ -113,18 +115,15 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
                 // TODO: add code
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle(currentTitle)
-                        .setItems(new String[]{getString(R.string.dialog_edit_title), getString(R.string.dialog_share_title), getString(R.string.dialog_delete_title)},
+                        .setItems(new String[]{getString(R.string.dialog_share_title), getString(R.string.dialog_delete_title)},
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         switch (which) {
-                                            case 0:     // edit button
-                                                Toast.makeText(getActivity(), "Edit", Toast.LENGTH_SHORT).show();
-                                                break;
-                                            case 1:     // share button
+                                            case 0:     // share button
                                                 showShareDialog(position);
                                                 break;
-                                            case 2:     // delete button
+                                            case 1:     // delete button
                                                 showDeleteDialog(position);
                                                 break;
                                         }
@@ -161,8 +160,6 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     }
 
     private void setUpSwipeRefresh() {
-        //        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh_layout);
-//        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
         swipeRefreshLayout.setEnabled(true);
         swipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);        // color scheme
         swipeRefreshLayout.setMaxDropHeight(300);           // TODO: figure out why this doesn't work
@@ -177,8 +174,6 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
                 listener.onReminderListRefresh();
             }
         });
-
-//        swipeRefreshLayout.setKeepScreenOn(true);
     }
 
     private void setUpOthers() {
@@ -193,7 +188,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
                 if (Build.VERSION.SDK_INT >= 21) {
                     getActivity().getWindow().setExitTransition(new Fade());
                     getActivity().getWindow().setReenterTransition(new Fade());
-                    getActivity().startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle());
+                    getActivity().startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, makeSceneTransitionAnimation(getActivity()).toBundle());
                 } else
                     getActivity().startActivityForResult(newReminder, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
             }

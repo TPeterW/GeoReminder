@@ -74,9 +74,6 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cursor>, LoginListener {
 
-    // TODO: log in through google play and other social media
-    // TODO: enable registration
-
     private static final int READ_CONTACTS_REQUEST_CODE     = 0x001;
 
     private static final int REGISTER_REQUEST_CODE          = 0x010;

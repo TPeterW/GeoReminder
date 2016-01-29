@@ -36,7 +36,7 @@ public class EditorScreen extends SwipeBackActivity implements MapListener{
 
         initEvent();
 
-        createFragment(savedInstanceState);
+        createFragment();
     }
 
     private void initData() {
@@ -58,8 +58,8 @@ public class EditorScreen extends SwipeBackActivity implements MapListener{
         //TODO:
     }
 
-    private void createFragment(Bundle savedInstanceState) {
-        EditItemFragment editItemFragment = new EditItemFragment(savedInstanceState);
+    private void createFragment() {
+        EditItemFragment editItemFragment = new EditItemFragment();
 
         Bundle bundle = new Bundle();
         bundle.putBoolean(getString(R.string.bundle_with_map), withMap);
