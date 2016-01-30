@@ -2,13 +2,16 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        tools:ignore="UselessParent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,7 +25,6 @@
                 android:id="@+id/edittext_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
                 android:textSize="24sp"
                 android:hint="@string/hint_reminder_title"
                 app:met_singleLineEllipsis="true"
@@ -30,7 +32,7 @@
                 app:met_floatingLabelText="@string/hint_reminder_title"
                 app:met_hideUnderline="true"
                 app:met_primaryColor="@color/colorPrimary"/>
-            
+
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/edittext_description"
                 android:layout_width="match_parent"
@@ -45,20 +47,197 @@
                 app:met_hideUnderline="true"
                 app:met_primaryColor="@color/colorPrimary"/>
 
+
+            <carbon.widget.Divider
+                android:id="@+id/divider_under_title"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/colorPrimary"/>
+
+
             <LinearLayout
+                android:id="@+id/with_time_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground">
 
-                <TextClock
+                <TextView
+                    android:id="@+id/with_time_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"/>
+                    android:text="@string/with_time"
+                    android:textSize="20sp"
+                    android:clickable="true"
+                    android:paddingBottom="5dp"
+                    android:background="?attr/selectableItemBackground" />
 
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:clickable="true"/>
 
+                <Switch
+                    android:id="@+id/with_time_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="end"
+                    android:checked="true"/>
 
             </LinearLayout>
-            
+
+            <LinearLayout
+                android:id="@+id/all_day_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/all_day_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/time_all_day"
+                    android:textSize="20sp"
+                    android:clickable="true"
+                    android:paddingBottom="5dp"
+                    android:background="?attr/selectableItemBackground"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:clickable="true"/>
+
+                <Switch
+                    android:id="@+id/all_day_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="end"
+                    android:checked="true"/>
+
+            </LinearLayout>
+
+            <!--Start Date-->
+            <LinearLayout
+                android:id="@+id/start_date_time_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="5dp"
+                android:paddingBottom="2dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/start_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/default_date"
+                    android:textSize="20sp"
+                    android:clickable="false"
+                    android:textColor="@color/carbon_black"
+                    android:background="?attr/selectableItemBackground" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:clickable="true"/>
+
+                <TextView
+                    android:id="@+id/start_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/default_time"
+                    android:textColor="@color/carbon_black"
+                    android:background="?attr/selectableItemBackground" />
+
+            </LinearLayout>
+
+            <!--End Date-->
+            <LinearLayout
+                android:id="@+id/end_date_time_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="2dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/end_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/default_date"
+                    android:textSize="20sp"
+                    android:clickable="true"
+                    android:textColor="@color/carbon_black"
+                    android:background="?attr/selectableItemBackground" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:clickable="true"/>
+
+                <TextView
+                    android:id="@+id/end_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/default_time"
+                    android:textColor="@color/carbon_black"
+                    android:background="?attr/selectableItemBackground" />
+
+            </LinearLayout>
+
+            <!--Repeat Everyday-->
+            <TextView
+                android:id="@+id/repeat_everyday_time_range_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:textSize="20sp"
+                android:text="@string/default_time"
+                android:textColor="@color/carbon_black"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:visibility="gone"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"/>
+
+            <TextView
+                android:id="@+id/repeat_options_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/repeat_options"
+                android:textSize="20sp"
+                android:clickable="true"/>
+
+
+            <carbon.widget.Divider
+                android:id="@+id/divider_under_time"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/colorPrimary"/>
+
+
             <TextView
                 android:id="@+id/textview_color_picker"
                 android:layout_width="match_parent"
@@ -66,7 +245,7 @@
                 android:text="@string/color_picker_title"
                 android:textColor="@color/colorPrimary"
                 android:clickable="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="?attr/selectableItemBackground"
                 android:textSize="20sp" />
 
             <com.rengwuxian.materialedittext.MaterialEditText

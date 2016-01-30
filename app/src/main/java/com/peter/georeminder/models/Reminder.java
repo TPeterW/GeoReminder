@@ -1,7 +1,6 @@
 package com.peter.georeminder.models;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.ColorInt;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -31,7 +30,7 @@ public class Reminder {
 
     private String title;
     private String description;
-    private String additional;
+    private String additional = null;
     private int importance;         // importance: 1, 2, 3, 4
     private int colorInt;
 
@@ -42,9 +41,17 @@ public class Reminder {
     private boolean vibrate;
     private int notification;
     private int repeatTimes;
+    private int repeatType;         // 0 = interval everyday, 1 = from point to point
+    public static final int REPEAT_EVERYDAY             = 0x0;
+    public static final int POINT_TO_POINT              = 0x1;
+    public static final int ALL_DAY                     = 0x2;
 
     // reminder type
-    private int type;       // 0 = notes, 1 = geo, 2 = normal
+    private int reminderType;       // 0 = notes, 1 = geo, 2 = normal
+    public static final int NOTES                       = 0x0;
+    public static final int GEO                         = 0x1;
+    public static final int NOR                         = 0x2;
+
 
     // logistics
     private Context context;
@@ -69,6 +76,7 @@ public class Reminder {
         createDate = new Date();
         colorInt = R.color.colorPrimary;
         vibrate = true;
+        repeatType = REPEAT_EVERYDAY;
     }
 
     // Title
@@ -167,6 +175,16 @@ public class Reminder {
 
     public Reminder setColorInt(@ColorInt int colorInt) {
         this.colorInt = colorInt;
+        return this;
+    }
+
+    // repeat type
+    public int getRepeatType() {
+        return repeatType;
+    }
+
+    public Reminder setRepeatType(int repeatType) {
+        this.repeatType = repeatType;
         return this;
     }
 }

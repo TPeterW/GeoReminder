@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">timerangepicker-library</string>
+
+    <string name="time_picker_dialog_done">Done</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="tab_start_time">Start Time</string>
+    <string name="tab_end_time">End Time</string>
+</resources>

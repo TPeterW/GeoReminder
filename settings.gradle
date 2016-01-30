@@ -1,1 +1,1 @@
-include ':app', ':searchbox'
+include ':app', ':searchbox', ':timerangepicker'

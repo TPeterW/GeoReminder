@@ -10,8 +10,7 @@
     <!--Bundle Keys-->
     <string name="bundle_with_map">withMap</string>
     <string name="bundle_new_reminder">newReminder</string>
-    <!--Could be the one just edited, or the one passed in-->
-    <string name="bundle_most_recent_reminder">mostRecentReminder</string>
+    <string name="bundle_most_recent_reminder">mostRecentReminder</string><!--Could be the one just edited, or the one passed in-->
 
     <!--Buttons-->
     <string name="new_geo">Geo Reminder</string>
@@ -59,6 +58,8 @@
 
     <!--Editor-->
     <string name="reminder_title">Title</string>
+    <string name="reminder_default_title">Untitled Reminder</string>
+    <string name="location_default_title">Untitled Location</string>
     <string name="color_picker_title">Reminder Color</string>
     <string name="color_picker_sub">Theme</string>
     <string name="button_done">Done</string>
@@ -66,11 +67,18 @@
     <string name="button_back">Back</string>
     <string name="button_custom">Custom</string>
     <string name="button_preset">Preset</string>
-
-    <!--Edittext-->
     <string name="hint_reminder_title">Title</string>
     <string name="hint_reminder_description">Description</string>
     <string name="hint_reminder_additional">Additional</string>
+    <string name="default_date">Today</string>
+    <string name="default_time">Now</string>
+    <string name="default_time_range">8:00 ~ 20:00</string>
+    <string name="with_time">Time Limit</string>
+    <string name="time_all_day">All Day</string>
+    <string name="repeat_options">Repeat Options</string>
+    <string name="repeat_option_repeat_everyday">Repeat Everyday</string>
+    <string name="repeat_option_point_to_point">Point to Point</string>
+    <string name="repeat_option_all_day">All Day</string>
 
     <!--Intent-->
     <string name="feedback_subject">Feedback on GeoReminder</string>
@@ -181,10 +189,6 @@
     <!--Parse keys-->
     <string name="parse_user_identifier">identifier</string>
     <string name="parse_user_userNameSet">userNameSet</string>
-
-    <!--Reminder fields-->
-    <string name="reminder_default_title">Untitled Reminder</string>
-    <string name="location_default_title">Untitled Location</string>
 
     <!--Service Availability Dialog-->
     <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>

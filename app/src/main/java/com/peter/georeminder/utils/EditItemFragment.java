@@ -1,6 +1,8 @@
 package com.peter.georeminder.utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
@@ -14,18 +16,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,10 +45,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
+import com.leavjenn.smoothdaterangepicker.date.SmoothDateRangePickerFragment;
 import com.peter.georeminder.EditorScreen;
 import com.peter.georeminder.R;
 import com.peter.georeminder.models.Reminder;
 import com.rengwuxian.materialedittext.MaterialEditText;
+
+import java.util.Calendar;
+
+import carbon.widget.Divider;
+import me.tittojose.www.timerangepicker_library.TimeRangePickerDialog;
 
 /**
  * Created by Peter on 10/6/15.
@@ -80,14 +90,38 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     // the editor views
     private MaterialEditText reminderTitle;
     private MaterialEditText reminderDescription;
+
+    private LinearLayout withTimeContainer;
+    private TextView withTimeText;
+    private Switch withTimeSwitch;
+
+    private LinearLayout allDayContainer;
+    private TextView allDayText;
+    private Switch allDaySwitch;
+
+    private LinearLayout startDateTimeContainer;
+    private TextView startDate;
+    private TextView startTime;
+    private LinearLayout endDateTimeContainer;
+    private TextView endDate;
+    private TextView endTime;
+    private TextView repeatTimeRange;
+    private TextView repeatOptions;
+
     private TextView colorPicker;
     private MaterialEditText reminderAdditional;
+
+    private Divider dividerUnderTitle;
+    private Divider dividerUnderTime;
 
 
     View rootView;
 
-    private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE = 0x001;
-    private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 0x002;
+    private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE    = 0x001;
+    private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE      = 0x002;
+
+    private static final String TIME_RANGE_DIALOG_TAG                   = "TIMERANGE";
+    private static final String DATE_RANGE_DIALOG_TAG                   = "DATERANGE";
 
     public EditItemFragment() {
 
@@ -142,6 +176,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private void initData() {
         if (newReminder) {
             currentReminder = new Reminder(getActivity());
+            currentReminder.setRepeatType(Reminder.ALL_DAY);
             Log.i("EditItemFragment", "New reminder");
         } else {            // from draft or edit existing
             Log.i("EditItemFragment", "Edit reminder");
@@ -178,14 +213,49 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         colorPicker = (TextView) rootView.findViewById(R.id.textview_color_picker);
         reminderTitle = (MaterialEditText) rootView.findViewById(R.id.edittext_title);
         reminderDescription = (MaterialEditText) rootView.findViewById(R.id.edittext_description);
+
+        withTimeContainer = (LinearLayout) rootView.findViewById(R.id.with_time_container);
+        withTimeText = (TextView) rootView.findViewById(R.id.with_time_txt);
+        withTimeSwitch = (Switch) rootView.findViewById(R.id.with_time_switch);
+
+        // TODO: change visibility accordingly
+        allDayContainer = (LinearLayout) rootView.findViewById(R.id.all_day_container);
+        allDayText = (TextView) rootView.findViewById(R.id.all_day_txt);
+        allDaySwitch = (Switch) rootView.findViewById(R.id.all_day_switch);
+
+        startDateTimeContainer = (LinearLayout) rootView.findViewById(R.id.start_date_time_container);
+        endDateTimeContainer = (LinearLayout) rootView.findViewById(R.id.end_date_time_container);
+        startDate = (TextView) rootView.findViewById(R.id.start_date);
+        startTime = (TextView) rootView.findViewById(R.id.start_time);
+        endDate = (TextView) rootView.findViewById(R.id.end_date);
+        endTime = (TextView) rootView.findViewById(R.id.end_time);
+        repeatTimeRange = (TextView) rootView.findViewById(R.id.repeat_everyday_time_range_txt);
+        repeatOptions = (TextView) rootView.findViewById(R.id.repeat_options_txt);
+
         reminderAdditional = (MaterialEditText) rootView.findViewById(R.id.edittext_additional);
+
+        dividerUnderTitle = (Divider) rootView.findViewById(R.id.divider_under_title);
+        dividerUnderTime = (Divider) rootView.findViewById(R.id.divider_under_time);
 
         // hide keyboard
         InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(rootView.getWindowToken(), 0);
+
+        switch (currentReminder.getRepeatType()) {
+            case Reminder.ALL_DAY:
+                setAllDayLayout();
+                break;
+            case Reminder.POINT_TO_POINT:
+                setPointToPointLayout();
+                break;
+            case Reminder.REPEAT_EVERYDAY:
+                setRepeatEverydayLayout();
+                break;
+        }
     }
 
     private void initEvent() {
+        // title and description
         reminderTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -205,6 +275,170 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             }
         });
 
+        // whether to use time or not
+        withTimeContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                withTimeSwitch.performClick();
+            }
+        });
+
+        withTimeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                withTimeSwitch.performClick();
+            }
+        });
+
+        withTimeSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (withTimeSwitch.isChecked()) {       // use time
+                    allDayContainer.setVisibility(View.VISIBLE);
+                    startDateTimeContainer.setVisibility(View.VISIBLE);
+                    endDateTimeContainer.setVisibility(View.VISIBLE);
+                    switch (currentReminder.getRepeatType()) {
+                        case Reminder.ALL_DAY:
+                            setAllDayLayout();
+                            break;
+                        case Reminder.REPEAT_EVERYDAY:
+                            setRepeatEverydayLayout();
+                            break;
+                        case Reminder.POINT_TO_POINT:
+                            setPointToPointLayout();
+                            break;
+                    }
+                } else {
+                    allDayContainer.setVisibility(View.GONE);
+                    startDateTimeContainer.setVisibility(View.GONE);
+                    endDateTimeContainer.setVisibility(View.GONE);
+                    repeatTimeRange.setVisibility(View.GONE);
+                    repeatOptions.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        // time
+        allDayContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                allDaySwitch.performClick();
+            }
+        });
+
+        allDayText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                allDaySwitch.performClick();
+            }
+        });
+
+        allDaySwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (allDaySwitch.isChecked()) {
+                    currentReminder.setRepeatType(Reminder.ALL_DAY);
+                    setAllDayLayout();
+                    Log.i("EditItemFragment", "Event all day");
+                    // TODO:
+
+                } else {
+                    Log.i("EditItemFragment", "Event has time limit");
+                    if (repeatOptions.getText().toString().equals(getString(R.string.repeat_option_repeat_everyday))) {
+                        currentReminder.setRepeatType(Reminder.REPEAT_EVERYDAY);
+                        setRepeatEverydayLayout();
+                    } else {
+                        currentReminder.setRepeatType(Reminder.POINT_TO_POINT);
+                        setPointToPointLayout();
+                    }
+                    // TODO:
+
+                }
+            }
+        });
+
+        startDateTimeContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentReminder.getRepeatType() == Reminder.ALL_DAY
+                        || currentReminder.getRepeatType() == Reminder.REPEAT_EVERYDAY) {
+                    showDateRangeDialog();
+                }
+            }
+        });
+
+        endDateTimeContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentReminder.getRepeatType() == Reminder.ALL_DAY
+                        || currentReminder.getRepeatType() == Reminder.REPEAT_EVERYDAY) {
+                    showDateRangeDialog();
+                }
+            }
+        });
+
+        startDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateRangeDialog();
+            }
+        });
+
+        endDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateRangeDialog();
+            }
+        });
+
+        startTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimeRangeDialog();
+            }
+        });
+
+        endTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimeRangeDialog();
+            }
+        });
+
+        // repeat
+        repeatTimeRange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimeRangeDialog();
+            }
+        });
+
+        repeatOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.repeat_options)
+                        .setItems(R.array.repeat_option_entry, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:         // repeat everyday
+                                        currentReminder.setRepeatType(Reminder.REPEAT_EVERYDAY);
+                                        repeatOptions.setText(R.string.repeat_option_repeat_everyday);
+                                        setRepeatEverydayLayout();
+                                        break;
+                                    case 1:         // point to point
+                                        currentReminder.setRepeatType(Reminder.POINT_TO_POINT);
+                                        repeatOptions.setText(R.string.repeat_option_point_to_point);
+                                        setPointToPointLayout();
+                                        break;
+                                }
+                            }
+                        });
+                builder.create().show();
+            }
+        });
+
         colorPicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,6 +454,39 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         });
     }
 
+    private void showDateRangeDialog() {
+        Calendar calendar = Calendar.getInstance();
+
+        SmoothDateRangePickerFragment smoothDateRangePickerFragment = SmoothDateRangePickerFragment.newInstance(new SmoothDateRangePickerFragment.OnDateRangeSetListener() {
+            @Override
+            public void onDateRangeSet(SmoothDateRangePickerFragment view, int yearStart, int monthStart, int dayStart, int yearEnd, int monthEnd, int dayEnd) {
+                // TODO:
+                Log.i("EditItemFragment", "Start date: " + yearStart + "-" + monthStart + "-" + dayStart);
+                Log.i("EditItemFragment", "End date: " + yearEnd + "-" + monthEnd + "-" + dayEnd);
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+        smoothDateRangePickerFragment.vibrate(true);
+        smoothDateRangePickerFragment.setMinDate(calendar);
+        smoothDateRangePickerFragment.show(getActivity().getFragmentManager(), DATE_RANGE_DIALOG_TAG);
+    }
+
+    private void showTimeRangeDialog() {
+        TimeRangePickerDialog timeRangePickerDialog = TimeRangePickerDialog.newInstance(new TimeRangePickerDialog.OnTimeRangeSelectedListener() {
+            @Override
+            public void onTimeRangeSelected(int startHour, int startMin, int endHour, int endMin) {
+                // TODO:
+                Log.i("EditItemFragment", "Start time: " + startHour + ":" + startMin);
+                Log.i("EditItemFragment", "End time: " + endHour + ":" + endMin);
+            }
+        }, true);
+
+        timeRangePickerDialog.setPrimaryColor(currentReminder.getColorInt());
+
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        timeRangePickerDialog.show(fragmentManager, TIME_RANGE_DIALOG_TAG);
+    }
+
     private void setUpMap() {
         supportGoogleMapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.edit_google_map);
@@ -227,7 +494,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         supportAMapFragment = (com.amap.api.maps.SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.edit_amap_map);
 
-        if(useGoogleMap) {
+        if (useGoogleMap) {
             aMapContainer.setVisibility(View.GONE);
             supportAMapFragment.onDestroy();        // hide AMap
             supportGoogleMapFragment.getMapAsync(this);
@@ -368,13 +635,13 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         int coarseLocation = ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION);
         int fineLocation = ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if(coarseLocation == PackageManager.PERMISSION_DENIED) {
+        if (coarseLocation == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     COARSE_LOCATION_PERMISSION_REQUEST_CODE);
         }
 
-        if(fineLocation == PackageManager.PERMISSION_DENIED) {
+        if (fineLocation == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     FINE_LOCATION_PERMISSION_REQUEST_CODE);
@@ -396,7 +663,40 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         reminderDescription.setPrimaryColor(selectedColor);
         reminderAdditional.setPrimaryColor(selectedColor);
 
+        dividerUnderTitle.setBackgroundColor(selectedColor);
+        dividerUnderTime.setBackgroundColor(selectedColor);
+
         colorPicker.setTextColor(selectedColor);
+    }
+
+    private void setRepeatEverydayLayout() {
+        startTime.setVisibility(View.GONE);
+        endTime.setVisibility(View.GONE);
+
+        repeatTimeRange.setVisibility(View.VISIBLE);
+        repeatTimeRange.setText(R.string.default_time_range);
+
+        repeatOptions.setVisibility(View.VISIBLE);
+        repeatOptions.setText(R.string.repeat_option_repeat_everyday);
+    }
+
+    private void setPointToPointLayout() {
+        startTime.setVisibility(View.VISIBLE);
+        endTime.setVisibility(View.VISIBLE);
+
+        repeatTimeRange.setVisibility(View.GONE);
+
+        repeatOptions.setVisibility(View.VISIBLE);
+        repeatOptions.setText(R.string.repeat_option_point_to_point);
+    }
+
+    private void setAllDayLayout() {
+        startTime.setVisibility(View.GONE);
+        endTime.setVisibility(View.GONE);
+
+        repeatTimeRange.setVisibility(View.GONE);
+
+        repeatOptions.setVisibility(View.GONE);
     }
 
     public void saveReminder() {
@@ -443,6 +743,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
 
 
 

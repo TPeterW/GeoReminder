@@ -1,7 +1,6 @@
 package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,9 +8,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.util.Log;
@@ -21,15 +18,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.peter.georeminder.utils.EditItemFragment;
 import com.peter.georeminder.utils.EditItemFragment.MapListener;
-import com.peter.georeminder.utils.swipeback.SwipeBackLayout;
-import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
 
 /**
  * Created by Peter on 10/8/15.
@@ -82,9 +76,6 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
         }
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-//        swipeBackLayout = getSwipeBackLayout();
-//        swipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
 
         getSpecs();
 
@@ -176,7 +167,7 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
     private void hideKeyboard() {
         try {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            inputMethodManager.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
         } catch (Exception e) {
             e.printStackTrace();
             // then you have a keyboard! for free!
