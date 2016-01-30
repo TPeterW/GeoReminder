@@ -3,11 +3,13 @@ package com.peter.georeminder.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -20,8 +22,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.UiSettings;
@@ -32,7 +36,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
+import com.google.gson.Gson;
+import com.peter.georeminder.EditorScreen;
 import com.peter.georeminder.R;
+import com.peter.georeminder.models.Reminder;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 /**
  * Created by Peter on 10/6/15.
@@ -42,10 +50,15 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     private MapListener listener;
 
+    // specs
     private boolean withMap;
     private boolean useGoogleMap;
+    private boolean newReminder;
 
+    // data
+    private Reminder currentReminder;
     private Bundle savedInstanceState;
+    private Bundle arguments;
 
     private SupportMapFragment supportGoogleMapFragment;
     private GoogleMap googleMap;
@@ -59,47 +72,123 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private Marker googleMapMarker;
     private com.amap.api.maps.model.Marker aMapMarker;
 
+
+    // the editor views
+    private MaterialEditText reminderTitle;
+    private MaterialEditText reminderDescription;
+    private TextView colorPicker;
+
+
     View rootView;
 
     private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE = 0x001;
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 0x002;
 
     public EditItemFragment() {
-        this.savedInstanceState = getArguments();
+        this.savedInstanceState = getArguments();           // why did I do this again?
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        try{
-            Bundle bundle = getArguments();
-            withMap = bundle.getBoolean("withMap");
-        }
-        catch (Exception e){
-            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+
+        if (!getSpecs())
             return null;
-        }
 
-
-        // set up map
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        useGoogleMap = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false)
-                && sharedPreferences.getString("whichMap", "0").equals("0");        // "0" is google map
-
-        if(withMap){
+        if (withMap) {
             rootView = inflater.inflate(R.layout.reminder_geo_edit_screen, container, false);
 
             googleMapContainer = (FrameLayout) rootView.findViewById(R.id.google_map_container);
             aMapContainer = (FrameLayout) rootView.findViewById(R.id.amap_map_container);
 
             setUpMap();
-        }
-        else {
+        } else {
             rootView = inflater.inflate(R.layout.reminder_normal_edit_screen, container, false);
         }
 
+        initData();
+
+        initView(rootView);
+
+        initEvent();
+
         return rootView;
-//        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    private boolean getSpecs() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        try {
+            arguments = getArguments();
+            withMap = arguments.getBoolean(getString(R.string.bundle_with_map));
+            newReminder = arguments.getBoolean(getString(R.string.bundle_new_reminder));
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // which map to use
+        useGoogleMap = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false)
+                && sharedPreferences.getString(getString(R.string.shared_pref_which_map), "0").equals("0");        // "0" is google map
+
+        return true;
+    }
+
+    private void initData() {
+        if (newReminder) {
+            currentReminder = new Reminder(getActivity());
+            Log.i("EditItemFragment", "New reminder");
+        } else {            // from draft or edit existing
+            Log.i("EditItemFragment", "Edit reminder");
+            try {
+                String existingInJSON = arguments.getString(getString(R.string.bundle_most_recent_reminder), null);
+                if (existingInJSON != null) {
+                    // existing reminder is passed in as JSON string
+                    Gson gson = new Gson();
+                    currentReminder = gson.fromJson(existingInJSON, Reminder.class);
+                    setAllColors(currentReminder.getColorInt());
+
+                    // change parent activity color
+                    if (((EditorScreen) getActivity()).getSupportActionBar() != null) {
+                        ((EditorScreen) getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(currentReminder.getColorInt()));
+                    }
+                    if (getActivity().getActionBar() != null)
+                        getActivity().getActionBar().setBackgroundDrawable(new ColorDrawable(currentReminder.getColorInt()));
+
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        getActivity().getWindow().setStatusBarColor(currentReminder.getColorInt());
+                        getActivity().getWindow().setNavigationBarColor(currentReminder.getColorInt());
+                    }
+                }
+            } catch (Exception e) {
+                // if cannot get the reminder, then we exit and say sorry
+                ((EditorScreen) getActivity()).scrollToFinishActivity();
+                Toast.makeText(getActivity(), getString(R.string.error_retrieving_reminder), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @SuppressWarnings("all")
+    private void initView(View rootView) {
+        colorPicker = (TextView) rootView.findViewById(R.id.textview_color_picker);
+        reminderTitle = (MaterialEditText) rootView.findViewById(R.id.edittext_title);
+        reminderDescription = (MaterialEditText) rootView.findViewById(R.id.edittext_description);
+    }
+
+    private void initEvent() {
+        colorPicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ColorChooserDialog.Builder((EditorScreen) getActivity(), R.string.color_picker_title)
+                        .titleSub(R.string.color_picker_title)
+                        .accentMode(false)
+                        .doneButton(R.string.button_done)
+                        .cancelButton(R.string.button_cancel)
+                        .backButton(R.string.button_back)
+                        .customButton(R.string.button_custom)
+                        .show();
+            }
+        });
     }
 
     private void setUpMap() {
@@ -266,6 +355,35 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
+    public void onColorChange(@ColorInt int selectedColor) {
+        currentReminder.setColorInt(selectedColor);
+
+        setAllColors(selectedColor);
+    }
+
+    private void setAllColors(@ColorInt int selectedColor) {
+        // TODO: change all colors
+        reminderTitle.setPrimaryColor(selectedColor);
+        reminderDescription.setPrimaryColor(selectedColor);
+
+        colorPicker.setTextColor(selectedColor);
+    }
+
+    public void saveReminder() {
+        Log.i("EditItemFragment", "Saving reminder...");
+
+        currentReminder.setTitle(reminderTitle.getText().toString());
+        currentReminder.setDescription(reminderDescription.getText().toString());
+        // TODO: more
+
+        // convert to gson
+        Gson gson = new Gson();
+        String currentReminderInJSONString = gson.toJson(currentReminder);
+
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        editor.putString(getString(R.string.bundle_most_recent_reminder), currentReminderInJSONString).apply();
+    }
+
     @Override
     public void onAttach(Context context) {
         listener = (MapListener) context;
@@ -294,6 +412,15 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+
+
+
+
+
+
+
+
 
     /**
      * Standard override for AMap

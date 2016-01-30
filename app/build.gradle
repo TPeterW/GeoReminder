@@ -80,6 +80,8 @@ dependencies {
     compile 'me.relex:circleindicator:1.1.8@aar'
     compile 'com.ToxicBakery.viewpager.transforms:view-pager-transforms:1.2.32@aar'
     compile 'com.blunderer:materialdesignlibrary:2.0.4'
+    compile 'com.rengwuxian.materialedittext:library:2.1.4'
+    compile 'com.google.code.gson:gson:2.5'
     compile 'com.parse:parse-android:1.13.0'
     compile 'com.parse.bolts:bolts-applinks:1.4.0'
     compile 'com.parse.bolts:bolts-tasks:1.4.0'
@@ -88,13 +90,16 @@ dependencies {
     compile ('com.facebook.android:facebook-android-sdk:4.9.0') {
         exclude module: 'bolts-android'
     }
+    compile('com.twitter.sdk.android:twitter:1.12.0@aar') {
+        transitive = true;
+    }
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
     compile('com.mikepenz:materialdrawer:4.6.4@aar') {
-        transitive = true
+        transitive = true;
     }
-    compile('com.twitter.sdk.android:twitter:1.12.0@aar') {
+    compile('com.github.afollestad.material-dialogs:commons:0.8.5.3@aar') {
         transitive = true;
     }
 }

@@ -77,7 +77,8 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
                 else
                     holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getStartingDate());
             } else {
-                holder.cardView.setDescription(context.getString(R.string.card_view_txt_no_hurry));
+//                holder.cardView.setDescription(context.getString(R.string.card_view_txt_no_hurry));
+                holder.cardView.setDescription(reminderList.get(position).getDescription());
             }
 
             holder.cardView.setHighlightButtonText(null);

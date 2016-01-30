@@ -4,10 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/edit_action_share"
-        android:icon="@drawable/ic_edit_share"
-        android:title="@string/dialog_share_title"
-        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:id="@+id/edit_action_save"
+        android:icon="@drawable/ic_edit_save"
+        android:title="@string/action_save"
         app:showAsAction="always" />
 
 </menu>

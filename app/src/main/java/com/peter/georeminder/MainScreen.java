@@ -2,7 +2,6 @@ package com.peter.georeminder;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,6 +39,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.gson.Gson;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -105,17 +105,17 @@ public class MainScreen extends AppCompatActivity implements
     private Drawer drawer = null;
     private IProfile userProfile;
     // Identifiers
-    private static final int LOCAL_USER_IDENTIFIER                          = 101;
-    private static final int ONLINE_USER_IDENTIFIER                         = 102;
-    private static final int ALL_IDENTIFIER                                 = 11;
-    private static final int GEO_IDENTIFIER                                 = 12;
-    private static final int NOR_IDENTIFIER                                 = 13;
-    private static final int DRAFT_IDENTIFIER                               = 14;
-    private static final int VIEW_MAP_IDENTIFIER                            = 15;
-    private static final int ABOUT_IDENTIFIER                               = 21;
-    private static final int SUPPORT_IDENTIFIER                             = 22;
-    private static final int FEEDBACK_IDENTIFIER                            = 51;
-    private static final int SETTINGS_IDENTIFIER                            = 52;
+    private static final int LOCAL_USER_IDENTIFIER                          = 0x101;
+    private static final int ONLINE_USER_IDENTIFIER                         = 0x102;
+    private static final int ALL_IDENTIFIER                                 = 0x11;
+    private static final int GEO_IDENTIFIER                                 = 0x12;
+    private static final int NOR_IDENTIFIER                                 = 0x13;
+    private static final int DRAFT_IDENTIFIER                               = 0x14;
+    private static final int VIEW_MAP_IDENTIFIER                            = 0x15;
+    private static final int ABOUT_IDENTIFIER                               = 0x21;
+    private static final int SUPPORT_IDENTIFIER                             = 0x22;
+    private static final int FEEDBACK_IDENTIFIER                            = 0x51;
+    private static final int SETTINGS_IDENTIFIER                            = 0x52;
 
     // Record the last time "Back" key was pressed, to implement "double-click-exit"
     private long firstBackPress;
@@ -433,7 +433,8 @@ public class MainScreen extends AppCompatActivity implements
             public void onClick(View view) {
                 newReminder.close(true);
                 Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
-                toEditScreen.putExtra(getString(R.string.bundle_with_map), false);
+                toEditScreen.putExtra(getString(R.string.bundle_with_map), false)
+                        .putExtra(getString(R.string.bundle_new_reminder), true);
                 //TODO: add specifications about the reminder to be created
 
                 // activity transition animation
@@ -459,7 +460,8 @@ public class MainScreen extends AppCompatActivity implements
                     }
 
                 Intent toEditScreen = new Intent(MainScreen.this, EditorScreen.class);
-                toEditScreen.putExtra(getString(R.string.bundle_with_map), true);
+                toEditScreen.putExtra(getString(R.string.bundle_with_map), true)
+                        .putExtra(getString(R.string.bundle_new_reminder), true);
                 //TODO: add specifications about the reminder to be created
 
                 // activity transition animation
@@ -478,7 +480,7 @@ public class MainScreen extends AppCompatActivity implements
     private void loadPref() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-        useAnimation = sharedPreferences.getBoolean("showAnim", true);
+        useAnimation = sharedPreferences.getBoolean(getString(R.string.shared_pref_show_animation), true);
         // TODO: apply fancy animations here
     }
 
@@ -488,15 +490,15 @@ public class MainScreen extends AppCompatActivity implements
             Log.i("Network Permission", (checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_GRANTED) + "");
             Log.i("Internet Permission", (checkSelfPermission(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) + "");
         }
-
+        
         // not sure which version of code is correct
 //        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)) {
 //            case ConnectionResult.API_UNAVAILABLE:
 //                break;
 //        }
-        //TODO: check if the user wants to use Amap first, before checking google play services
+        // TODO: check if the user wants to use Amap first, before checking google play services
 
-        //TODO: make sure Toast only appears once
+        // TODO: make sure Toast only appears once
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -563,14 +565,44 @@ public class MainScreen extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         switch (requestCode) {
             // TODO: check if list is till empty, otherwise hide the new reminder button and text
             case CREATE_NEW_GEO_REMINDER_REQUEST_CODE:
+                Log.i("MainScreen", "From new geo");
 //                Bundle resultFromCreating = data.getExtras();
-                return;
-            case CREATE_NEW_NOR_REMINDER_REQUEST_CODE:
+                // TODO:
+                if (resultCode == EditorScreen.SAVED_AS_REMINDER) {
+                    Log.i("MainScreen", "Reminder saved");
 
-                return;
+                } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
+
+                } else if (resultCode == EditorScreen.EDIT_CANCELLED) {
+
+                }
+
+                break;
+            case CREATE_NEW_NOR_REMINDER_REQUEST_CODE:
+                Log.i("MainScreen", "From new nor");
+                // TODO:
+                if (resultCode == EditorScreen.SAVED_AS_REMINDER) {
+                    Log.i("MainScreen", "Reminder saved");
+                    String reminderInJSONString = sharedPreferences.getString(getString(R.string.bundle_most_recent_reminder), null);
+                    if (reminderInJSONString != null) {
+                        Gson gson = new Gson();
+                        Reminder editedReminder = gson.fromJson(reminderInJSONString, Reminder.class);
+                        Log.d("MainScreen", editedReminder.getTitle() + " " + editedReminder.getDescription());
+                    } else {
+                        Toast.makeText(MainScreen.this, getString(R.string.cannot_save_reminder), Toast.LENGTH_SHORT).show();
+                    }
+
+                } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
+
+                } else if (resultCode == EditorScreen.EDIT_CANCELLED) {
+
+                }
+                break;
 
             case LOGIN_REQUEST_CODE:
                 loadPref();
@@ -584,7 +616,7 @@ public class MainScreen extends AppCompatActivity implements
 
                         break;
                 }
-                return;
+                break;
 
             case SETTINGS_REQUEST_CODE:
                 loadPref();

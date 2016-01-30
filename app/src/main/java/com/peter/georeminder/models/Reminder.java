@@ -2,6 +2,7 @@ package com.peter.georeminder.models;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.ColorInt;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.peter.georeminder.R;
@@ -30,8 +31,8 @@ public class Reminder {
 
     private String title;
     private String description;
-    private int importance;
-    private Color color;
+    private int importance;         // importance: 1, 2, 3, 4
+    private int colorInt;
 
     private boolean withLocation;
     private boolean withTime;
@@ -65,6 +66,8 @@ public class Reminder {
         startingDate = null;
         endDate = null;
         createDate = new Date();
+        colorInt = R.color.colorPrimary;
+        vibrate = true;
     }
 
     // Title
@@ -144,6 +147,16 @@ public class Reminder {
 
     public Reminder setEndDate(Date endDate) {
         this.endDate = endDate;
+        return this;
+    }
+
+    // color
+    public int getColorInt() {
+        return colorInt;
+    }
+
+    public Reminder setColorInt(@ColorInt int colorInt) {
+        this.colorInt = colorInt;
         return this;
     }
 }
