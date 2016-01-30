@@ -20,9 +20,11 @@ import android.text.TextWatcher;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -165,7 +167,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                 }
             } catch (Exception e) {
                 // if cannot get the reminder, then we exit and say sorry
-                ((EditorScreen) getActivity()).scrollToFinishActivity();
+                getActivity().onBackPressed();
                 Toast.makeText(getActivity(), getString(R.string.error_retrieving_reminder), Toast.LENGTH_SHORT).show();
             }
         }
@@ -177,6 +179,10 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         reminderTitle = (MaterialEditText) rootView.findViewById(R.id.edittext_title);
         reminderDescription = (MaterialEditText) rootView.findViewById(R.id.edittext_description);
         reminderAdditional = (MaterialEditText) rootView.findViewById(R.id.edittext_additional);
+
+        // hide keyboard
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(rootView.getWindowToken(), 0);
     }
 
     private void initEvent() {
@@ -194,7 +200,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().length() < 1) {
-                    getActivity().setTitle(getString(R.string.title_create_new));
+                    getActivity().setTitle(getString(R.string.title_untitled));
                 }
             }
         });
@@ -437,6 +443,10 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+
+
+
 
 
 

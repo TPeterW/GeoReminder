@@ -1,6 +1,7 @@
 package com.peter.georeminder;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,13 +9,19 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
@@ -28,7 +35,7 @@ import com.peter.georeminder.utils.swipeback.app.SwipeBackActivity;
  * Created by Peter on 10/8/15.
  * Screen that loads two different fragments depending on the type of reminder
  */
-public class EditorScreen extends SwipeBackActivity implements MapListener, ColorChooserDialog.ColorCallback {
+public class EditorScreen extends AppCompatActivity implements MapListener, ColorChooserDialog.ColorCallback {
 
     private boolean withMap;
     private boolean newReminder;
@@ -37,7 +44,6 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
     private double currentLongitude;
 
     private EditItemFragment currentFragment;
-    private SwipeBackLayout swipeBackLayout;
 
     // result code
     public static final int SAVED_TO_DRAFT                  = 0x91;
@@ -63,14 +69,22 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
 
     private void initEvent() {
         if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().setEnterTransition(new Slide(GravityCompat.END)
+            getWindow().setEnterTransition(new Slide(Gravity.END)
                     .excludeTarget(android.R.id.statusBarBackground, true)
                     .excludeTarget(android.R.id.navigationBarBackground, true));
+
+            // TODO: set exit transition
+            getWindow().setReturnTransition(new Slide(Gravity.END)
+                    .excludeTarget(android.R.id.statusBarBackground, true)
+                    .excludeTarget(android.R.id.navigationBarBackground, true));
+
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
         }
 
-        swipeBackLayout = getSwipeBackLayout();
-        swipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+//        swipeBackLayout = getSwipeBackLayout();
+//        swipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
 
         getSpecs();
 
@@ -108,13 +122,13 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
         switch (id) {
             case android.R.id.home:
                 saveToDraft();
-                swipeBackLayout.scrollToFinishActivity();
+                onBackPressed();
                 return true;
 
             case R.id.edit_action_save:
                 currentFragment.saveReminder();
                 setResult(SAVED_AS_REMINDER);
-                swipeBackLayout.scrollToFinishActivity();
+                onBackPressed();
                 return true;
         }
 
@@ -133,15 +147,40 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 saveToDraft();
-                swipeBackLayout.scrollToFinishActivity();
+                onBackPressed();
+                return true;
         }
 
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    public void onBackPressed() {
+        // clean the fragments at the same time
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int backStackEntryCount = fragmentManager.getBackStackEntryCount();
+        Log.d("EditorScreen", "BackStackEntryCount: " + backStackEntryCount);
+        for (int i = 0; i < backStackEntryCount; i++) {
+            fragmentManager.popBackStack();
+        }
+
+        super.onBackPressed();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        hideKeyboard();
+        return super.onTouchEvent(event);
+    }
+
     private void hideKeyboard() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+        try {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // then you have a keyboard! for free!
+        }
     }
 
     private void saveToDraft() {

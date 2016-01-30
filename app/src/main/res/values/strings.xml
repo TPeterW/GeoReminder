@@ -169,7 +169,7 @@
     <!--Page Titles-->
     <string name="title_syncing">Syncing</string>
     <string name="title_location">Locations</string>
-    <string name="title_create_new">New Reminder</string>
+    <string name="title_untitled">Untitled</string>
     <string name="title_edit_existing">Edit</string>
     <string name="title_page_settings">Preferences</string>
     <string name="title_view_whole_map">All Pins</string>

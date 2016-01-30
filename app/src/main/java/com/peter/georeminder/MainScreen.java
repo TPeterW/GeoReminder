@@ -439,8 +439,8 @@ public class MainScreen extends AppCompatActivity implements
 
                 // activity transition animation
                 if (Build.VERSION.SDK_INT >= 21) {
-                    getWindow().setExitTransition(new Fade());
-                    getWindow().setReenterTransition(new Fade());
+                    getWindow().setExitTransition(new Explode());
+                    getWindow().setReenterTransition(new Explode());
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
                 } else
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
@@ -466,8 +466,8 @@ public class MainScreen extends AppCompatActivity implements
 
                 // activity transition animation
                 if (Build.VERSION.SDK_INT >= 21) {
-                    getWindow().setExitTransition(new Fade());
-                    getWindow().setReenterTransition(new Fade());
+                    getWindow().setExitTransition(new Explode());
+                    getWindow().setReenterTransition(new Explode());
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
                 } else
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);

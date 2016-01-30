@@ -59,10 +59,11 @@
             android:name=".MainScreen"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".EditorScreen"
-            android:label="@string/title_create_new"
+            android:label="@string/title_untitled"
             android:parentActivityName=".MainScreen"
             android:screenOrientation="portrait">
             <meta-data
