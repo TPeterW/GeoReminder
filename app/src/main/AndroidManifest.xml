@@ -64,8 +64,11 @@
             android:name=".EditorScreen"
             android:label="@string/title_create_new"
             android:parentActivityName=".MainScreen"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.SwipeBackWindow"/>
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.peter.georeminder.MainScreen" />
+        </activity>
         <activity
             android:name=".SettingsScreen"
             android:label="@string/title_page_settings"

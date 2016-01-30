@@ -70,6 +70,7 @@
     <!--Edittext-->
     <string name="hint_reminder_title">Title</string>
     <string name="hint_reminder_description">Description</string>
+    <string name="hint_reminder_additional">Additional</string>
 
     <!--Intent-->
     <string name="feedback_subject">Feedback on GeoReminder</string>

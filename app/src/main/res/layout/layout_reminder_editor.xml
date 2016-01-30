@@ -22,10 +22,13 @@
                 android:id="@+id/edittext_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:textSize="24sp"
                 android:hint="@string/hint_reminder_title"
+                app:met_singleLineEllipsis="true"
                 app:met_floatingLabel="highlight"
                 app:met_floatingLabelText="@string/hint_reminder_title"
+                app:met_hideUnderline="true"
                 app:met_primaryColor="@color/colorPrimary"/>
             
             <com.rengwuxian.materialedittext.MaterialEditText
@@ -34,12 +37,27 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:inputType="textMultiLine"
-                android:lines="5"
                 android:scrollbars="vertical"
+                android:maxLines="5"
                 android:hint="@string/hint_reminder_description"
                 app:met_floatingLabel="highlight"
                 app:met_floatingLabelText="@string/hint_reminder_description"
+                app:met_hideUnderline="true"
                 app:met_primaryColor="@color/colorPrimary"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"/>
+
+
+
+            </LinearLayout>
             
             <TextView
                 android:id="@+id/textview_color_picker"
@@ -49,7 +67,21 @@
                 android:textColor="@color/colorPrimary"
                 android:clickable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:textSize="24sp" />
+                android:textSize="20sp" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edittext_additional"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical"
+                android:maxLines="3"
+                android:hint="@string/hint_reminder_additional"
+                app:met_floatingLabel="highlight"
+                app:met_floatingLabelText="@string/hint_reminder_additional"
+                app:met_hideUnderline="true"
+                app:met_primaryColor="@color/colorPrimary"/>
 
         </LinearLayout>
 

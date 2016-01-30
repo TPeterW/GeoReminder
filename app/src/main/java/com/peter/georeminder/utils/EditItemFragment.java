@@ -15,6 +15,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
@@ -77,6 +79,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private MaterialEditText reminderTitle;
     private MaterialEditText reminderDescription;
     private TextView colorPicker;
+    private MaterialEditText reminderAdditional;
 
 
     View rootView;
@@ -85,7 +88,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 0x002;
 
     public EditItemFragment() {
-        this.savedInstanceState = getArguments();           // why did I do this again?
+
     }
 
     @Nullable
@@ -173,9 +176,29 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         colorPicker = (TextView) rootView.findViewById(R.id.textview_color_picker);
         reminderTitle = (MaterialEditText) rootView.findViewById(R.id.edittext_title);
         reminderDescription = (MaterialEditText) rootView.findViewById(R.id.edittext_description);
+        reminderAdditional = (MaterialEditText) rootView.findViewById(R.id.edittext_additional);
     }
 
     private void initEvent() {
+        reminderTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                getActivity().setTitle(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() < 1) {
+                    getActivity().setTitle(getString(R.string.title_create_new));
+                }
+            }
+        });
+
         colorPicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -365,6 +388,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         // TODO: change all colors
         reminderTitle.setPrimaryColor(selectedColor);
         reminderDescription.setPrimaryColor(selectedColor);
+        reminderAdditional.setPrimaryColor(selectedColor);
 
         colorPicker.setTextColor(selectedColor);
     }
@@ -374,6 +398,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         currentReminder.setTitle(reminderTitle.getText().toString());
         currentReminder.setDescription(reminderDescription.getText().toString());
+        currentReminder.setAdditional(reminderAdditional.getText().toString());
         // TODO: more
 
         // convert to gson

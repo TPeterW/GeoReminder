@@ -9,7 +9,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         
         <!--Shared Element Transition-->
-        <item name="android:windowSharedElementEnterTransition">@transition/change_image_form</item>
+        <!--<item name="android:windowSharedElementEnterTransition">@transition/change_image_form</item>-->
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

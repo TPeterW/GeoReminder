@@ -31,6 +31,7 @@ public class Reminder {
 
     private String title;
     private String description;
+    private String additional;
     private int importance;         // importance: 1, 2, 3, 4
     private int colorInt;
 
@@ -87,6 +88,15 @@ public class Reminder {
 
     public Reminder setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public String getAdditional() {
+        return additional;
+    }
+
+    public Reminder setAdditional(String additional) {
+        this.additional = additional;
         return this;
     }
 

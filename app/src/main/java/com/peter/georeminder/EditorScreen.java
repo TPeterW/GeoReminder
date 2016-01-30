@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
@@ -36,6 +37,7 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
     private double currentLongitude;
 
     private EditItemFragment currentFragment;
+    private SwipeBackLayout swipeBackLayout;
 
     // result code
     public static final int SAVED_TO_DRAFT                  = 0x91;
@@ -60,14 +62,15 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
     }
 
     private void initEvent() {
-        if(Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setEnterTransition(new Slide(GravityCompat.END)
                     .excludeTarget(android.R.id.statusBarBackground, true)
                     .excludeTarget(android.R.id.navigationBarBackground, true));
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
         }
 
-        getSwipeBackLayout().setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
+        swipeBackLayout = getSwipeBackLayout();
+        swipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
 
         getSpecs();
 
@@ -105,14 +108,14 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
         switch (id) {
             case android.R.id.home:
                 saveToDraft();
-                scrollToFinishActivity();
-                break;
+                swipeBackLayout.scrollToFinishActivity();
+                return true;
 
             case R.id.edit_action_save:
                 currentFragment.saveReminder();
                 setResult(SAVED_AS_REMINDER);
-                scrollToFinishActivity();
-                break;
+                swipeBackLayout.scrollToFinishActivity();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -130,7 +133,7 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 saveToDraft();
-                scrollToFinishActivity();
+                swipeBackLayout.scrollToFinishActivity();
         }
 
         return super.onKeyDown(keyCode, event);
@@ -187,8 +190,8 @@ public class EditorScreen extends SwipeBackActivity implements MapListener, Colo
         longitudeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                setTitle(Math.round ((float) latitudeAnimator.getAnimatedValue() * 100000.0) / 100000.0 + ", "
-                        + Math.round ((float) longitudeAnimator.getAnimatedValue() * 100000.0) / 100000.0);
+                setTitle(Math.round((float) latitudeAnimator.getAnimatedValue() * 100000.0) / 100000.0 + ", "
+                        + Math.round((float) longitudeAnimator.getAnimatedValue() * 100000.0) / 100000.0);
             }
         });
 
