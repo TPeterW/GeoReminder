@@ -20,9 +20,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Slide;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +49,9 @@ import com.peter.georeminder.R;
 import com.peter.georeminder.models.Reminder;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import carbon.widget.Divider;
 import me.tittojose.www.timerangepicker_library.TimeRangePickerDialog;
@@ -91,9 +91,9 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private MaterialEditText reminderTitle;
     private MaterialEditText reminderDescription;
 
-    private LinearLayout withTimeContainer;
-    private TextView withTimeText;
-    private Switch withTimeSwitch;
+    private LinearLayout alwaysContainer;
+    private TextView alwaysText;
+    private Switch alwaysSwitch;
 
     private LinearLayout allDayContainer;
     private TextView allDayText;
@@ -176,7 +176,37 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private void initData() {
         if (newReminder) {
             currentReminder = new Reminder(getActivity());
-            currentReminder.setRepeatType(Reminder.ALL_DAY);
+            currentReminder.setRepeatType(Reminder.ALL_DAY);            // default withTime false
+
+            Calendar calendar = Calendar.getInstance();
+            currentReminder.setCreateDateTime(calendar.getTime());
+            currentReminder.setStartTime(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE));
+            currentReminder.setEndTime(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE));
+
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            calendar.clear();
+            calendar.set(year, month, day);
+            currentReminder.setStartDate(calendar.getTime());           // for these two we only need year, month, day
+            currentReminder.setEndDate(calendar.getTime());
+
+            // set reminder type
+            if (withMap)
+                currentReminder.setReminderType(Reminder.GEO);
+            else
+                currentReminder.setReminderType(Reminder.NOR);
+
+            // set create location
+            try {
+                Location currentLocation = getLastKnownLocation();
+                currentReminder.setCreateLat(currentLocation.getLatitude());
+                currentReminder.setCreateLng(currentLocation.getLongitude());
+            } catch (Exception e) {         // probably null pointer
+                currentReminder.setCreateLat(null);
+                currentReminder.setCreateLng(null);
+            }
+
             Log.i("EditItemFragment", "New reminder");
         } else {            // from draft or edit existing
             Log.i("EditItemFragment", "Edit reminder");
@@ -187,18 +217,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                     Gson gson = new Gson();
                     currentReminder = gson.fromJson(existingInJSON, Reminder.class);
                     setAllColors(currentReminder.getColorInt());
-
-                    // change parent activity color
-                    if (((EditorScreen) getActivity()).getSupportActionBar() != null) {
-                        ((EditorScreen) getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(currentReminder.getColorInt()));
-                    }
-                    if (getActivity().getActionBar() != null)
-                        getActivity().getActionBar().setBackgroundDrawable(new ColorDrawable(currentReminder.getColorInt()));
-
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        getActivity().getWindow().setStatusBarColor(currentReminder.getColorInt());
-                        getActivity().getWindow().setNavigationBarColor(currentReminder.getColorInt());
-                    }
                 }
             } catch (Exception e) {
                 // if cannot get the reminder, then we exit and say sorry
@@ -214,9 +232,9 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         reminderTitle = (MaterialEditText) rootView.findViewById(R.id.edittext_title);
         reminderDescription = (MaterialEditText) rootView.findViewById(R.id.edittext_description);
 
-        withTimeContainer = (LinearLayout) rootView.findViewById(R.id.with_time_container);
-        withTimeText = (TextView) rootView.findViewById(R.id.with_time_txt);
-        withTimeSwitch = (Switch) rootView.findViewById(R.id.with_time_switch);
+        alwaysContainer = (LinearLayout) rootView.findViewById(R.id.always_container);
+        alwaysText = (TextView) rootView.findViewById(R.id.always_txt);
+        alwaysSwitch = (Switch) rootView.findViewById(R.id.always_switch);
 
         // TODO: change visibility accordingly
         allDayContainer = (LinearLayout) rootView.findViewById(R.id.all_day_container);
@@ -252,6 +270,40 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                 setRepeatEverydayLayout();
                 break;
         }
+
+        // TODO: check withMap,
+
+        // change parent activity color
+        if (newReminder) {
+            if (Build.VERSION.SDK_INT >= 21) {
+                getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+                getActivity().getWindow().setNavigationBarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+            }
+
+            if (withMap) {      // GEO
+                alwaysContainer.setVisibility(View.VISIBLE);
+                currentReminder.withTime(false);
+                allDayContainer.setVisibility(View.GONE);
+                startDateTimeContainer.setVisibility(View.GONE);
+                endDateTimeContainer.setVisibility(View.GONE);
+            } else {            // NOR
+                currentReminder.withTime(true);
+                alwaysContainer.setVisibility(View.GONE);
+            }
+        } else {
+            if (currentReminder != null) {
+                if (((EditorScreen) getActivity()).getSupportActionBar() != null)
+                    ((EditorScreen) getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(currentReminder.getColorInt()));
+
+                if (getActivity().getActionBar() != null)
+                    getActivity().getActionBar().setBackgroundDrawable(new ColorDrawable(currentReminder.getColorInt()));
+
+                if (Build.VERSION.SDK_INT >= 21) {
+                    getActivity().getWindow().setStatusBarColor(currentReminder.getColorInt());
+                    getActivity().getWindow().setNavigationBarColor(currentReminder.getColorInt());
+                }
+            }
+        }
     }
 
     private void initEvent() {
@@ -275,28 +327,40 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             }
         });
 
-        // whether to use time or not
-        withTimeContainer.setOnClickListener(new View.OnClickListener() {
+        // date
+        alwaysContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                withTimeSwitch.performClick();
+                alwaysSwitch.performClick();
             }
         });
 
-        withTimeText.setOnClickListener(new View.OnClickListener() {
+        alwaysText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                withTimeSwitch.performClick();
+                alwaysSwitch.performClick();
             }
         });
 
-        withTimeSwitch.setOnClickListener(new View.OnClickListener() {
+        alwaysSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (withTimeSwitch.isChecked()) {       // use time
+                if (alwaysSwitch.isChecked()) {
+                    currentReminder.withTime(false);
+
+                    allDayContainer.setVisibility(View.GONE);
+                    startDateTimeContainer.setVisibility(View.GONE);
+                    endDateTimeContainer.setVisibility(View.GONE);
+                    repeatOptions.setVisibility(View.GONE);
+
+                    Log.i("EditItemFragment", "Event always");
+                } else {
+                    currentReminder.withTime(true);
+
                     allDayContainer.setVisibility(View.VISIBLE);
                     startDateTimeContainer.setVisibility(View.VISIBLE);
                     endDateTimeContainer.setVisibility(View.VISIBLE);
+
                     switch (currentReminder.getRepeatType()) {
                         case Reminder.ALL_DAY:
                             setAllDayLayout();
@@ -308,12 +372,8 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                             setPointToPointLayout();
                             break;
                     }
-                } else {
-                    allDayContainer.setVisibility(View.GONE);
-                    startDateTimeContainer.setVisibility(View.GONE);
-                    endDateTimeContainer.setVisibility(View.GONE);
-                    repeatTimeRange.setVisibility(View.GONE);
-                    repeatOptions.setVisibility(View.GONE);
+
+                    Log.i("EditItemFragment", "Event has date limit");
                 }
             }
         });
@@ -460,9 +520,24 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         SmoothDateRangePickerFragment smoothDateRangePickerFragment = SmoothDateRangePickerFragment.newInstance(new SmoothDateRangePickerFragment.OnDateRangeSetListener() {
             @Override
             public void onDateRangeSet(SmoothDateRangePickerFragment view, int yearStart, int monthStart, int dayStart, int yearEnd, int monthEnd, int dayEnd) {
-                // TODO:
-                Log.i("EditItemFragment", "Start date: " + yearStart + "-" + monthStart + "-" + dayStart);
-                Log.i("EditItemFragment", "End date: " + yearEnd + "-" + monthEnd + "-" + dayEnd);
+                Calendar startCalendar = Calendar.getInstance();
+                Calendar endCalendar = Calendar.getInstance();
+                startCalendar.clear();
+                endCalendar.clear();
+                startCalendar.set(yearStart, monthStart, dayStart);
+                endCalendar.set(yearEnd, monthEnd, dayEnd);
+
+                currentReminder.setStartDate(startCalendar.getTime());
+                currentReminder.setEndDate(endCalendar.getTime());
+
+                DateFormat dateFormat = DateFormat.getDateInstance();
+                dateFormat.setTimeZone(TimeZone.getDefault());
+
+                startDate.setText(dateFormat.format(startCalendar.getTime()));
+                endDate.setText(dateFormat.format(endCalendar.getTime()));
+
+                Log.i("EditItemFragment", "Start date: " + startDate.getText().toString());
+                Log.i("EditItemFragment", "End date: " + endDate.getText().toString());
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
@@ -475,13 +550,19 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         TimeRangePickerDialog timeRangePickerDialog = TimeRangePickerDialog.newInstance(new TimeRangePickerDialog.OnTimeRangeSelectedListener() {
             @Override
             public void onTimeRangeSelected(int startHour, int startMin, int endHour, int endMin) {
-                // TODO:
+                currentReminder.setStartTime(startHour * 60 + startMin);
+                currentReminder.setEndTime(endHour * 60 + endMin);
+
+                startTime.setText(getString(R.string.point_to_point_time_format, startHour, startMin));
+                endTime.setText(getString(R.string.point_to_point_time_format, endHour, endMin));
+                repeatTimeRange.setText(getString(R.string.time_range_time_format, startHour, startMin, endHour, endMin));
+
                 Log.i("EditItemFragment", "Start time: " + startHour + ":" + startMin);
                 Log.i("EditItemFragment", "End time: " + endHour + ":" + endMin);
             }
         }, true);
 
-        timeRangePickerDialog.setPrimaryColor(currentReminder.getColorInt());
+//        timeRangePickerDialog.setPrimaryColor(currentReminder.getColorInt());
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         timeRangePickerDialog.show(fragmentManager, TIME_RANGE_DIALOG_TAG);
@@ -550,6 +631,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
                 googleMap.clear();
                 googleMapMarker = googleMap.addMarker(markerOptions);
+                // TODO: add latlng to reminder
             }
         });
 
@@ -610,6 +692,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
                 aMap.clear();
                 aMapMarker = aMap.addMarker(markerOptions);
+                // TODO: add latlng to reminder
             }
         });
 
@@ -670,27 +753,52 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     }
 
     private void setRepeatEverydayLayout() {
+        startDate.setVisibility(View.VISIBLE);
+        endDate.setVisibility(View.VISIBLE);
+        startDate.setText(DateFormat.getDateInstance().format(currentReminder.getStartDate()));
+        endDate.setText(DateFormat.getDateInstance().format(currentReminder.getEndDate()));
+
         startTime.setVisibility(View.GONE);
         endTime.setVisibility(View.GONE);
 
         repeatTimeRange.setVisibility(View.VISIBLE);
-        repeatTimeRange.setText(R.string.default_time_range);
+        int startHour = currentReminder.getStartTime() / 60;
+        int startMin = currentReminder.getStartTime() % 60;
+        int endHour = currentReminder.getEndTime() / 60;
+        int endMin = currentReminder.getEndTime() % 60;
+        repeatTimeRange.setText(getString(R.string.time_range_time_format, startHour, startMin, endHour, endMin));
 
         repeatOptions.setVisibility(View.VISIBLE);
         repeatOptions.setText(R.string.repeat_option_repeat_everyday);
     }
 
     private void setPointToPointLayout() {
+        startDate.setVisibility(View.VISIBLE);
+        endDate.setVisibility(View.VISIBLE);
+        startDate.setText(DateFormat.getDateInstance().format(currentReminder.getStartDate()));
+        endDate.setText(DateFormat.getDateInstance().format(currentReminder.getEndDate()));
+
         startTime.setVisibility(View.VISIBLE);
         endTime.setVisibility(View.VISIBLE);
 
         repeatTimeRange.setVisibility(View.GONE);
+        int startHour = currentReminder.getStartTime() / 60;
+        int startMin = currentReminder.getStartTime() % 60;
+        int endHour = currentReminder.getEndTime() / 60;
+        int endMin = currentReminder.getEndTime() % 60;
+        startTime.setText(getString(R.string.point_to_point_time_format, startHour, startMin));
+        endTime.setText(getString(R.string.point_to_point_time_format, endHour, endMin));
 
         repeatOptions.setVisibility(View.VISIBLE);
         repeatOptions.setText(R.string.repeat_option_point_to_point);
     }
 
     private void setAllDayLayout() {
+        startDate.setVisibility(View.VISIBLE);
+        endDate.setVisibility(View.VISIBLE);
+        startDate.setText(DateFormat.getDateInstance().format(currentReminder.getStartDate()));
+        endDate.setText(DateFormat.getDateInstance().format(currentReminder.getEndDate()));
+
         startTime.setVisibility(View.GONE);
         endTime.setVisibility(View.GONE);
 
@@ -764,6 +872,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     @Override
     public void onResume() {
+        Log.d("EditItemFragment", "onResume");
         super.onResume();
         if (withMap && !useGoogleMap)
             supportAMapFragment.onResume();
@@ -771,6 +880,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     @Override
     public void onPause() {
+        Log.d("EditItemFragment", "onPause");
         super.onPause();
         if (withMap && !useGoogleMap)
             supportAMapFragment.onPause();
@@ -785,6 +895,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     @Override
     public void onDestroy() {
+        Log.d("EditItemFragment", "onDestroy");
         super.onDestroy();
         if (withMap && !useGoogleMap)
             supportAMapFragment.onDestroyView();
@@ -792,8 +903,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     @Override
     public void onDestroyView() {
-        if (Build.VERSION.SDK_INT >= 21)
-            getActivity().getWindow().setReturnTransition(new Slide(Gravity.END));
+        Log.d("EditItemFragment", "onDestroyView");
         super.onDestroyView();
     }
 

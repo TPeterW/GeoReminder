@@ -51,14 +51,12 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     public ReminderRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.layout_reminder_recycler_item, parent, false);
         RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
-        //TODO: do what? figure out later
+        // TODO: do what? figure out later
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-        // TODO: Change this to use information from reminderList
-
         // set OnItemClick/LongClick listener
         // implement in calling activity (in this case, MainScreen)
 
@@ -75,7 +73,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
                 if (current.getEndDate() != null)
                     holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getEndDate());
                 else
-                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getStartingDate());
+                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getStartDate());
             } else {
 //                holder.cardView.setDescription(context.getString(R.string.card_view_txt_no_hurry));
                 holder.cardView.setDescription(reminderList.get(position).getDescription());
@@ -139,6 +137,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
      */
     public static class RecyclerViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
+        // TODO: add other attributes
 
         public RecyclerViewHolder(View itemView) {
             super(itemView);

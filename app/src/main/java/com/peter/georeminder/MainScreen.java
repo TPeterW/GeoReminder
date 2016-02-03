@@ -25,7 +25,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
-import android.transition.Fade;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -439,8 +438,12 @@ public class MainScreen extends AppCompatActivity implements
 
                 // activity transition animation
                 if (Build.VERSION.SDK_INT >= 21) {
-                    getWindow().setExitTransition(new Explode());
-                    getWindow().setReenterTransition(new Explode());
+                    getWindow().setExitTransition(new Explode()
+                            .excludeTarget(android.R.id.navigationBarBackground, true)
+                            .excludeTarget(android.R.id.statusBarBackground, true));
+                    getWindow().setReenterTransition(new Explode()
+                            .excludeTarget(android.R.id.navigationBarBackground, true)
+                            .excludeTarget(android.R.id.statusBarBackground, true));
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
                 } else
                     startActivityForResult(toEditScreen, CREATE_NEW_NOR_REMINDER_REQUEST_CODE);
@@ -466,8 +469,12 @@ public class MainScreen extends AppCompatActivity implements
 
                 // activity transition animation
                 if (Build.VERSION.SDK_INT >= 21) {
-                    getWindow().setExitTransition(new Explode());
-                    getWindow().setReenterTransition(new Explode());
+                    getWindow().setExitTransition(new Explode()
+                            .excludeTarget(android.R.id.navigationBarBackground, true)
+                            .excludeTarget(android.R.id.statusBarBackground, true));
+                    getWindow().setReenterTransition(new Explode()
+                            .excludeTarget(android.R.id.navigationBarBackground, true)
+                            .excludeTarget(android.R.id.statusBarBackground, true));
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
                 } else
                     startActivityForResult(toEditScreen, CREATE_NEW_GEO_REMINDER_REQUEST_CODE);
@@ -765,7 +772,7 @@ public class MainScreen extends AppCompatActivity implements
         Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
 
         if (Build.VERSION.SDK_INT >= 21) {
-            if(animateExit) {
+            if (animateExit) {
                 getWindow().setExitTransition(new Explode());
             } else {
                 getWindow().setExitTransition(null);

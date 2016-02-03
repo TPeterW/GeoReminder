@@ -67,7 +67,6 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
                     .excludeTarget(android.R.id.statusBarBackground, true)
                     .excludeTarget(android.R.id.navigationBarBackground, true));
 
-            // TODO: set exit transition
             getWindow().setReturnTransition(new Slide(Gravity.END)
                     .excludeTarget(android.R.id.statusBarBackground, true)
                     .excludeTarget(android.R.id.navigationBarBackground, true));

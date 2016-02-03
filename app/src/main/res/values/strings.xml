@@ -75,10 +75,15 @@
     <string name="default_time_range">8:00 ~ 20:00</string>
     <string name="with_time">Time Limit</string>
     <string name="time_all_day">All Day</string>
+    <string name="time_always">Always</string>
     <string name="repeat_options">Repeat Options</string>
     <string name="repeat_option_repeat_everyday">Repeat Everyday</string>
     <string name="repeat_option_point_to_point">Point to Point</string>
     <string name="repeat_option_all_day">All Day</string>
+
+    <string name="point_to_point_time_format" formatted="false">%02d:%02d</string>
+    <string name="time_range_time_format" formatted="false">%02d:%02d ~ %02d:%02d</string>
+
 
     <!--Intent-->
     <string name="feedback_subject">Feedback on GeoReminder</string>

@@ -2,8 +2,8 @@ package com.peter.georeminder.models;
 
 import android.content.Context;
 import android.support.annotation.ColorInt;
+import android.support.annotation.Nullable;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.peter.georeminder.R;
 
 import java.util.Calendar;
@@ -17,14 +17,17 @@ public class Reminder {
 
     private String Uid;             // Uid = title_lat_lng_createDate_createTime
 
-    private Date createDate;
-    private Date startingDate;
+    private Date createDateTime;
+    private Date startDate;
     private Date endDate;
+    private int startTime;          // hour * 60 + min
+    private int endTime;
     private long timeFromNow;
 
-    private LatLng createLocation;
-    private LatLng remindLocation;
-    private LatLng lastKnownLocation;
+    private Double createLat;
+    private Double createLng;
+    private Double remindLat;
+    private Double remindLng;
     private int locationAccuracy;
     private double distanceToHere;
 
@@ -44,7 +47,7 @@ public class Reminder {
     private int repeatType;         // 0 = interval everyday, 1 = from point to point
     public static final int REPEAT_EVERYDAY             = 0x0;
     public static final int POINT_TO_POINT              = 0x1;
-    public static final int ALL_DAY                     = 0x2;
+    public static final int ALL_DAY                     = 0x2;          // means not with time
 
     // reminder type
     private int reminderType;       // 0 = notes, 1 = geo, 2 = normal
@@ -65,18 +68,18 @@ public class Reminder {
     }
 
     private void initialise(Context context) {
-        startingDate = cal.getTime();
-//        endDate
+        this.context = context;
 
-        setTitle(context.getString(R.string.reminder_default_title));
-
+        startDate = cal.getTime();
+        title = context.getString(R.string.reminder_default_title);
         distanceToHere = 0;
-        startingDate = null;
+        startDate = null;
         endDate = null;
-        createDate = new Date();
+        createDateTime = new Date();
         colorInt = R.color.colorPrimary;
         vibrate = true;
         repeatType = REPEAT_EVERYDAY;
+        withTime = false;
     }
 
     // Title
@@ -128,6 +131,43 @@ public class Reminder {
         return this;
     }
 
+    // latlng
+    public Double getCreateLat() {
+        return createLat;
+    }
+
+    public Reminder setCreateLat(@Nullable Double createLat) {
+        this.createLat = createLat;
+        return this;
+    }
+
+    public Double getCreateLng() {
+        return createLng;
+    }
+
+    public Reminder setCreateLng(@Nullable Double createLng) {
+        this.createLng = createLng;
+        return this;
+    }
+
+    public Double getRemindLat() {
+        return remindLat;
+    }
+
+    public Reminder setRemindLat(@Nullable Double remindLat) {
+        this.remindLat = remindLat;
+        return this;
+    }
+
+    public Double getRemindLng() {
+        return remindLng;
+    }
+
+    public Reminder setRemindLng(@Nullable Double remindLng) {
+        this.remindLng = remindLng;
+        return this;
+    }
+
     // distanceToHere
     public double getDistanceToHere() {
         return distanceToHere;
@@ -148,13 +188,23 @@ public class Reminder {
         return this;
     }
 
-    // startingDate
-    public Date getStartingDate() {
-        return startingDate;
+    // createDateTime
+    public Date getCreateDateTime() {
+        return createDateTime;
     }
 
-    public Reminder setStartingDate(Date startingDate) {
-        this.startingDate = startingDate;
+    public Reminder setCreateDateTime(Date createDateTime) {
+        this.createDateTime = createDateTime;
+        return this;
+    }
+
+    // startDate
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Reminder setStartDate(Date startDate) {
+        this.startDate = startDate;
         return this;
     }
 
@@ -165,6 +215,26 @@ public class Reminder {
 
     public Reminder setEndDate(Date endDate) {
         this.endDate = endDate;
+        return this;
+    }
+
+    // startTime
+    public int getStartTime() {
+        return startTime;
+    }
+
+    public Reminder setStartTime(int startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    // endTime
+    public int getEndTime() {
+        return endTime;
+    }
+
+    public Reminder setEndTime(int endTime) {
+        this.endTime = endTime;
         return this;
     }
 
@@ -185,6 +255,16 @@ public class Reminder {
 
     public Reminder setRepeatType(int repeatType) {
         this.repeatType = repeatType;
+        return this;
+    }
+
+    // reminder type
+    public int getReminderType() {
+        return reminderType;
+    }
+
+    public Reminder setReminderType(int reminderType) {
+        this.reminderType = reminderType;
         return this;
     }
 }

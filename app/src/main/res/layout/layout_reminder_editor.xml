@@ -56,9 +56,8 @@
                 android:layout_marginBottom="10dp"
                 android:background="@color/colorPrimary"/>
 
-
             <LinearLayout
-                android:id="@+id/with_time_container"
+                android:id="@+id/always_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -66,14 +65,14 @@
                 android:background="?attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/with_time_txt"
+                    android:id="@+id/always_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/with_time"
+                    android:text="@string/time_always"
                     android:textSize="20sp"
                     android:clickable="true"
                     android:paddingBottom="5dp"
-                    android:background="?attr/selectableItemBackground" />
+                    android:background="?attr/selectableItemBackground"/>
 
                 <View
                     android:layout_width="0dp"
@@ -82,7 +81,7 @@
                     android:clickable="true"/>
 
                 <Switch
-                    android:id="@+id/with_time_switch"
+                    android:id="@+id/always_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
