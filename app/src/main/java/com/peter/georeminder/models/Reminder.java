@@ -57,7 +57,7 @@ public class Reminder {
 
 
     // logistics
-    private Context context;
+    private transient Context context;
 
 
     // utilities

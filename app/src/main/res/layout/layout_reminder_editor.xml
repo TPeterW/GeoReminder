@@ -225,8 +225,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/repeat_options"
                 android:textSize="20sp"
-                android:clickable="true"/>
-
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"/>
 
             <carbon.widget.Divider
                 android:id="@+id/divider_under_time"

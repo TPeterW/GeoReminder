@@ -310,7 +310,6 @@ public class MainScreen extends AppCompatActivity implements
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withAccountHeader(drawerHeader)
-                .withStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary))
                 .addDrawerItems(
                         new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all).withBadge(8 + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary)),
                         new PrimaryDrawerItem().withIdentifier(GEO_IDENTIFIER).withName(getString(R.string.nav_opt_geo)).withIcon(R.drawable.ic_nav_geo),
@@ -325,7 +324,7 @@ public class MainScreen extends AppCompatActivity implements
                                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                                     @Override
                                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                        switch (drawerItem.getIdentifier()) {
+                                        switch ((int) drawerItem.getIdentifier()) {
                                             case ALL_IDENTIFIER:
 
                                                 break;
@@ -383,6 +382,8 @@ public class MainScreen extends AppCompatActivity implements
                                 )
                                 .withSavedInstance(savedInstanceState)
                                 .build();
+        // set status bar color
+        drawer.getDrawerLayout().setStatusBarBackgroundColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
     }
 
     private void initEvent() {
@@ -772,12 +773,11 @@ public class MainScreen extends AppCompatActivity implements
         Intent toViewWholeMap = new Intent(MainScreen.this, WholeMapScreen.class);
 
         if (Build.VERSION.SDK_INT >= 21) {
-            if (animateExit) {
-                getWindow().setExitTransition(new Explode());
-            } else {
-                getWindow().setExitTransition(null);
-            }
-            getWindow().setReenterTransition(new Explode());
+            getWindow().setExitTransition(new Explode()
+                    .excludeTarget(android.R.id.navigationBarBackground, true));
+            getWindow().setReenterTransition(new Explode()
+                    .excludeTarget(android.R.id.navigationBarBackground, true));
+
             startActivity(toViewWholeMap, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
         } else
             startActivity(toViewWholeMap);

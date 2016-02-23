@@ -95,7 +95,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         useGoogleMap = sharedPreferences.getBoolean(getString(R.string.shared_pref_google_avail), false)
                 && sharedPreferences.getString("whichMap", "0").equals("0");        // "0" is google map
 
-        if(useGoogleMap) {
+        if (useGoogleMap) {
             setTheme(R.style.AppTheme_TranslucentWindow);
         } else {                  // use AMAP
             setTheme(R.style.AppTheme_TranslucentStatusBar);
@@ -103,7 +103,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
         super.onCreate(savedInstanceState);
 
-        if(useGoogleMap) {
+        if (useGoogleMap) {
             setContentView(R.layout.activity_google_map_screen);
         } else {                  // use AMAP
             setContentView(R.layout.activity_amap_map_screen);
@@ -122,8 +122,10 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     private void initTransitions() {
         if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().setEnterTransition(new Slide(Gravity.END));
-            getWindow().setReturnTransition(new Slide(Gravity.START));
+            getWindow().setEnterTransition(new Slide(Gravity.END)
+                    .excludeTarget(android.R.id.navigationBarBackground, true));
+            getWindow().setReturnTransition(new Slide(Gravity.START)
+                    .excludeTarget(android.R.id.navigationBarBackground, true));
         }
     }
 
@@ -177,8 +179,6 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
             // Initialise AMAP
             aMapFragment = (com.amap.api.maps.SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.whole_amap_map);
-//            mapView = (MapView) findViewById(R.id.whole_amap_map);
-//            mapView.onCreate(savedInstanceState);
             aMapFragment.onCreate(savedInstanceState);
             aMap = aMapFragment.getMap();
 
@@ -205,7 +205,7 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
         searchBox.setMenuListener(new SearchBox.MenuListener() {
             @Override
             public void onMenuClick() {
-                //Hamburger has been clicked
+                // Hamburger has been clicked
                 if (!drawer.isDrawerOpen(GravityCompat.START))
                     drawer.openDrawer(GravityCompat.START);
             }
@@ -214,18 +214,18 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
             @Override
             public void onSearchOpened() {
-                //Use this to tint the screen
+                // Use this to tint the screen
             }
 
             @Override
             public void onSearchClosed() {
-                //Use this to un-tint the screen
+                // Use this to un-tint the screen
             }
 
             @Override
             public void onSearchTermChanged(String term) {
-                //React to the search term changing
-                //Called after it has updated results
+                // React to the search term changing
+                // Called after it has updated results
             }
 
             @Override
@@ -235,12 +235,12 @@ public class WholeMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
             @Override
             public void onResultClick(SearchResult result) {
-                //React to a result being clicked
+                // React to a result being clicked
             }
 
             @Override
             public void onSearchCleared() {
-                //Called when the clear button is clicked
+                // Called when the clear button is clicked
             }
 
         });

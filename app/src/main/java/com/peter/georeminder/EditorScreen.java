@@ -116,8 +116,12 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
                 return true;
 
             case R.id.edit_action_save:
-                currentFragment.saveReminder();
-                setResult(SAVED_AS_REMINDER);
+                // TODO: check see if is draft, pop up dialog
+                if (currentFragment.saveReminder()) {
+                    setResult(SAVED_AS_REMINDER);
+                } else {
+                    setResult(SAVED_TO_DRAFT);
+                }
                 onBackPressed();
                 return true;
         }
@@ -153,6 +157,8 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
         for (int i = 0; i < backStackEntryCount; i++) {
             fragmentManager.popBackStack();
         }
+
+        // TODO: check if is draft
 
         super.onBackPressed();
     }

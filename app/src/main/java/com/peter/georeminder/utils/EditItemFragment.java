@@ -117,6 +117,8 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     View rootView;
 
+    private Gson gson;
+
     private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE    = 0x001;
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE      = 0x002;
 
@@ -174,6 +176,9 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     }
 
     private void initData() {
+        // TODO: not sure if works
+        gson = new Gson();
+
         if (newReminder) {
             currentReminder = new Reminder(getActivity());
             currentReminder.setRepeatType(Reminder.ALL_DAY);            // default withTime false
@@ -214,7 +219,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                 String existingInJSON = arguments.getString(getString(R.string.bundle_most_recent_reminder), null);
                 if (existingInJSON != null) {
                     // existing reminder is passed in as JSON string
-                    Gson gson = new Gson();
                     currentReminder = gson.fromJson(existingInJSON, Reminder.class);
                     setAllColors(currentReminder.getColorInt());
                 }
@@ -351,6 +355,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                     allDayContainer.setVisibility(View.GONE);
                     startDateTimeContainer.setVisibility(View.GONE);
                     endDateTimeContainer.setVisibility(View.GONE);
+                    repeatTimeRange.setVisibility(View.GONE);
                     repeatOptions.setVisibility(View.GONE);
 
                     Log.i("EditItemFragment", "Event always");
@@ -807,8 +812,13 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         repeatOptions.setVisibility(View.GONE);
     }
 
-    public void saveReminder() {
+    public boolean saveReminder() {
         Log.i("EditItemFragment", "Saving reminder...");
+
+        boolean isDraft = false;
+
+        if (reminderTitle.getText() == null)
+            isDraft = true;
 
         currentReminder.setTitle(reminderTitle.getText().toString());
         currentReminder.setDescription(reminderDescription.getText().toString());
@@ -816,11 +826,12 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         // TODO: more
 
         // convert to gson
-        Gson gson = new Gson();
-        String currentReminderInJSONString = gson.toJson(currentReminder);
+        String currentReminderInJSONString = gson.toJson(currentReminder, Reminder.class);
 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
         editor.putString(getString(R.string.bundle_most_recent_reminder), currentReminderInJSONString).apply();
+
+        return isDraft;
     }
 
     @Override
