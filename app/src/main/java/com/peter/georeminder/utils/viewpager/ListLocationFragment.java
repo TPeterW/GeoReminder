@@ -42,9 +42,12 @@ public class ListLocationFragment extends Fragment implements OnSharedPreference
     private LocationRecyclerAdapter recyclerAdapter;
     private StaggeredGridLayoutManager layoutManager;
 
+    private static ListLocationFragment instance;
 
     public static ListLocationFragment getInstance() {
-        return new ListLocationFragment();
+        if (instance == null)
+            instance = new ListLocationFragment();
+        return instance;
     }
 
     public ListLocationFragment() {

@@ -1,5 +1,6 @@
 package com.peter.georeminder.utils.viewpager;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,21 +11,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.peter.georeminder.EditorScreen;
 import com.peter.georeminder.MainScreen;
@@ -48,7 +47,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 
     private ListReminderListener listener;
 
-    private List<Reminder> reminderList;
+    private static List<Reminder> reminderList;
 
     private RecyclerView recyclerView;
     private WaveSwipeRefreshLayout swipeRefreshLayout;
@@ -57,13 +56,15 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     private TextView txtNoReminder;
     private Button btnNoReminder;
 
-
-    private ReminderRecyclerAdapter recyclerAdapter;
+    private static ReminderRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
 
+    private static ListReminderFragment instance;
 
     public static ListReminderFragment getInstance(){
-        return new ListReminderFragment();
+        if (instance == null)
+            instance = new ListReminderFragment();
+        return instance;
     }
 
     public ListReminderFragment() {
@@ -183,7 +184,9 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
             public void onClick(View v) {
                 Intent newReminder = new Intent(getActivity(), EditorScreen.class);       // default is a new GeoReminder
                 newReminder.putExtra(getString(R.string.bundle_with_map), true);
-                //TODO: more specifications
+
+                // TODO: more specifications
+                // TODO: maybe check for google service, but it should go straight to AMap if google isn't available
 
                 if (Build.VERSION.SDK_INT >= 21) {
                     getActivity().getWindow().setExitTransition(new Fade());
@@ -231,12 +234,10 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         recyclerAdapter.deleteReminder(position);
-                        if (reminderList.size() == 0) {
-                            imgNoReminder.setVisibility(View.VISIBLE);
-                            txtNoReminder.setVisibility(View.VISIBLE);
-                            btnNoReminder.setVisibility(View.VISIBLE);
-                            btnNoReminder.setClickable(true);
-                        }
+                        if (reminderList.size() == 0)
+                            setNoReminderUI(true);
+                        else
+                            setNoReminderUI(false);
                     }
                 })
                 .setNegativeButton(getString(R.string.dialog_neg_btn), new DialogInterface.OnClickListener() {
@@ -248,6 +249,29 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void setNoReminderUI(boolean noReminder) {
+        if (noReminder) {
+            imgNoReminder.setVisibility(View.VISIBLE);
+            txtNoReminder.setVisibility(View.VISIBLE);
+            btnNoReminder.setVisibility(View.VISIBLE);
+        } else {
+            imgNoReminder.setVisibility(View.GONE);
+            txtNoReminder.setVisibility(View.GONE);
+            btnNoReminder.setVisibility(View.GONE);
+        }
+    }
+
+    public static void addReminder(@Nullable Integer index, Reminder reminder) {
+        if (recyclerAdapter.getItemCount() < 1)     // added the only one
+            instance.setNoReminderUI(false);
+        recyclerAdapter.addReminder(index == null ? reminderList.size() : index, reminder);
+    }
+
+    public static void replaceReminder(int index, Reminder newReminder) {
+        recyclerAdapter.deleteReminder(index);
+        recyclerAdapter.addReminder(index, newReminder);
     }
 
     private void showShareDialog(final int position) {

@@ -38,9 +38,6 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     }
 
 
-
-
-
     public ReminderRecyclerAdapter(Context context, List<Reminder> reminderList){
         this.reminderList = reminderList;
         this.context = context;
@@ -50,6 +47,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     @Override
     public ReminderRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.layout_reminder_recycler_item, parent, false);
+
         RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
         // TODO: do what? figure out later
         return viewHolder;
@@ -84,6 +82,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
         holder.cardView.setRadius(8);
 
+//        Log.d("CardView", "Height: " + holder.itemView.getHeight() + " Width: " + holder.itemView.getWidth());
 
         if(listener != null){
             holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +117,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     }
 
     public void addReminder(int position, Reminder addedReminder){
-        //TODO: what kind of reminder and where to add them
+        // TODO: what kind of reminder and where to add them
         reminderList.add(position, addedReminder);
         notifyItemInserted(position);
     }

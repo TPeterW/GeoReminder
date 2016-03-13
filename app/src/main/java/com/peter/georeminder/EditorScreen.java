@@ -32,7 +32,7 @@ import com.peter.georeminder.utils.EditItemFragment.MapListener;
 public class EditorScreen extends AppCompatActivity implements MapListener, ColorChooserDialog.ColorCallback {
 
     private boolean withMap;
-    private boolean newReminder;
+    private boolean isNewReminder;
 
     private double currentLatitude;
     private double currentLongitude;
@@ -58,7 +58,7 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
     }
 
     private void initData() {
-        newReminder = false;
+        isNewReminder = false;
     }
 
     private void initEvent() {
@@ -86,7 +86,7 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
 
         Bundle bundle = new Bundle();
         bundle.putBoolean(getString(R.string.bundle_with_map), withMap);
-        bundle.putBoolean(getString(R.string.bundle_new_reminder), newReminder);
+        bundle.putBoolean(getString(R.string.bundle_new_reminder), isNewReminder);
 
         //TODO: and other specifications
 
@@ -102,7 +102,7 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
         //TODO:
         Bundle reminderSpecs = getIntent().getExtras();
         withMap = reminderSpecs.getBoolean(getResources().getString(R.string.bundle_with_map));
-        newReminder = reminderSpecs.getBoolean(getString(R.string.bundle_new_reminder));
+        isNewReminder = reminderSpecs.getBoolean(getString(R.string.bundle_new_reminder));
     }
 
     @Override
@@ -117,7 +117,7 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
 
             case R.id.edit_action_save:
                 // TODO: check see if is draft, pop up dialog
-                if (currentFragment.saveReminder()) {
+                if (!currentFragment.saveReminder()) {      // returns whether is draft
                     setResult(SAVED_AS_REMINDER);
                 } else {
                     setResult(SAVED_TO_DRAFT);

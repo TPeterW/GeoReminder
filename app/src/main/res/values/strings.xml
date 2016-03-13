@@ -228,10 +228,11 @@
     <string name="pref_app_bar_enabled">AppBar Enabled</string>
 
     <!--SharedPreferences-->
-    <string name="shared_pref_google_avail">GoogleMapAvailable</string>
-    <string name="shared_pref_tutorial_shown">TutorialAlreadyShown</string>
+    <string name="shared_pref_google_avail">googleMapAvailable</string>
+    <string name="shared_pref_tutorial_shown">tutorialAlreadyShown</string>
     <string name="shared_pref_which_map">whichMap</string>
     <string name="shared_pref_show_animation">showAnim</string>
+    <string name="shared_pref_local_reminders">localReminders</string>
 
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>

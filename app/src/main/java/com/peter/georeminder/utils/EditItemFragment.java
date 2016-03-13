@@ -819,8 +819,8 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         if (reminderTitle.getText() == null)
             isDraft = true;
-
-        currentReminder.setTitle(reminderTitle.getText().toString());
+        else
+            currentReminder.setTitle(reminderTitle.getText().toString());
         currentReminder.setDescription(reminderDescription.getText().toString());
         currentReminder.setAdditional(reminderAdditional.getText().toString());
         // TODO: more

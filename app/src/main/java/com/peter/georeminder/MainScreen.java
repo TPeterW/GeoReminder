@@ -57,9 +57,13 @@ import com.parse.ParseUser;
 import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
+import com.peter.georeminder.utils.viewpager.ListLocationFragment;
 import com.peter.georeminder.utils.viewpager.ListLocationFragment.ListLocationListener;
+import com.peter.georeminder.utils.viewpager.ListReminderFragment;
 import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -98,6 +102,7 @@ public class MainScreen extends AppCompatActivity implements
     // DataList
     private static List<Reminder> reminderList;
     private static List<Location> locationList;
+    private Gson gson;
 
     // For custom Nav Drawer
     private AccountHeader drawerHeader = null;
@@ -123,6 +128,9 @@ public class MainScreen extends AppCompatActivity implements
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private ListReminderFragment reminderFragment;
+    private ListLocationFragment locationFragment;
+    private ArrayList<String> reminderIdList;
     private static int reminderListOffset = 0;      // to get back to same place when coming back from the right panel (location list)
 
     @Override
@@ -160,19 +168,20 @@ public class MainScreen extends AppCompatActivity implements
     private void initData() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        // TODO: get data from shared preferences
+
+        gson = new Gson();
 
         reminderList = new LinkedList<>();
-        // TODO: remove these and actually get the reminders from local data storage
-        reminderList.add(new Reminder(this).setTitle("Reminder 1"));
-        reminderList.add(new Reminder(this).setTitle("Reminder 2"));
-        reminderList.add(new Reminder(this).setTitle("Reminder 3"));
-        reminderList.add(new Reminder(this).setTitle("Reminder 4"));
-        reminderList.add(new Reminder(this).setTitle("Reminder 5"));
-        reminderList.add(new Reminder(this).setTitle("Reminder 6"));
-        reminderList.add(new Reminder(this).setTitle("Reminder 7"));
-        reminderList.add(new Reminder(this).setTitle("Reminder 8"));
-
+        reminderIdList = new ArrayList<>();
+        // TODO: get reminders from local storage
+        String localReminders = sharedPreferences.getString(getString(R.string.shared_pref_local_reminders), null);
+        if (localReminders != null){
+            LinkedList local = gson.fromJson(localReminders, LinkedList.class);
+            for (Object reminder : local) {
+                reminderList.add((Reminder) reminder);
+                reminderIdList.add(((Reminder) reminder).getUuid());
+            }
+        }
 
         locationList = new LinkedList<>();
         // TODO: remove these and actually get the reminders from local data storage
@@ -211,6 +220,9 @@ public class MainScreen extends AppCompatActivity implements
         viewPager = (ViewPager) findViewById(R.id.main_view_pager);
         FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
+
+//        reminderFragment = (ListReminderFragment) adapter.getItem(0);
+//        locationFragment = (ListLocationFragment) adapter.getItem(1);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
@@ -547,7 +559,7 @@ public class MainScreen extends AppCompatActivity implements
     }
 
     private void requestPermission(String permission, int requestCode) {
-        ActivityCompat.requestPermissions(MainScreen.this, new String[] { permission }, requestCode);
+        ActivityCompat.requestPermissions(MainScreen.this, new String[]{permission}, requestCode);
     }
 
     @Override
@@ -595,20 +607,27 @@ public class MainScreen extends AppCompatActivity implements
                 Log.i("MainScreen", "From new nor");
                 // TODO:
                 if (resultCode == EditorScreen.SAVED_AS_REMINDER) {
-                    Log.i("MainScreen", "Reminder saved");
+                    Log.d("MainScreen", "ResultCode SAVED_AS_REMINDER");
                     String reminderInJSONString = sharedPreferences.getString(getString(R.string.bundle_most_recent_reminder), null);
                     if (reminderInJSONString != null) {
-                        Gson gson = new Gson();
                         Reminder editedReminder = gson.fromJson(reminderInJSONString, Reminder.class);
-                        Log.d("MainScreen", editedReminder.getTitle() + " " + editedReminder.getDescription());
+                        if (reminderIdList.contains(editedReminder.getUuid())) {        // editted
+                            int index = reminderIdList.indexOf(editedReminder.getUuid());
+                            ListReminderFragment.replaceReminder(index, editedReminder);
+                        } else {                    // new reminder
+                            ListReminderFragment.addReminder(null, editedReminder);
+                        }
+                        Log.d("MainScreen", editedReminder.getUuid() + " " + editedReminder.getTitle() + " " + editedReminder.getDescription());
                     } else {
                         Toast.makeText(MainScreen.this, getString(R.string.cannot_save_reminder), Toast.LENGTH_SHORT).show();
                     }
 
                 } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
-
+                    Log.d("MainScreen", "ResultCode SAVED_TO_DRAFT");
                 } else if (resultCode == EditorScreen.EDIT_CANCELLED) {
-
+                    Log.d("MainScreen", "ResultCode EDIT_CANCELLED");
+                } else {
+                    Log.d("MainScreen", "ResultCode UNKNOWN");
                 }
                 break;
 

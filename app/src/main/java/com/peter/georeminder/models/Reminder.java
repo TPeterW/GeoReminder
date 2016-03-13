@@ -8,6 +8,7 @@ import com.peter.georeminder.R;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by Peter on 10/6/15.
@@ -15,7 +16,7 @@ import java.util.Date;
  */
 public class Reminder {
 
-    private String Uid;             // Uid = title_lat_lng_createDate_createTime
+    private String uuid;
 
     private Date createDateTime;
     private Date startDate;
@@ -80,6 +81,18 @@ public class Reminder {
         vibrate = true;
         repeatType = REPEAT_EVERYDAY;
         withTime = false;
+
+        uuid = UUID.randomUUID().toString();
+    }
+
+    // UUID
+    public String getUuid() {
+        return uuid;
+    }
+
+    public Reminder setUuid(String uuid) {
+        this.uuid = uuid;
+        return this;
     }
 
     // Title
