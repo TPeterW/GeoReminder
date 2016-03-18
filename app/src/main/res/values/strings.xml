@@ -232,7 +232,7 @@
     <string name="shared_pref_tutorial_shown">tutorialAlreadyShown</string>
     <string name="shared_pref_which_map">whichMap</string>
     <string name="shared_pref_show_animation">showAnim</string>
-    <string name="shared_pref_local_reminders">localReminders</string>
+    <string name="shared_pref_local_storage_reminders">localReminders</string>
 
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>

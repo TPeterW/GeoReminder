@@ -39,6 +39,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -63,9 +64,9 @@ import com.peter.georeminder.utils.viewpager.ListReminderFragment;
 import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class MainScreen extends AppCompatActivity implements
         ListReminderListener, ListLocationListener, OnSharedPreferenceChangeListener{
@@ -173,10 +174,12 @@ public class MainScreen extends AppCompatActivity implements
 
         reminderList = new LinkedList<>();
         reminderIdList = new ArrayList<>();
-        // TODO: get reminders from local storage
-        String localReminders = sharedPreferences.getString(getString(R.string.shared_pref_local_reminders), null);
+        // get reminders from local storage
+        String localReminders = sharedPreferences.getString(getString(R.string.shared_pref_local_storage_reminders), null);
+
         if (localReminders != null){
-            LinkedList local = gson.fromJson(localReminders, LinkedList.class);
+            LinkedList local = gson.fromJson(localReminders,
+                    new TypeToken<LinkedList<Reminder>>() {}.getType());
             for (Object reminder : local) {
                 reminderList.add((Reminder) reminder);
                 reminderIdList.add(((Reminder) reminder).getUuid());
@@ -558,6 +561,13 @@ public class MainScreen extends AppCompatActivity implements
         //TODO: check other availabilities such as Internet connection
     }
 
+    private void writeRemindersToStorage() {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putString(getString(R.string.shared_pref_local_storage_reminders),
+                gson.toJson(reminderList, new TypeToken<LinkedList<Reminder>>() {}.getType()))
+                .apply();
+    }
+
     private void requestPermission(String permission, int requestCode) {
         ActivityCompat.requestPermissions(MainScreen.this, new String[]{permission}, requestCode);
     }
@@ -590,37 +600,31 @@ public class MainScreen extends AppCompatActivity implements
         switch (requestCode) {
             // TODO: check if list is till empty, otherwise hide the new reminder button and text
             case CREATE_NEW_GEO_REMINDER_REQUEST_CODE:
-                Log.i("MainScreen", "From new geo");
-//                Bundle resultFromCreating = data.getExtras();
-                // TODO:
-                if (resultCode == EditorScreen.SAVED_AS_REMINDER) {
-                    Log.i("MainScreen", "Reminder saved");
-
-                } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
-
-                } else if (resultCode == EditorScreen.EDIT_CANCELLED) {
-
-                }
-
-                break;
             case CREATE_NEW_NOR_REMINDER_REQUEST_CODE:
-                Log.i("MainScreen", "From new nor");
+                Log.i("MainScreen", "From new normal");
                 // TODO:
                 if (resultCode == EditorScreen.SAVED_AS_REMINDER) {
                     Log.d("MainScreen", "ResultCode SAVED_AS_REMINDER");
+                    // retrive reminder
                     String reminderInJSONString = sharedPreferences.getString(getString(R.string.bundle_most_recent_reminder), null);
+
                     if (reminderInJSONString != null) {
                         Reminder editedReminder = gson.fromJson(reminderInJSONString, Reminder.class);
-                        if (reminderIdList.contains(editedReminder.getUuid())) {        // editted
+                        if (reminderIdList.contains(editedReminder.getUuid())) {        // edited
                             int index = reminderIdList.indexOf(editedReminder.getUuid());
                             ListReminderFragment.replaceReminder(index, editedReminder);
                         } else {                    // new reminder
+                            editedReminder.setUuid(UUID.randomUUID().toString());
                             ListReminderFragment.addReminder(null, editedReminder);
+                            reminderIdList.add(editedReminder.getUuid());       // add to list
                         }
                         Log.d("MainScreen", editedReminder.getUuid() + " " + editedReminder.getTitle() + " " + editedReminder.getDescription());
                     } else {
                         Toast.makeText(MainScreen.this, getString(R.string.cannot_save_reminder), Toast.LENGTH_SHORT).show();
+                        break;
                     }
+
+                    writeRemindersToStorage();  // everything works out, save!
 
                 } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
                     Log.d("MainScreen", "ResultCode SAVED_TO_DRAFT");

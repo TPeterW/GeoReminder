@@ -100,9 +100,9 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-maps/8.4.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.joooonho/selectableroundedimageview/1.0.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.leavjenn.smoothdaterangepicker/library/0.2.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/fastadapter/1.2.4/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/iconics-core/2.5.9/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/materialdrawer/5.1.3/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/fastadapter/1.2.6/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/iconics-core/2.5.10/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/materialdrawer/5.1.5/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/materialize/0.8.6/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.parse/parsefacebookutils-v4-android/1.10.4/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.rengwuxian.materialedittext/library/2.1.4/jars" />
@@ -149,8 +149,9 @@
     <orderEntry type="library" exported="" name="open_sdk_r5509" level="project" />
     <orderEntry type="library" exported="" name="1_open_sdk_r5509" level="project" />
     <orderEntry type="library" exported="" name="beta-1.1.4" level="project" />
-    <orderEntry type="library" exported="" name="materialdrawer-5.1.3" level="project" />
-    <orderEntry type="library" exported="" name="fastadapter-1.2.4" level="project" />
+    <orderEntry type="library" exported="" name="iconics-core-2.5.10" level="project" />
+    <orderEntry type="library" exported="" name="materialdrawer-5.1.5" level="project" />
+    <orderEntry type="library" exported="" name="fastadapter-1.2.6" level="project" />
     <orderEntry type="library" exported="" name="mta-sdk-1.6.2" level="project" />
     <orderEntry type="library" exported="" name="1_mta-sdk-1.6.2" level="project" />
     <orderEntry type="library" exported="" name="design-23.2.1" level="project" />
@@ -164,7 +165,6 @@
     <orderEntry type="library" exported="" name="twitter-core-1.6.4" level="project" />
     <orderEntry type="library" exported="" name="WaveSwipeRefreshLayout-1.6" level="project" />
     <orderEntry type="library" exported="" name="view-pager-transforms-1.2.32" level="project" />
-    <orderEntry type="library" exported="" name="iconics-core-2.5.9" level="project" />
     <orderEntry type="library" exported="" name="fab-1.6.2" level="project" />
     <orderEntry type="library" exported="" name="parsetwitterutils-android-1.10.5" level="project" />
     <orderEntry type="library" exported="" name="picasso-2.5.2" level="project" />
