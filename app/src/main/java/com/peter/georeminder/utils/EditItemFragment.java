@@ -85,7 +85,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     private Marker googleMapMarker;
     private com.amap.api.maps.model.Marker aMapMarker;
-
+    
 
     // the editor views
     private MaterialEditText reminderTitle;
@@ -162,7 +162,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         try {
             arguments = getArguments();
             withMap = arguments.getBoolean(getString(R.string.bundle_with_map));
-            newReminder = arguments.getBoolean(getString(R.string.bundle_new_reminder));
+            newReminder = arguments.getBoolean(getString(R.string.bundle_new_reminder));    // default false
         } catch (Exception e) {
             Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
             return false;
@@ -819,6 +819,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         if (reminderTitle.getText() == null)
             isDraft = true;
+//        else if (withMap && )     // TODO: get location parameters
         else
             currentReminder.setTitle(reminderTitle.getText().toString());
         currentReminder.setDescription(reminderDescription.getText().toString());

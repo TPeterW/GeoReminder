@@ -20,7 +20,7 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '23.0.3'
     defaultConfig {
         applicationId "com.peter.georeminder"
         minSdkVersion 19
@@ -62,16 +62,16 @@ dependencies {
     compile files('open_sdk_r5509.jar')
     compile project(':searchbox')
     compile project(':timerangepicker')
-    compile('com.facebook.android:facebook-android-sdk:4.10.0') {
+    compile('com.facebook.android:facebook-android-sdk:4.10.1') {
         exclude module: 'bolts-android'
     }
-    compile('com.twitter.sdk.android:twitter:1.12.1@aar') {
+    compile('com.twitter.sdk.android:twitter:1.13.0@aar') {
         transitive = true;
     }
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile('com.mikepenz:materialdrawer:5.1.5@aar') {
+    compile('com.mikepenz:materialdrawer:5.1.8@aar') {
         transitive = true;
     }
     compile('com.github.afollestad.material-dialogs:commons:0.8.5.6@aar') {

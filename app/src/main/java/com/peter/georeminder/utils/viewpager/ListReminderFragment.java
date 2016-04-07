@@ -183,7 +183,8 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
             @Override
             public void onClick(View v) {
                 Intent newReminder = new Intent(getActivity(), EditorScreen.class);       // default is a new GeoReminder
-                newReminder.putExtra(getString(R.string.bundle_with_map), true);
+                newReminder.putExtra(getString(R.string.bundle_with_map), true)
+                        .putExtra(getString(R.string.bundle_new_reminder), true);
 
                 // TODO: more specifications
                 // TODO: maybe check for google service, but it should go straight to AMap if google isn't available
