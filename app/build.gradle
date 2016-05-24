@@ -5,7 +5,7 @@ buildscript {
 
     dependencies {
 //        classpath 'io.fabric.tools:gradle:1.+'
-        classpath 'io.fabric.tools:gradle:1.21.2'
+        classpath 'io.fabric.tools:gradle:1.21.6'
     }
 }
 apply plugin: 'com.android.application'
@@ -63,7 +63,7 @@ dependencies {
     compile files('libs/open_sdk_r5509.jar')
     compile project(':searchbox')
     compile project(':timerangepicker')
-    compile('com.facebook.android:facebook-android-sdk:4.11.0') {
+    compile('com.facebook.android:facebook-android-sdk:4.12.0') {
         exclude module: 'bolts-android'
     }
     compile('com.twitter.sdk.android:twitter:1.13.1@aar') {
@@ -72,10 +72,10 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile('com.mikepenz:materialdrawer:5.2.2@aar') {
+    compile('com.mikepenz:materialdrawer:5.2.7@aar') {
         transitive = true;
     }
-    compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') {
+    compile('com.afollestad.material-dialogs:commons:0.8.5.8@aar') {
         transitive = true;
     }
     compile 'com.android.support:multidex:1.0.1'
@@ -85,8 +85,8 @@ dependencies {
     compile 'com.android.support:design:23.4.0'
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.android.support:support-annotations:23.4.0'
-    compile 'com.google.android.gms:play-services-maps:8.4.0'
-    compile 'com.google.android.gms:play-services-identity:8.4.0'
+    compile 'com.google.android.gms:play-services-maps:9.0.0'
+    compile 'com.google.android.gms:play-services-identity:9.0.0'
     compile 'com.github.clans:fab:1.6.3'
     compile 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
     compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.6'
