@@ -88,7 +88,7 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
         bundle.putBoolean(getString(R.string.bundle_with_map), withMap);
         bundle.putBoolean(getString(R.string.bundle_new_reminder), isNewReminder);
 
-        //TODO: and other specifications
+        // TODO: and other specifications
 
         currentFragment.setArguments(bundle);              // pass the withMap parameter to the fragment with a bundle
         FragmentManager fragmentManager = getSupportFragmentManager();

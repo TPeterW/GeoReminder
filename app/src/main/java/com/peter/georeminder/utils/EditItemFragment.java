@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.MapsInitializer;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MarkerOptions;
@@ -62,6 +64,8 @@ import me.tittojose.www.timerangepicker_library.TimeRangePickerDialog;
  *
  */
 public class EditItemFragment extends Fragment implements OnMapReadyCallback, LocationSource {
+
+    private static final String TAG = "EditItemFragment";
 
     private MapListener listener;
 
@@ -585,16 +589,23 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                     .addToBackStack(null)
                     .commit();
         } else {        // use AMap
-            supportAMapFragment = com.amap.api.maps.SupportMapFragment.newInstance();
-            supportAMapFragment.onCreate(savedInstanceState);
-            aMap = supportAMapFragment.getMap();
+            try {
+                MapsInitializer.initialize(getContext());
 
-            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.add(R.id.edit_map_container, supportAMapFragment)
-                    .addToBackStack(null)
-                    .commit();
+                supportAMapFragment = com.amap.api.maps.SupportMapFragment.newInstance();
+                supportAMapFragment.onCreate(savedInstanceState);
+                aMap = supportAMapFragment.getMap();
 
-            initAMap();
+                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                transaction.add(R.id.edit_map_container, supportAMapFragment)
+                        .addToBackStack(null)
+                        .commit();
+
+                initAMap();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Failed to initialise AMap");
+            }
         }
     }
 
@@ -673,7 +684,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         uiSettings.setCompassEnabled(true);
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setScaleControlsEnabled(true);
-        uiSettings.setZoomControlsEnabled(false);
+        uiSettings.setZoomControlsEnabled(true);
 
         // put the original marker on
         MarkerOptions markerOptions = new MarkerOptions();
