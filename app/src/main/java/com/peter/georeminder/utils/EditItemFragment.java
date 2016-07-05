@@ -85,8 +85,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private com.amap.api.maps.SupportMapFragment supportAMapFragment;
     private AMap aMap;
 
-    private FrameLayout googleMapContainer;
-    private FrameLayout aMapContainer;
     private FrameLayout mapContainer;
 
     private Marker googleMapMarker;
@@ -120,8 +118,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private Divider dividerUnderTitle;
     private Divider dividerUnderTime;
 
-
-    View rootView;
+    private View rootView;
 
     private Gson gson;
 
@@ -138,6 +135,8 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        this.savedInstanceState = savedInstanceState;
 
         if (!getSpecs())
             return null;
@@ -612,9 +611,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     @SuppressWarnings("all")
     @Override
     public void onMapReady(GoogleMap inputMap) {
-
-        Log.d("EditItemFragment", "Map Ready");
-
         googleMap = inputMap;
         googleMap.setMyLocationEnabled(true);
         googleMap.setIndoorEnabled(true);
@@ -684,7 +680,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         uiSettings.setCompassEnabled(true);
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setScaleControlsEnabled(true);
-        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setZoomControlsEnabled(false);
 
         // put the original marker on
         MarkerOptions markerOptions = new MarkerOptions();

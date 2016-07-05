@@ -2,6 +2,7 @@ package com.peter.georeminder.utils.recyclerview;
 
 /**
  * Created by Peter on 10/11/15.
+ *
  */
 import android.content.Context;
 import android.graphics.Rect;

@@ -128,6 +128,8 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         notifyItemRangeChanged((int) getItemId(position), getItemCount() + 1);
     }
 
+    // TODO: after add and remove, update the badge in main screen
+
 
 
 

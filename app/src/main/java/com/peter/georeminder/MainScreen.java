@@ -131,7 +131,7 @@ public class MainScreen extends AppCompatActivity implements
     private ViewPager viewPager;
     private ListReminderFragment reminderFragment;
     private ListLocationFragment locationFragment;
-    private ArrayList<String> reminderIdList;
+    private static ArrayList<String> reminderIdList;
     private static int reminderListOffset = 0;      // to get back to same place when coming back from the right panel (location list)
 
     @Override
@@ -178,7 +178,7 @@ public class MainScreen extends AppCompatActivity implements
         String localReminders = sharedPreferences.getString(getString(R.string.shared_pref_local_storage_reminders), null);
 
         if (localReminders != null){
-            LinkedList local = gson.fromJson(localReminders,
+            LinkedList<Reminder> local = gson.fromJson(localReminders,
                     new TypeToken<LinkedList<Reminder>>() {}.getType());
             for (Object reminder : local) {
                 reminderList.add((Reminder) reminder);
@@ -224,8 +224,8 @@ public class MainScreen extends AppCompatActivity implements
         FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
 
-//        reminderFragment = (ListReminderFragment) adapter.getItem(0);
-//        locationFragment = (ListLocationFragment) adapter.getItem(1);
+        reminderFragment = (ListReminderFragment) adapter.getItem(0);
+        locationFragment = (ListLocationFragment) adapter.getItem(1);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
@@ -326,7 +326,7 @@ public class MainScreen extends AppCompatActivity implements
                 .withToolbar(toolbar)
                 .withAccountHeader(drawerHeader)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all).withBadge(8 + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary)),
+                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all).withBadge(reminderIdList.size() + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary)),
                         new PrimaryDrawerItem().withIdentifier(GEO_IDENTIFIER).withName(getString(R.string.nav_opt_geo)).withIcon(R.drawable.ic_nav_geo),
                         new PrimaryDrawerItem().withIdentifier(NOR_IDENTIFIER).withName(getString(R.string.nav_opt_nor)).withIcon(R.drawable.ic_nav_nor),
                         new PrimaryDrawerItem().withIdentifier(DRAFT_IDENTIFIER).withName(getString(R.string.nav_opt_draft)).withIcon(R.drawable.ic_nav_draft),
@@ -513,13 +513,6 @@ public class MainScreen extends AppCompatActivity implements
             Log.i("Network Permission", (checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_GRANTED) + "");
             Log.i("Internet Permission", (checkSelfPermission(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) + "");
         }
-        
-        // not sure which version of code is correct
-//        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainScreen.this)) {
-//            case ConnectionResult.API_UNAVAILABLE:
-//                break;
-//        }
-        // TODO: check if the user wants to use Amap first, before checking google play services
 
         // TODO: make sure Toast only appears once
 
@@ -598,14 +591,13 @@ public class MainScreen extends AppCompatActivity implements
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         switch (requestCode) {
-            // TODO: check if list is till empty, otherwise hide the new reminder button and text
+            // TODO: check if list is still empty, otherwise hide the new reminder button and text
             case CREATE_NEW_GEO_REMINDER_REQUEST_CODE:
             case CREATE_NEW_NOR_REMINDER_REQUEST_CODE:
                 Log.i("MainScreen", "From new normal");
-                // TODO:
                 if (resultCode == EditorScreen.SAVED_AS_REMINDER) {
                     Log.d("MainScreen", "ResultCode SAVED_AS_REMINDER");
-                    // retrive reminder
+                    // retrieve reminder
                     String reminderInJSONString = sharedPreferences.getString(getString(R.string.bundle_most_recent_reminder), null);
 
                     if (reminderInJSONString != null) {
@@ -625,6 +617,9 @@ public class MainScreen extends AppCompatActivity implements
                     }
 
                     writeRemindersToStorage();  // everything works out, save!
+
+                    // set badge for number of reminders
+                    ((PrimaryDrawerItem) drawer.getDrawerItem(ALL_IDENTIFIER)).withBadge(reminderIdList.size() + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary));
 
                 } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
                     Log.d("MainScreen", "ResultCode SAVED_TO_DRAFT");
@@ -725,58 +720,57 @@ public class MainScreen extends AppCompatActivity implements
                 .withHeaderBackground(R.color.colorPrimary)
                 .withCompactStyle(compact)
                 .addProfiles(
-                        userProfile,        // TODO: figure out the click event for profile image
-                        //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
+                        userProfile
+                        // don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
 //                        new ProfileSettingDrawerItem().withName(getResources().getString(R.string.nav_acct_switch)).withDescription(getResources().getString(R.string.nav_desc_switch)).withIcon(R.drawable.ic_nav_add).withIdentifier(PROFILE_SETTING),
-                        new ProfileSettingDrawerItem()
-                                .withName(getString(R.string.nav_acct_manage))
-                                .withDescription(getString(R.string.nav_desc_manage))
-                                .withIcon(R.drawable.ic_nav_manage)
-                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                                    @Override
-                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                        // TODO: change to jump to UserInfoPage
-                                        if (ParseUser.getCurrentUser() != null) {
-                                            // TODO: delete this toast and jump to user page
-                                            Toast.makeText(MainScreen.this, "Already Logged In", Toast.LENGTH_SHORT).show();
-                                            return false;
-                                        } else {
-                                            Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
-                                            if (Build.VERSION.SDK_INT >= 21) {
-                                                getWindow().setExitTransition(null);
-                                            }
-                                            startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
-                                        }
-
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                drawer.closeDrawer();
-                                            }
-                                        }, 200);        // wait for the activity to start then close the drawer
-
-                                        return false;
-                                    }
-                                }),
-                        // TODO: remove this and create a new drawer
-                        new ProfileSettingDrawerItem()
-                                .withName(getString(R.string.nav_acct_logout))
-                                .withDescription(getString(R.string.nav_desc_logout))
-                                .withIcon(R.drawable.ic_nav_logout)
-                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                                    @Override
-                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                        if (ParseUser.getCurrentUser() != null) {
-                                            ParseUser.logOutInBackground();
-//                                            drawerHeader.removeProfileByIdentifier(ParseUser.getCurrentUser().getInt(getString(R.string.parse_user_identifier)));
-                                            drawerHeader.getActiveProfile().withEmail(getString(R.string.nav_local_email));
-                                            drawerHeader.getActiveProfile().withName(getString(R.string.nav_head_appname));
-                                            drawerHeader.getActiveProfile().withIcon(R.mipmap.ic_default_avatar);
-                                            drawerHeader.getActiveProfile().withIdentifier(LOCAL_USER_IDENTIFIER);
-                                        }
-                                        return true;
-                                    }
-                                })
+//                        new ProfileSettingDrawerItem()
+//                                .withName(getString(R.string.nav_acct_manage))
+//                                .withDescription(getString(R.string.nav_desc_manage))
+//                                .withIcon(R.drawable.ic_nav_manage)
+//                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+//                                    @Override
+//                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+//                                        // TODO: change to jump to UserInfoPage
+//                                        if (ParseUser.getCurrentUser() != null) {
+//                                            // TODO: delete this toast and jump to user page
+//                                            Toast.makeText(MainScreen.this, "Already Logged In", Toast.LENGTH_SHORT).show();
+//                                            return false;
+//                                        } else {
+//                                            Intent toLoginScreen = new Intent(MainScreen.this, LoginScreen.class);
+//                                            if (Build.VERSION.SDK_INT >= 21) {
+//                                                getWindow().setExitTransition(null);
+//                                            }
+//                                            startActivityForResult(toLoginScreen, LOGIN_REQUEST_CODE, ActivityOptionsCompat.makeSceneTransitionAnimation(MainScreen.this).toBundle());
+//                                        }
+//
+//                                        new Handler().postDelayed(new Runnable() {
+//                                            @Override
+//                                            public void run() {
+//                                                drawer.closeDrawer();
+//                                            }
+//                                        }, 200);        // wait for the activity to start then close the drawer
+//
+//                                        return false;
+//                                    }
+//                                }),
+//
+//                        new ProfileSettingDrawerItem()
+//                                .withName(getString(R.string.nav_acct_logout))
+//                                .withDescription(getString(R.string.nav_desc_logout))
+//                                .withIcon(R.drawable.ic_nav_logout)
+//                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+//                                    @Override
+//                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+//                                        if (ParseUser.getCurrentUser() != null) {
+//                                            ParseUser.logOutInBackground();
+//                                            drawerHeader.getActiveProfile().withEmail(getString(R.string.nav_local_email));
+//                                            drawerHeader.getActiveProfile().withName(getString(R.string.nav_head_appname));
+//                                            drawerHeader.getActiveProfile().withIcon(R.mipmap.ic_default_avatar);
+//                                            drawerHeader.getActiveProfile().withIdentifier(LOCAL_USER_IDENTIFIER);
+//                                        }
+//                                        return true;
+//                                    }
+//                                })
                 )
                 .withSavedInstance(savedInstanceState)
                 .withCloseDrawerOnProfileListClick(false)

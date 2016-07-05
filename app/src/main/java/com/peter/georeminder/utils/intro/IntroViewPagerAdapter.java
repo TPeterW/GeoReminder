@@ -12,7 +12,7 @@ import java.util.Random;
  */
 public class IntroViewPagerAdapter extends FragmentPagerAdapter{
 
-    private int pageCount = 5;
+    private static final int PAGE_COUNT = 5;
 
     Random random = new Random();
 
@@ -22,7 +22,7 @@ public class IntroViewPagerAdapter extends FragmentPagerAdapter{
 
     @Override
     public int getCount() {
-        return pageCount;
+        return PAGE_COUNT;
     }
 
     @Override

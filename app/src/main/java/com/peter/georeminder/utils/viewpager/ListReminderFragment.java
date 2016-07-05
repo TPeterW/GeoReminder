@@ -187,7 +187,6 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
                         .putExtra(getString(R.string.bundle_new_reminder), true);
 
                 // TODO: more specifications
-                // TODO: maybe check for google service, but it should go straight to AMap if google isn't available
 
                 if (Build.VERSION.SDK_INT >= 21) {
                     getActivity().getWindow().setExitTransition(new Fade());
