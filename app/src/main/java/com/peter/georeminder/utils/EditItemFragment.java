@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -82,6 +83,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     private FrameLayout googleMapContainer;
     private FrameLayout aMapContainer;
+    private FrameLayout mapContainer;
 
     private Marker googleMapMarker;
     private com.amap.api.maps.model.Marker aMapMarker;
@@ -139,8 +141,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         if (withMap) {
             rootView = inflater.inflate(R.layout.reminder_geo_edit_screen, container, false);
 
-            googleMapContainer = (FrameLayout) rootView.findViewById(R.id.google_map_container);
-            aMapContainer = (FrameLayout) rootView.findViewById(R.id.amap_map_container);
+            mapContainer = (FrameLayout) rootView.findViewById(R.id.edit_map_container);
 
             setUpMap();
         } else {
@@ -574,22 +575,24 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     }
 
     private void setUpMap() {
-        supportGoogleMapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.edit_google_map);
-
-        supportAMapFragment = (com.amap.api.maps.SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.edit_amap_map);
-
+        // TODO: change TAG
         if (useGoogleMap) {
-            aMapContainer.setVisibility(View.GONE);
-            supportAMapFragment.onDestroy();        // hide AMap
+            supportGoogleMapFragment = SupportMapFragment.newInstance();
             supportGoogleMapFragment.getMapAsync(this);
+
+            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            transaction.add(R.id.edit_map_container, supportGoogleMapFragment)
+                    .addToBackStack(null)
+                    .commit();
         } else {        // use AMap
-            googleMapContainer.setVisibility(View.GONE);
-            supportGoogleMapFragment.onDetach();   // hide Google Map
-            supportGoogleMapFragment.onDestroyView();
+            supportAMapFragment = com.amap.api.maps.SupportMapFragment.newInstance();
             supportAMapFragment.onCreate(savedInstanceState);
             aMap = supportAMapFragment.getMap();
+
+            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            transaction.add(R.id.edit_map_container, supportAMapFragment)
+                    .addToBackStack(null)
+                    .commit();
 
             initAMap();
         }
@@ -598,6 +601,9 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     @SuppressWarnings("all")
     @Override
     public void onMapReady(GoogleMap inputMap) {
+
+        Log.d("EditItemFragment", "Map Ready");
+
         googleMap = inputMap;
         googleMap.setMyLocationEnabled(true);
         googleMap.setIndoorEnabled(true);

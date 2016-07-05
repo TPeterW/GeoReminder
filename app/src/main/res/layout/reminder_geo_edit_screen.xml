@@ -3,39 +3,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--To host the map fragment-->
     <FrameLayout
         android:id="@+id/edit_map_container"
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:background="@color/colorPrimary">
-
-        <FrameLayout
-            android:id="@+id/google_map_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <fragment
-                android:id="@+id/edit_google_map"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:name="com.google.android.gms.maps.SupportMapFragment"/>
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/amap_map_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <fragment
-                android:id="@+id/edit_amap_map"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:name="com.amap.api.maps.SupportMapFragment"/>
-
-        </FrameLayout>
-
-    </FrameLayout>
+        android:background="@color/colorPrimary" />
 
     <include layout="@layout/layout_reminder_editor" />
 
