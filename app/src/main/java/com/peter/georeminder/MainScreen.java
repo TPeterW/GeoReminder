@@ -235,7 +235,7 @@ public class MainScreen extends AppCompatActivity implements
         // initialise StatusBar color
         if(Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
-            //TODO: decide whether to change the navigation bar color or not
+            // TODO: decide whether to change the navigation bar color or not
 //            getWindow().setNavigationBarColor(ContextCompat.getColor(MainScreen.this, R.color.colorPrimary));
         }
 
@@ -253,9 +253,9 @@ public class MainScreen extends AppCompatActivity implements
         new Handler().postDelayed(new Runnable() {                      // fam show and hide animation
             @Override
             public void run() {
-                newReminder.showMenuButton(true);
                 newReminder.setMenuButtonShowAnimation(AnimationUtils.loadAnimation(MainScreen.this, R.anim.jump_from_down));
                 newReminder.setMenuButtonHideAnimation(AnimationUtils.loadAnimation(MainScreen.this, R.anim.jump_to_down));
+                newReminder.showMenuButton(true);
             }
         }, 300);
 
