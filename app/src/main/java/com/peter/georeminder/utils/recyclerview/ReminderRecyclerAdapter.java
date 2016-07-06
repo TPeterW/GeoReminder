@@ -1,5 +1,6 @@
 package com.peter.georeminder.utils.recyclerview;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +19,9 @@ import java.util.List;
  * Adapter for the list of reminders on the first tap of ViewPager
  */
 public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecyclerAdapter.RecyclerViewHolder> {
+
+    private OnBadgeUpdateListener badgeUpdateListener;
+
     private List<Reminder> reminderList;
     private Context context;
     private LayoutInflater inflater;
@@ -31,16 +35,17 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     }
 
     // implement onItemClick and onItemLongClick
-    private OnItemClickListener listener;
+    private OnItemClickListener itemClickListener;
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        itemClickListener = listener;
     }
 
 
     public ReminderRecyclerAdapter(Context context, List<Reminder> reminderList){
         this.reminderList = reminderList;
         this.context = context;
+        badgeUpdateListener = (OnBadgeUpdateListener) context;
         inflater = LayoutInflater.from(context);
     }
 
@@ -55,7 +60,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-        // set OnItemClick/LongClick listener
+        // set OnItemClick/LongClick itemClickListener
         // implement in calling activity (in this case, MainScreen)
 
         Reminder current = reminderList.get(position);
@@ -84,18 +89,18 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
 //        Log.d("CardView", "Height: " + holder.itemView.getHeight() + " Width: " + holder.itemView.getWidth());
 
-        if(listener != null){
+        if(itemClickListener != null){
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onItemClick(holder.cardView, position);
+                    itemClickListener.onItemClick(holder.cardView, position);
                 }
             });
 
             holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    listener.onItemLongClick(holder.cardView, position);
+                    itemClickListener.onItemLongClick(holder.cardView, position);
                     return false;
                 }
             });
@@ -120,16 +125,17 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         // TODO: what kind of reminder and where to add them
         reminderList.add(position, addedReminder);
         notifyItemInserted(position);
+        badgeUpdateListener.onBadgeUpdate(addedReminder.getUuid());
     }
 
     public void deleteReminder(int position){
+        String uuid = reminderList.get(position).getUuid();
         reminderList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged((int) getItemId(position), getItemCount() + 1);
+        badgeUpdateListener.onBadgeUpdate(uuid);
+        // TODO: update local storage
     }
-
-    // TODO: after add and remove, update the badge in main screen
-
 
 
 
@@ -145,5 +151,11 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
             cardView = (CardView) itemView.findViewById(R.id.reminder_holder_card_view);
         }
+    }
+
+    public interface OnBadgeUpdateListener {
+
+        void onBadgeUpdate(String uuid);
+
     }
 }

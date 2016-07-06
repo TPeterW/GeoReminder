@@ -45,6 +45,7 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.holder.BadgeStyle;
+import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
@@ -57,6 +58,8 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
+import com.peter.georeminder.utils.recyclerview.ReminderRecyclerAdapter;
+import com.peter.georeminder.utils.recyclerview.ReminderRecyclerAdapter.OnBadgeUpdateListener;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
 import com.peter.georeminder.utils.viewpager.ListLocationFragment;
 import com.peter.georeminder.utils.viewpager.ListLocationFragment.ListLocationListener;
@@ -69,7 +72,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MainScreen extends AppCompatActivity implements
-        ListReminderListener, ListLocationListener, OnSharedPreferenceChangeListener{
+        ListReminderListener, ListLocationListener, OnSharedPreferenceChangeListener, OnBadgeUpdateListener {
     //TODO: put Build.VERSION.SDK_INT into shared preference so that it wouldn't have to check every time
 
     // ToolBar
@@ -619,7 +622,7 @@ public class MainScreen extends AppCompatActivity implements
                     writeRemindersToStorage();  // everything works out, save!
 
                     // set badge for number of reminders
-                    ((PrimaryDrawerItem) drawer.getDrawerItem(ALL_IDENTIFIER)).withBadge(reminderIdList.size() + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary));
+                    drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderIdList.size() + ""));
 
                 } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
                     Log.d("MainScreen", "ResultCode SAVED_TO_DRAFT");
@@ -891,6 +894,12 @@ public class MainScreen extends AppCompatActivity implements
 
     public static List<Location> getLocationList() {
         return locationList;
+    }
+
+    @Override
+    public void onBadgeUpdate(String uuid) {
+        reminderIdList.remove(uuid);
+        drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderIdList.size() + ""));
     }
 
     // Below: code for testing and debugging
