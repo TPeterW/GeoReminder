@@ -341,7 +341,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             @Override
             public void onClick(View v) {
                 if (alwaysSwitch.isChecked()) {
-                    currentReminder.withTime(false);
+                    currentReminder.withTime(false);    // TODO: debatable
 
                     allDayContainer.setVisibility(View.GONE);
                     startDateTimeContainer.setVisibility(View.GONE);
@@ -750,7 +750,10 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         }
 
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        else
+            return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
     }
 
     public void onColorChange(@ColorInt int selectedColor) {
@@ -846,6 +849,23 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             currentReminder.setTitle(reminderTitle.getText().toString());
         currentReminder.setDescription(reminderDescription.getText().toString());
         currentReminder.setAdditional(reminderAdditional.getText().toString());
+
+        // if repeat all day, we don't need the hours and minutes
+        if (currentReminder.getRepeatType() == Reminder.ALL_DAY) {
+            Calendar startCalendar = Calendar.getInstance();
+            Calendar endCalendar = Calendar.getInstance();
+
+            startCalendar.setTimeInMillis(currentReminder.getStartTime());
+            endCalendar.setTimeInMillis(currentReminder.getEndTime());
+            startCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            startCalendar.set(Calendar.MINUTE, 0);
+            endCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            endCalendar.set(Calendar.MINUTE, 0);
+
+            currentReminder.setStartTime(startCalendar.getTimeInMillis());
+            currentReminder.setEndTime(endCalendar.getTimeInMillis());
+        }
+
         // TODO: more
 
         // convert to gson
