@@ -176,7 +176,6 @@ public class MainScreen extends AppCompatActivity implements
         gson = new Gson();
 
         reminderList = new LinkedList<>();
-        reminderIdList = new ArrayList<>();
         // get reminders from local storage
         String localReminders = sharedPreferences.getString(getString(R.string.shared_pref_local_storage_reminders), null);
 
@@ -185,7 +184,6 @@ public class MainScreen extends AppCompatActivity implements
                     new TypeToken<LinkedList<Reminder>>() {}.getType());
             for (Object reminder : local) {
                 reminderList.add((Reminder) reminder);
-                reminderIdList.add(((Reminder) reminder).getUuid());
             }
         }
 
@@ -200,12 +198,8 @@ public class MainScreen extends AppCompatActivity implements
         locationList.add(new Location(this).setTitle("Location 7"));
         locationList.add(new Location(this).setTitle("Location 8"));
 
-        //TODO: add list of reminders
-
-
         // Nav Drawer
         // create user profile
-        //TODO: if user is registered and logged in, skip this step and go ahead to load the profile as the user profile
         if (ParseUser.getCurrentUser() == null) {
             userProfile = new ProfileDrawerItem()
                     .withName(getString(R.string.nav_head_appname))
@@ -329,7 +323,7 @@ public class MainScreen extends AppCompatActivity implements
                 .withToolbar(toolbar)
                 .withAccountHeader(drawerHeader)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all).withBadge(reminderIdList.size() + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary)),
+                        new PrimaryDrawerItem().withIdentifier(ALL_IDENTIFIER).withName(getString(R.string.nav_opt_all)).withIcon(R.drawable.ic_nav_all).withBadge(reminderList.size() + "").withBadgeStyle(new BadgeStyle().withTextColor(ContextCompat.getColor(MainScreen.this, R.color.md_white_1000)).withColorRes(R.color.colorPrimary)),
                         new PrimaryDrawerItem().withIdentifier(GEO_IDENTIFIER).withName(getString(R.string.nav_opt_geo)).withIcon(R.drawable.ic_nav_geo),
                         new PrimaryDrawerItem().withIdentifier(NOR_IDENTIFIER).withName(getString(R.string.nav_opt_nor)).withIcon(R.drawable.ic_nav_nor),
                         new PrimaryDrawerItem().withIdentifier(DRAFT_IDENTIFIER).withName(getString(R.string.nav_opt_draft)).withIcon(R.drawable.ic_nav_draft),
@@ -605,13 +599,13 @@ public class MainScreen extends AppCompatActivity implements
 
                     if (reminderInJSONString != null) {
                         Reminder editedReminder = gson.fromJson(reminderInJSONString, Reminder.class);
-                        if (reminderIdList.contains(editedReminder.getUuid())) {        // edited
-                            int index = reminderIdList.indexOf(editedReminder.getUuid());
+                        if (reminderList.contains(editedReminder)) {        // edited
+                            int index = reminderList.indexOf(editedReminder);
                             ListReminderFragment.replaceReminder(index, editedReminder);
                         } else {                    // new reminder
                             editedReminder.setUuid(UUID.randomUUID().toString());
                             ListReminderFragment.addReminder(null, editedReminder);
-                            reminderIdList.add(editedReminder.getUuid());       // add to list
+                            reminderList.add(editedReminder);       // add to list
                         }
                         Log.d("MainScreen", editedReminder.getUuid() + " " + editedReminder.getTitle() + " " + editedReminder.getDescription());
                     } else {
@@ -622,7 +616,7 @@ public class MainScreen extends AppCompatActivity implements
                     writeRemindersToStorage();  // everything works out, save!
 
                     // set badge for number of reminders
-                    drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderIdList.size() + ""));
+                    drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderList.size() + ""));
 
                 } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
                     Log.d("MainScreen", "ResultCode SAVED_TO_DRAFT");
@@ -898,8 +892,8 @@ public class MainScreen extends AppCompatActivity implements
 
     @Override
     public void onBadgeUpdate(String uuid) {
-        reminderIdList.remove(uuid);
-        drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderIdList.size() + ""));
+        reminderList.remove(uuid);
+        drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderList.size() + ""));
     }
 
     // Below: code for testing and debugging

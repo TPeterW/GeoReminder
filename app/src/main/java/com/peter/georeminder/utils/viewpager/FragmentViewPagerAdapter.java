@@ -23,7 +23,7 @@ public class FragmentViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if(position == 0)
+        if (position == 0)
             return ListReminderFragment.getInstance();
         else
             return ListLocationFragment.getInstance();
