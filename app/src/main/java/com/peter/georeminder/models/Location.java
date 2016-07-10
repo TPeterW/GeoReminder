@@ -17,27 +17,35 @@ public class Location {
     private LatLng googleMapLatLng;
     private com.amap.api.maps.model.LatLng aMapLatLng;
 
-    private String title;
+    private String name;
 
 
     public Location(Context context){
-        initialise(context);
+        setTitle(context.getString(R.string.location_default_title));
     }
 
-    private void initialise(Context context) {
+    public LatLng getGoogleMapLatLng() {
+        return googleMapLatLng;
+    }
 
-        setTitle(context.getString(R.string.location_default_title));
+    public com.amap.api.maps.model.LatLng getAMapLatLng() {
+        return aMapLatLng;
+    }
 
-
-
+    public Location setLatLng(double latitude, double longitude) {
+        googleMapLatLng = new LatLng(latitude, longitude);
+        aMapLatLng = new com.amap.api.maps.model.LatLng(latitude, longitude);
+        return this;
     }
 
     public String getTitle() {
-        return title;
+        return name;
     }
 
-    public Location setTitle(String title) {
-        this.title = title;
+    public Location setTitle(String name) {
+        this.name = name;
         return this;
     }
+
+
 }

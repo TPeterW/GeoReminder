@@ -129,7 +129,6 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     }
 
     public void deleteReminder(int position){
-        String uuid = reminderList.get(position).getUuid();
         reminderList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged((int) getItemId(position), getItemCount() + 1);
