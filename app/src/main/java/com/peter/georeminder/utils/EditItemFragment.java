@@ -54,6 +54,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 import carbon.widget.Divider;
@@ -120,8 +121,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     private View rootView;
 
-    private Gson gson;
-
     private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE    = 0x001;
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE      = 0x002;
 
@@ -180,25 +179,15 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     }
 
     private void initData() {
-        // TODO: not sure if works
-        gson = new Gson();
-
         if (newReminder) {
             currentReminder = new Reminder(getActivity());
             currentReminder.setRepeatType(Reminder.ALL_DAY);            // default withTime false
 
-            Calendar calendar = Calendar.getInstance();
-            currentReminder.setCreateDateTime(calendar.getTime());
-            currentReminder.setStartTime(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE));
-            currentReminder.setEndTime(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE));
+            long currentTimeMillis = System.currentTimeMillis();
+            currentReminder.setCreateTime(currentTimeMillis);
+            currentReminder.setStartTime(currentTimeMillis);
+            currentReminder.setEndTime(currentTimeMillis);
 
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            calendar.clear();
-            calendar.set(year, month, day);
-            currentReminder.setStartDate(calendar.getTime());           // for these two we only need year, month, day
-            currentReminder.setEndDate(calendar.getTime());
 
             // set reminder type
             if (withMap)
@@ -209,11 +198,9 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             // set create location
             try {
                 Location currentLocation = getLastKnownLocation();
-                currentReminder.setCreateLat(currentLocation.getLatitude());
-                currentReminder.setCreateLng(currentLocation.getLongitude());
+                currentReminder.setCreateLocation(currentLocation.getLatitude(), currentLocation.getLongitude());
             } catch (Exception e) {         // probably null pointer
-                currentReminder.setCreateLat(null);
-                currentReminder.setCreateLng(null);
+                currentReminder.setCreateLocation(null, null);
             }
 
             Log.i("EditItemFragment", "New reminder");
@@ -223,7 +210,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                 String existingInJSON = arguments.getString(getString(R.string.shared_pref_most_recent_reminder), null);
                 if (existingInJSON != null) {
                     // existing reminder is passed in as JSON string
-                    currentReminder = gson.fromJson(existingInJSON, Reminder.class);
+                    currentReminder = new Gson().fromJson(existingInJSON, Reminder.class);
                     setAllColors(currentReminder.getColorInt());
                 }
             } catch (Exception e) {
@@ -533,11 +520,11 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                 Calendar endCalendar = Calendar.getInstance();
                 startCalendar.clear();
                 endCalendar.clear();
-                startCalendar.set(yearStart, monthStart, dayStart);
-                endCalendar.set(yearEnd, monthEnd, dayEnd);
+                startCalendar.set(yearStart, monthStart, dayStart, 0, 0);       // midnight
+                endCalendar.set(yearEnd, monthEnd, dayEnd, 0, 0);               // wait for time range
 
-                currentReminder.setStartDate(startCalendar.getTime());
-                currentReminder.setEndDate(endCalendar.getTime());
+                currentReminder.setStartTime(startCalendar.getTimeInMillis());
+                currentReminder.setEndTime(endCalendar.getTimeInMillis());
 
                 DateFormat dateFormat = DateFormat.getDateInstance();
                 dateFormat.setTimeZone(TimeZone.getDefault());
@@ -559,8 +546,22 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         TimeRangePickerDialog timeRangePickerDialog = TimeRangePickerDialog.newInstance(new TimeRangePickerDialog.OnTimeRangeSelectedListener() {
             @Override
             public void onTimeRangeSelected(int startHour, int startMin, int endHour, int endMin) {
-                currentReminder.setStartTime(startHour * 60 + startMin);
-                currentReminder.setEndTime(endHour * 60 + endMin);
+                Calendar startCalendar = Calendar.getInstance();
+                Calendar endCalendar = Calendar.getInstance();
+                startCalendar.clear();
+                endCalendar.clear();
+
+                startCalendar.setTimeInMillis(currentReminder.getStartTime());
+                endCalendar.setTimeInMillis(currentReminder.getEndTime());
+
+                // add hours and minutes to current dates
+                startCalendar.set(Calendar.HOUR_OF_DAY, startHour);
+                startCalendar.set(Calendar.MINUTE, startMin);
+                endCalendar.set(Calendar.HOUR_OF_DAY, endHour);
+                endCalendar.set(Calendar.MINUTE, endMin);
+
+                currentReminder.setStartTime(startCalendar.getTimeInMillis());
+                currentReminder.setEndTime(endCalendar.getTimeInMillis());
 
                 startTime.setText(getString(R.string.point_to_point_time_format, startHour, startMin));
                 endTime.setText(getString(R.string.point_to_point_time_format, endHour, endMin));
@@ -773,17 +774,21 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private void setRepeatEverydayLayout() {
         startDate.setVisibility(View.VISIBLE);
         endDate.setVisibility(View.VISIBLE);
-        startDate.setText(DateFormat.getDateInstance().format(currentReminder.getStartDate()));
-        endDate.setText(DateFormat.getDateInstance().format(currentReminder.getEndDate()));
+        startDate.setText(DateFormat.getDateInstance().format(new Date(currentReminder.getStartTime())));
+        endDate.setText(DateFormat.getDateInstance().format(new Date(currentReminder.getEndTime())));
 
         startTime.setVisibility(View.GONE);
         endTime.setVisibility(View.GONE);
 
         repeatTimeRange.setVisibility(View.VISIBLE);
-        int startHour = currentReminder.getStartTime() / 60;
-        int startMin = currentReminder.getStartTime() % 60;
-        int endHour = currentReminder.getEndTime() / 60;
-        int endMin = currentReminder.getEndTime() % 60;
+        Calendar startCalendar = Calendar.getInstance();
+        Calendar endCalendar = Calendar.getInstance();
+        startCalendar.setTimeInMillis(currentReminder.getStartTime());
+        endCalendar.setTimeInMillis(currentReminder.getEndTime());
+        int startHour = startCalendar.get(Calendar.HOUR_OF_DAY);
+        int startMin = startCalendar.get(Calendar.MINUTE);
+        int endHour = endCalendar.get(Calendar.HOUR_OF_DAY);
+        int endMin = endCalendar.get(Calendar.MINUTE);
         repeatTimeRange.setText(getString(R.string.time_range_time_format, startHour, startMin, endHour, endMin));
 
         repeatOptions.setVisibility(View.VISIBLE);
@@ -793,17 +798,21 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private void setPointToPointLayout() {
         startDate.setVisibility(View.VISIBLE);
         endDate.setVisibility(View.VISIBLE);
-        startDate.setText(DateFormat.getDateInstance().format(currentReminder.getStartDate()));
-        endDate.setText(DateFormat.getDateInstance().format(currentReminder.getEndDate()));
+        startDate.setText(DateFormat.getDateInstance().format(new Date(currentReminder.getStartTime())));
+        endDate.setText(DateFormat.getDateInstance().format(new Date(currentReminder.getEndTime())));
 
         startTime.setVisibility(View.VISIBLE);
         endTime.setVisibility(View.VISIBLE);
 
         repeatTimeRange.setVisibility(View.GONE);
-        int startHour = currentReminder.getStartTime() / 60;
-        int startMin = currentReminder.getStartTime() % 60;
-        int endHour = currentReminder.getEndTime() / 60;
-        int endMin = currentReminder.getEndTime() % 60;
+        Calendar startCalendar = Calendar.getInstance();
+        Calendar endCalendar = Calendar.getInstance();
+        startCalendar.setTimeInMillis(currentReminder.getStartTime());
+        endCalendar.setTimeInMillis(currentReminder.getEndTime());
+        int startHour = startCalendar.get(Calendar.HOUR_OF_DAY);
+        int startMin = startCalendar.get(Calendar.MINUTE);
+        int endHour = endCalendar.get(Calendar.HOUR_OF_DAY);
+        int endMin = endCalendar.get(Calendar.MINUTE);
         startTime.setText(getString(R.string.point_to_point_time_format, startHour, startMin));
         endTime.setText(getString(R.string.point_to_point_time_format, endHour, endMin));
 
@@ -814,8 +823,8 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private void setAllDayLayout() {
         startDate.setVisibility(View.VISIBLE);
         endDate.setVisibility(View.VISIBLE);
-        startDate.setText(DateFormat.getDateInstance().format(currentReminder.getStartDate()));
-        endDate.setText(DateFormat.getDateInstance().format(currentReminder.getEndDate()));
+        startDate.setText(DateFormat.getDateInstance().format(new Date(currentReminder.getStartTime())));
+        endDate.setText(DateFormat.getDateInstance().format(new Date(currentReminder.getEndTime())));
 
         startTime.setVisibility(View.GONE);
         endTime.setVisibility(View.GONE);
@@ -840,7 +849,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         // TODO: more
 
         // convert to gson
-        String currentReminderInJSONString = gson.toJson(currentReminder, Reminder.class);
+        String currentReminderInJSONString = new Gson().toJson(currentReminder, Reminder.class);
 
         PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
                 .putString(getString(R.string.shared_pref_most_recent_reminder), currentReminderInJSONString)

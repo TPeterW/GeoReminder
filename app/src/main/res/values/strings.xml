@@ -34,7 +34,7 @@
     <!--CardView-->
     <string name="card_view_btn_edit">Edit</string>
     <string name="card_view_btn_map">View in Map</string>
-    <string name="card_view_txt_distance_to_current">Distance:</string>
+    <string name="card_view_txt_location_name">At:</string>
     <string name="card_view_txt_date">Date:</string>
     <string name="card_view_txt_no_hurry">There\'s no hurry…</string>
 

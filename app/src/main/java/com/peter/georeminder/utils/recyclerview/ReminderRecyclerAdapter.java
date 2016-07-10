@@ -1,6 +1,5 @@
 package com.peter.georeminder.utils.recyclerview;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import com.blunderer.materialdesignlibrary.views.CardView;
 import com.peter.georeminder.R;
 import com.peter.georeminder.models.Reminder;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -69,14 +69,17 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         holder.cardView.setNormalButtonText(context.getString(R.string.card_view_btn_edit));
 
         if (current.isWithLocation()) {         // has location
-            holder.cardView.setDescription(context.getString(R.string.card_view_txt_distance_to_current) + current.getDistanceToHere());
+            holder.cardView.setDescription(context.getString(R.string.card_view_txt_location_name) + current.getRemindLocation().getName());
             holder.cardView.setHighlightButtonText(context.getString(R.string.card_view_btn_map));
         } else {                                // has a time
             if (current.isWithTime()) {
-                if (current.getEndDate() != null)
-                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getEndDate());
-                else
-                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getStartDate());
+//                if (current.getEndTime() != null)
+//                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getEndDate());
+//                else
+//                    holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + current.getStartDate());
+                Calendar startCalendar = Calendar.getInstance();
+                startCalendar.setTimeInMillis(current.getStartTime());
+                holder.cardView.setDescription(context.getString(R.string.card_view_txt_date) + " " + startCalendar.getTime());
             } else {
 //                holder.cardView.setDescription(context.getString(R.string.card_view_txt_no_hurry));
                 holder.cardView.setDescription(reminderList.get(position).getDescription());

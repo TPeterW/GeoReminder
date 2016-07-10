@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -173,6 +174,26 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
             public void onRefresh() {           // this is a very dirty workaround for the build tool support problem
                 recyclerView.setNestedScrollingEnabled(false);      // so wouldn't pull AppBar out
                 listener.onReminderListRefresh();
+
+                // TODO: temp
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        recyclerView.setNestedScrollingEnabled(true);
+                        super.onPostExecute(aVoid);
+                    }
+                }.execute();
             }
         });
     }

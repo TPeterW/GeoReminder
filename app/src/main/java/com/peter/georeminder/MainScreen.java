@@ -67,7 +67,6 @@ import com.peter.georeminder.utils.viewpager.ListReminderFragment.ListReminderLi
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 public class MainScreen extends AppCompatActivity implements
         ListReminderListener, ListLocationListener, OnSharedPreferenceChangeListener, OnBadgeUpdateListener {
@@ -187,14 +186,14 @@ public class MainScreen extends AppCompatActivity implements
 
         locationList = new LinkedList<>();
         // TODO: remove these and actually get the reminders from local data storage
-        locationList.add(new Location(this).setTitle("Location 1"));
-        locationList.add(new Location(this).setTitle("Location 2"));
-        locationList.add(new Location(this).setTitle("Location 3"));
-        locationList.add(new Location(this).setTitle("Location 4"));
-        locationList.add(new Location(this).setTitle("Location 5"));
-        locationList.add(new Location(this).setTitle("Location 6"));
-        locationList.add(new Location(this).setTitle("Location 7"));
-        locationList.add(new Location(this).setTitle("Location 8"));
+        locationList.add(new Location(this).setName("Location 1"));
+        locationList.add(new Location(this).setName("Location 2"));
+        locationList.add(new Location(this).setName("Location 3"));
+        locationList.add(new Location(this).setName("Location 4"));
+        locationList.add(new Location(this).setName("Location 5"));
+        locationList.add(new Location(this).setName("Location 6"));
+        locationList.add(new Location(this).setName("Location 7"));
+        locationList.add(new Location(this).setName("Location 8"));
 
         // Nav Drawer
         // create user profile
@@ -601,7 +600,6 @@ public class MainScreen extends AppCompatActivity implements
                             int index = reminderList.indexOf(editedReminder);
                             ListReminderFragment.replaceReminder(index, editedReminder);
                         } else {                    // new reminder
-                            editedReminder.setUuid(UUID.randomUUID().toString());
                             ListReminderFragment.addReminder(null, editedReminder);
                         }
                         Log.d("MainScreen", editedReminder.getUuid() + " | " + editedReminder.getTitle() + " | " + editedReminder.getDescription());
