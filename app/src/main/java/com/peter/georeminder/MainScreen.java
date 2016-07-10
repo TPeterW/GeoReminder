@@ -48,7 +48,6 @@ import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -58,7 +57,6 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
-import com.peter.georeminder.utils.recyclerview.ReminderRecyclerAdapter;
 import com.peter.georeminder.utils.recyclerview.ReminderRecyclerAdapter.OnBadgeUpdateListener;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
 import com.peter.georeminder.utils.viewpager.ListLocationFragment;
@@ -552,9 +550,9 @@ public class MainScreen extends AppCompatActivity implements
     }
 
     private void writeRemindersToStorage() {
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putString(getString(R.string.shared_pref_local_storage_reminders),
-                gson.toJson(reminderList, new TypeToken<LinkedList<Reminder>>() {}.getType()))
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putString(getString(R.string.shared_pref_local_storage_reminders),
+                        gson.toJson(reminderList, new TypeToken<LinkedList<Reminder>>() {}.getType()))
                 .apply();
     }
 
@@ -595,7 +593,7 @@ public class MainScreen extends AppCompatActivity implements
                 if (resultCode == EditorScreen.SAVED_AS_REMINDER) {
                     Log.d("MainScreen", "ResultCode SAVED_AS_REMINDER");
                     // retrieve reminder
-                    String reminderInJSONString = sharedPreferences.getString(getString(R.string.bundle_most_recent_reminder), null);
+                    String reminderInJSONString = sharedPreferences.getString(getString(R.string.shared_pref_most_recent_reminder), null);
 
                     if (reminderInJSONString != null) {
                         Reminder editedReminder = gson.fromJson(reminderInJSONString, Reminder.class);
@@ -605,9 +603,8 @@ public class MainScreen extends AppCompatActivity implements
                         } else {                    // new reminder
                             editedReminder.setUuid(UUID.randomUUID().toString());
                             ListReminderFragment.addReminder(null, editedReminder);
-                            reminderList.add(editedReminder);       // add to list
                         }
-                        Log.d("MainScreen", editedReminder.getUuid() + " " + editedReminder.getTitle() + " " + editedReminder.getDescription());
+                        Log.d("MainScreen", editedReminder.getUuid() + " | " + editedReminder.getTitle() + " | " + editedReminder.getDescription());
                     } else {
                         Toast.makeText(MainScreen.this, getString(R.string.cannot_save_reminder), Toast.LENGTH_SHORT).show();
                         break;
@@ -619,6 +616,7 @@ public class MainScreen extends AppCompatActivity implements
                     drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderList.size() + ""));
 
                 } else if (resultCode == EditorScreen.SAVED_TO_DRAFT) {
+                    // TODO:
                     Log.d("MainScreen", "ResultCode SAVED_TO_DRAFT");
                 } else if (resultCode == EditorScreen.EDIT_CANCELLED) {
                     Log.d("MainScreen", "ResultCode EDIT_CANCELLED");
@@ -891,9 +889,9 @@ public class MainScreen extends AppCompatActivity implements
     }
 
     @Override
-    public void onBadgeUpdate(String uuid) {
-        reminderList.remove(uuid);
+    public void onBadgeUpdate() {
         drawer.updateBadge(ALL_IDENTIFIER, new StringHolder(reminderList.size() + ""));
+        writeRemindersToStorage();
     }
 
     // Below: code for testing and debugging

@@ -220,7 +220,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         } else {            // from draft or edit existing
             Log.i("EditItemFragment", "Edit reminder");
             try {
-                String existingInJSON = arguments.getString(getString(R.string.bundle_most_recent_reminder), null);
+                String existingInJSON = arguments.getString(getString(R.string.shared_pref_most_recent_reminder), null);
                 if (existingInJSON != null) {
                     // existing reminder is passed in as JSON string
                     currentReminder = gson.fromJson(existingInJSON, Reminder.class);
@@ -842,8 +842,9 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         // convert to gson
         String currentReminderInJSONString = gson.toJson(currentReminder, Reminder.class);
 
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-        editor.putString(getString(R.string.bundle_most_recent_reminder), currentReminderInJSONString).apply();
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
+                .putString(getString(R.string.shared_pref_most_recent_reminder), currentReminderInJSONString)
+                .apply();
 
         return isDraft;
     }

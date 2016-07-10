@@ -125,7 +125,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         // TODO: what kind of reminder and where to add them
         reminderList.add(position, addedReminder);
         notifyItemInserted(position);
-        badgeUpdateListener.onBadgeUpdate(addedReminder.getUuid());
+        badgeUpdateListener.onBadgeUpdate();
     }
 
     public void deleteReminder(int position){
@@ -133,8 +133,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         reminderList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged((int) getItemId(position), getItemCount() + 1);
-        badgeUpdateListener.onBadgeUpdate(uuid);
-        // TODO: update local storage
+        badgeUpdateListener.onBadgeUpdate();
     }
 
 
@@ -155,7 +154,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
     public interface OnBadgeUpdateListener {
 
-        void onBadgeUpdate(String uuid);
+        void onBadgeUpdate();
 
     }
 }

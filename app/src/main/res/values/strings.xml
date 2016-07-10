@@ -10,7 +10,7 @@
     <!--Bundle Keys-->
     <string name="bundle_with_map">withMap</string>
     <string name="bundle_new_reminder">newReminder</string>
-    <string name="bundle_most_recent_reminder">mostRecentReminder</string><!--Could be the one just edited, or the one passed in-->
+    <string name="shared_pref_most_recent_reminder">mostRecentReminder</string><!--Could be the one just edited, or the one passed in-->
 
     <!--Buttons-->
     <string name="new_geo">Geo Reminder</string>
