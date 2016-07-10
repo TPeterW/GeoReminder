@@ -8,9 +8,9 @@
     <string name="action_share">Share</string>
 
     <!--Bundle Keys-->
-    <string name="bundle_with_map">withMap</string>
-    <string name="bundle_new_reminder">newReminder</string>
-    <string name="shared_pref_most_recent_reminder">mostRecentReminder</string><!--Could be the one just edited, or the one passed in-->
+    <string name="bundle_with_map" translatable="false">withMap</string>
+    <string name="bundle_new_reminder" translatable="false">newReminder</string>
+    <string name="shared_pref_most_recent_reminder" translatable="false">mostRecentReminder</string><!--Could be the one just edited, or the one passed in-->
 
     <!--Buttons-->
     <string name="new_geo">Geo Reminder</string>
@@ -57,6 +57,7 @@
     <string name="dialog_new_geo">New Geo Reminder</string>
 
     <!--Editor-->
+    <string name="place_picker">Use Google Place Picker</string>
     <string name="reminder_title">Title</string>
     <string name="reminder_default_title">Untitled Reminder</string>
     <string name="location_default_title">Untitled Location</string>
@@ -81,8 +82,8 @@
     <string name="repeat_option_point_to_point">Point to Point</string>
     <string name="repeat_option_all_day">All Day</string>
 
-    <string name="point_to_point_time_format" formatted="false">%02d:%02d</string>
-    <string name="time_range_time_format" formatted="false">%02d:%02d ~ %02d:%02d</string>
+    <string name="point_to_point_time_format" formatted="false" translatable="false">%02d:%02d</string>
+    <string name="time_range_time_format" formatted="false" translatable="false">%02d:%02d ~ %02d:%02d</string>
 
 
     <!--Intent-->
@@ -176,8 +177,8 @@
     <string name="title_activity_test">Map</string>
 
     <!--Parse keys-->
-    <string name="parse_user_identifier">identifier</string>
-    <string name="parse_user_userNameSet">userNameSet</string>
+    <string name="parse_user_identifier" translatable="false">identifier</string>
+    <string name="parse_user_userNameSet" translatable="false">userNameSet</string>
 
     <!--Service Availability Dialog-->
     <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>
@@ -212,11 +213,11 @@
     <string name="pref_app_bar_enabled">AppBar Enabled</string>
 
     <!--SharedPreferences-->
-    <string name="shared_pref_google_avail">googleMapAvailable</string>
-    <string name="shared_pref_tutorial_shown">tutorialAlreadyShown</string>
-    <string name="shared_pref_which_map">whichMap</string>
-    <string name="shared_pref_show_animation">showAnim</string>
-    <string name="shared_pref_local_storage_reminders">localReminders</string>
+    <string name="shared_pref_google_avail" translatable="false">googleMapAvailable</string>
+    <string name="shared_pref_tutorial_shown" translatable="false">tutorialAlreadyShown</string>
+    <string name="shared_pref_which_map" translatable="false">whichMap</string>
+    <string name="shared_pref_show_animation" translatable="false">showAnim</string>
+    <string name="shared_pref_local_storage_reminders" translatable="false">localReminders</string>
 
     <!--Snack Bar-->
     <string name="press_again_exit">Press again to exit</string>
@@ -236,32 +237,5 @@
     <string name="cannot_save_reminder">Cannot save reminder</string>
 
     <string name="permission_need_fine_location">GeoReminder needs to access your location to provide Geo-reminding service</string>
-
-
-
-
-
-
-    <string name="long_text">A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words A lot of words
-        A lot of words A lot of words A lot of words A lot of words
-    </string>
 
 </resources>

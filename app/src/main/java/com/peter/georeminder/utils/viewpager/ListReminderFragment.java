@@ -1,6 +1,5 @@
 package com.peter.georeminder.utils.viewpager;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +73,7 @@ public class ListReminderFragment extends Fragment implements SharedPreferences.
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_list_reminder_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_reminder, container, false);
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.reminder_recycler_layout);
         swipeRefreshLayout = (WaveSwipeRefreshLayout) rootView.findViewById(R.id.reminder_swipe_to_refresh_layout);

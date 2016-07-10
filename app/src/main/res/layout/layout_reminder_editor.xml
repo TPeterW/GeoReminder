@@ -62,30 +62,25 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:clickable="true"
-                android:background="?attr/selectableItemBackground">
+                android:background="?android:attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/always_txt"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="6"
                     android:text="@string/time_always"
                     android:textSize="20sp"
-                    android:clickable="true"
-                    android:paddingBottom="5dp"
-                    android:background="?attr/selectableItemBackground"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:clickable="true"/>
+                    android:clickable="false"
+                    android:paddingBottom="5dp" />
 
                 <Switch
                     android:id="@+id/always_switch"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:gravity="end"
+                    android:clickable="false"
                     android:checked="true"/>
 
             </LinearLayout>
@@ -96,28 +91,22 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:clickable="true"
-                android:background="?attr/selectableItemBackground">
+                android:background="?android:attr/selectableItemBackground">
 
                 <TextView
-                    android:id="@+id/all_day_txt"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="6"
                     android:text="@string/time_all_day"
                     android:textSize="20sp"
-                    android:clickable="true"
-                    android:paddingBottom="5dp"
-                    android:background="?attr/selectableItemBackground"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:clickable="true"/>
+                    android:clickable="false"
+                    android:paddingBottom="5dp" />
 
                 <Switch
                     android:id="@+id/all_day_switch"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:gravity="end"
                     android:checked="true"/>

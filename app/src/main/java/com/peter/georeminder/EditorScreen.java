@@ -99,7 +99,7 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
     }
 
     private void getSpecs() {
-        //TODO:
+        // TODO:
         Bundle reminderSpecs = getIntent().getExtras();
         withMap = reminderSpecs.getBoolean(getResources().getString(R.string.bundle_with_map));
         isNewReminder = reminderSpecs.getBoolean(getString(R.string.bundle_new_reminder));

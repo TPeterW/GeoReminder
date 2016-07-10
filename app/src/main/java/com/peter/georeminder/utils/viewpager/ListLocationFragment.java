@@ -57,7 +57,7 @@ public class ListLocationFragment extends Fragment implements OnSharedPreference
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_list_location_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_location, container, false);
 
         PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
 

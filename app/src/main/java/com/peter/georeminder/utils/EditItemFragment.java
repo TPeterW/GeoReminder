@@ -141,13 +141,13 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             return null;
 
         if (withMap) {
-            rootView = inflater.inflate(R.layout.reminder_geo_edit_screen, container, false);
+            rootView = inflater.inflate(R.layout.fragment_geo_edit_screen, container, false);
 
             mapContainer = (FrameLayout) rootView.findViewById(R.id.edit_map_container);
 
             setUpMap();
         } else {
-            rootView = inflater.inflate(R.layout.reminder_normal_edit_screen, container, false);
+            rootView = inflater.inflate(R.layout.fragment_normal_edit_screen, container, false);
         }
 
         initData();
@@ -228,12 +228,10 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         reminderDescription = (MaterialEditText) rootView.findViewById(R.id.edittext_description);
 
         alwaysContainer = (LinearLayout) rootView.findViewById(R.id.always_container);
-        alwaysText = (TextView) rootView.findViewById(R.id.always_txt);
         alwaysSwitch = (Switch) rootView.findViewById(R.id.always_switch);
 
         // TODO: change visibility accordingly
         allDayContainer = (LinearLayout) rootView.findViewById(R.id.all_day_container);
-        allDayText = (TextView) rootView.findViewById(R.id.all_day_txt);
         allDaySwitch = (Switch) rootView.findViewById(R.id.all_day_switch);
 
         startDateTimeContainer = (LinearLayout) rootView.findViewById(R.id.start_date_time_container);
@@ -330,13 +328,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             }
         });
 
-        alwaysText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alwaysSwitch.performClick();
-            }
-        });
-
         alwaysSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -376,13 +367,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         // time
         allDayContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                allDaySwitch.performClick();
-            }
-        });
-
-        allDayText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allDaySwitch.performClick();

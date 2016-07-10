@@ -59,11 +59,11 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
         // set OnItemClick/LongClick itemClickListener
         // implement in calling activity (in this case, MainScreen)
 
-        Reminder current = reminderList.get(position);
+        Reminder current = reminderList.get(holder.getAdapterPosition());
         holder.cardView.setTitle(current.getTitle());
         holder.cardView.setImageResource(R.drawable.reminder_default_icon);
         holder.cardView.setNormalButtonText(context.getString(R.string.card_view_btn_edit));
@@ -96,14 +96,14 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    itemClickListener.onItemClick(holder.cardView, position);
+                    itemClickListener.onItemClick(holder.cardView, holder.getAdapterPosition());
                 }
             });
 
             holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    itemClickListener.onItemLongClick(holder.cardView, position);
+                    itemClickListener.onItemLongClick(holder.cardView, holder.getAdapterPosition());
                     return false;
                 }
             });
