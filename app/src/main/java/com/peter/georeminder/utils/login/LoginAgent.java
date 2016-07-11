@@ -3,11 +3,6 @@ package com.peter.georeminder.utils.login;
 import android.content.Context;
 import android.util.Log;
 
-import com.parse.LogInCallback;
-import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,53 +29,28 @@ public class LoginAgent {
         }
     }
 
+    // TODO:
+    public static User getCurrentUser() {
+        return null;
+    }
+
     public void unregisterListener(Context context) {
         callbacks.remove((LoginListener) context);
     }
 
     public void logInInBackground(String email, String password) {
-        ParseUser.logInInBackground(email, password, new LogInCallback() {
-            @Override
-            public void done(ParseUser user, ParseException e) {
-                if (user != null) {
-                    for (LoginListener callback : callbacks) {
-                        callback.onLoginComplete();
-                    }
-                } else {
-                    for (LoginListener callback : callbacks) {
-                        callback.onLoginFail(e);
-                    }
-                }
-            }
-        });
+        // TODO:
     }
 
     public void registerInBackground(String email, String password) {
-        ParseUser user = new ParseUser();
-        user.setEmail(email);
-        user.setUsername(email);
-        user.setPassword(password);
-        user.signUpInBackground(new SignUpCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    for (LoginListener callback : callbacks) {
-                        callback.onRegisterComplete();
-                    }
-                } else {
-                    for (LoginListener callback : callbacks) {
-                        callback.onRegisterFail(e);
-                    }
-                }
-            }
-        });
+        // TODO:
     }
 
     public interface LoginListener {
 
         void onLoginComplete();
 
-        void onLoginFail(ParseException e);
+        void onLoginFail(Exception e);
 
         void onLoginCancelled();
 
@@ -88,7 +58,7 @@ public class LoginAgent {
 
         void onRegisterComplete();
 
-        void onRegisterFail(ParseException e);
+        void onRegisterFail(Exception e);
 
     }
 

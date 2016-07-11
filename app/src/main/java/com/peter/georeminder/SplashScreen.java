@@ -20,7 +20,7 @@ import static android.view.View.*;
  * After launch, this screen will appear for 1.5 seconds, then head off to MainScreen and destroy itself
  */
 public class SplashScreen extends Activity {
-    private static int SPLASH_TIME_OUT = 2000;
+    private static final int SPLASH_TIME_OUT = 2000;
 
     private ImageView splashLogo;
 

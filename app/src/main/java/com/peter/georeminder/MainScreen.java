@@ -37,7 +37,7 @@ import android.widget.Toast;
 import com.facebook.appevents.AppEventsLogger;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -52,11 +52,10 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.parse.ParseFacebookUtils;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
 import com.peter.georeminder.models.Location;
 import com.peter.georeminder.models.Reminder;
+import com.peter.georeminder.utils.login.LoginAgent;
+import com.peter.georeminder.utils.login.User;
 import com.peter.georeminder.utils.recyclerview.ReminderRecyclerAdapter.OnBadgeUpdateListener;
 import com.peter.georeminder.utils.viewpager.FragmentViewPagerAdapter;
 import com.peter.georeminder.utils.viewpager.ListLocationFragment;
@@ -197,19 +196,20 @@ public class MainScreen extends AppCompatActivity implements
 
         // Nav Drawer
         // create user profile
-        if (ParseUser.getCurrentUser() == null) {
+        if (LoginAgent.getCurrentUser() == null) {
+            // TODO: create new user
             userProfile = new ProfileDrawerItem()
                     .withName(getString(R.string.nav_head_appname))
                     .withEmail(getString(R.string.nav_local_email))
                     .withIcon(R.mipmap.ic_default_avatar)
                     .withIdentifier(LOCAL_USER_IDENTIFIER);
         } else {
-            ParseUser currentUser = ParseUser.getCurrentUser();
+            User currentUser = LoginAgent.getCurrentUser();
             userProfile  = new ProfileDrawerItem()
                     .withName(currentUser.getUsername())
                     .withEmail(currentUser.getEmail())
                     .withIcon(R.mipmap.ic_default_avatar)
-                    .withIdentifier(currentUser.getInt(getString(R.string.parse_user_identifier)));
+                    .withIdentifier(currentUser.getIdentifier());
         }
     }
 
@@ -509,10 +509,9 @@ public class MainScreen extends AppCompatActivity implements
         }
 
         // TODO: make sure Toast only appears once
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext())) {
+        switch (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getApplicationContext())) {
             case ConnectionResult.SUCCESS:
                 editor.putBoolean(getString(R.string.shared_pref_google_avail), true);
                 break;
@@ -641,9 +640,6 @@ public class MainScreen extends AppCompatActivity implements
                 loadPref();
                 return;
         }
-
-        // for Facebook integration
-        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
 
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -913,14 +909,6 @@ public class MainScreen extends AppCompatActivity implements
 
 
 
-    private void sendParseTestObject() {
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("Name", "Tao Peter Wang");
-        testObject.put("Location", "NULL");
-        Log.i("Cloud", "Sent Parse TestObject");
-        testObject.saveInBackground();
-    }
-
     @Override
     protected void onStop() {
         Log.i("MainScreen", "Stop");
@@ -940,7 +928,6 @@ public class MainScreen extends AppCompatActivity implements
     protected void onResume() {
         Log.i("MainScreen", "Resume");
         super.onResume();
-        AppEventsLogger.activateApp(this, getString(R.string.facebook_app_id));
     }
     @Override
     protected void onRestart() {
@@ -951,6 +938,5 @@ public class MainScreen extends AppCompatActivity implements
     protected void onPause() {
         Log.i("MainScreen", "Pause");
         super.onPause();
-        AppEventsLogger.deactivateApp(this, getString(R.string.facebook_app_id));
     }
 }

@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.text.TextUtils;
@@ -27,14 +26,10 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.dd.processbutton.iml.ActionProcessButton;
-import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 import com.peter.georeminder.utils.login.LoginAgent;
 import com.peter.georeminder.utils.login.LoginAgent.LoginListener;
 import com.peter.georeminder.utils.login.ProgressGenerator;
@@ -231,28 +226,6 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
         return password.length() >= 6;
     }
 
-    private void showErrorMessage(ParseException e) {
-        switch (e.getCode()) {
-            case ParseException.CONNECTION_FAILED:
-                Toast.makeText(this, R.string.exception_connection_failed, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.INTERNAL_SERVER_ERROR:
-                Toast.makeText(this, R.string.exception_internal_server_error, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.TIMEOUT:
-                Toast.makeText(this, R.string.exception_timeout, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.VALIDATION_ERROR:
-                Toast.makeText(this, R.string.exception_validation_error, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.ACCOUNT_ALREADY_LINKED:
-                Toast.makeText(this, R.string.exception_email_already_linked, Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                Toast.makeText(this, R.string.exception_invalid_login_param, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
@@ -329,7 +302,7 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
     }
 
     @Override
-    public void onLoginFail(ParseException e) {
+    public void onLoginFail(Exception e) {
         // nothing here
     }
 
@@ -360,14 +333,13 @@ public class RegisterScreen extends SwipeBackActivity implements LoaderCallbacks
     }
 
     @Override
-    public void onRegisterFail(ParseException e) {
+    public void onRegisterFail(Exception e) {
         Log.i("RegisterScreen", "Register fail");
         btnRegister.setProgress(0);
         btnRegister.setText(R.string.action_sign_in_short);
         isRegistering = false;
 
         e.printStackTrace();
-        showErrorMessage(e);
     }
 
     private interface ProfileQuery {

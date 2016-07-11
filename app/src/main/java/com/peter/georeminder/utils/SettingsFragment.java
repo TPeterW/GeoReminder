@@ -1,6 +1,5 @@
 package com.peter.georeminder.utils;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;

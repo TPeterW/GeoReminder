@@ -1,8 +1,10 @@
 package com.peter.georeminder.utils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
@@ -36,15 +38,18 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.LocationSource;
-import com.amap.api.maps.MapsInitializer;
-import com.amap.api.maps.UiSettings;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.MarkerOptions;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.leavjenn.smoothdaterangepicker.date.SmoothDateRangePickerFragment;
 import com.peter.georeminder.EditorScreen;
@@ -87,21 +92,19 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     private AMap aMap;
 
     private FrameLayout mapContainer;
-
     private Marker googleMapMarker;
     private com.amap.api.maps.model.Marker aMapMarker;
-    
+
+    private LinearLayout placePickerContainer;
 
     // the editor views
     private MaterialEditText reminderTitle;
     private MaterialEditText reminderDescription;
 
     private LinearLayout alwaysContainer;
-    private TextView alwaysText;
     private Switch alwaysSwitch;
 
     private LinearLayout allDayContainer;
-    private TextView allDayText;
     private Switch allDaySwitch;
 
     private LinearLayout startDateTimeContainer;
@@ -123,6 +126,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
     private static final int COARSE_LOCATION_PERMISSION_REQUEST_CODE    = 0x001;
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE      = 0x002;
+    private static final int PLACE_PICKER_REQUEST_CODE                  = 0x011;
 
     private static final String TIME_RANGE_DIALOG_TAG                   = "TIMERANGE";
     private static final String DATE_RANGE_DIALOG_TAG                   = "DATERANGE";
@@ -142,9 +146,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
 
         if (withMap) {
             rootView = inflater.inflate(R.layout.fragment_geo_edit_screen, container, false);
-
-            mapContainer = (FrameLayout) rootView.findViewById(R.id.edit_map_container);
-
             setUpMap();
         } else {
             rootView = inflater.inflate(R.layout.fragment_normal_edit_screen, container, false);
@@ -230,7 +231,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         alwaysContainer = (LinearLayout) rootView.findViewById(R.id.always_container);
         alwaysSwitch = (Switch) rootView.findViewById(R.id.always_switch);
 
-        // TODO: change visibility accordingly
         allDayContainer = (LinearLayout) rootView.findViewById(R.id.all_day_container);
         allDaySwitch = (Switch) rootView.findViewById(R.id.all_day_switch);
 
@@ -264,7 +264,10 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                 break;
         }
 
-        // TODO: check withMap,
+        if (withMap) {      // using map fragment
+            mapContainer = (FrameLayout) rootView.findViewById(R.id.edit_map_container);
+            placePickerContainer = (LinearLayout) rootView.findViewById(R.id.place_picker_container);
+        }
 
         // change parent activity color
         if (newReminder) {
@@ -300,6 +303,21 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     }
 
     private void initEvent() {
+        // place picker
+        if (withMap) {
+            placePickerContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        Intent placePickerIntent = new PlacePicker.IntentBuilder().build(getActivity());
+                        startActivityForResult(placePickerIntent, PLACE_PICKER_REQUEST_CODE);
+                    } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
         // title and description
         reminderTitle.addTextChangedListener(new TextWatcher() {
             @Override
@@ -332,7 +350,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             @Override
             public void onClick(View v) {
                 if (alwaysSwitch.isChecked()) {
-                    currentReminder.withTime(false);    // TODO: debatable
+                    currentReminder.withTime(false);
 
                     allDayContainer.setVisibility(View.GONE);
                     startDateTimeContainer.setVisibility(View.GONE);
@@ -380,8 +398,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                     currentReminder.setRepeatType(Reminder.ALL_DAY);
                     setAllDayLayout();
                     Log.i("EditItemFragment", "Event all day");
-                    // TODO:
-
                 } else {
                     Log.i("EditItemFragment", "Event has time limit");
                     if (repeatOptions.getText().toString().equals(getString(R.string.repeat_option_repeat_everyday))) {
@@ -391,8 +407,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                         currentReminder.setRepeatType(Reminder.POINT_TO_POINT);
                         setPointToPointLayout();
                     }
-                    // TODO:
-
                 }
             }
         });
@@ -563,7 +577,6 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
     }
 
     private void setUpMap() {
-        // TODO: change TAG
         if (useGoogleMap) {
             supportGoogleMapFragment = SupportMapFragment.newInstance();
             supportGoogleMapFragment.getMapAsync(this);
@@ -574,7 +587,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                     .commit();
         } else {        // use AMap
             try {
-                MapsInitializer.initialize(getContext());
+                com.amap.api.maps.MapsInitializer.initialize(getContext());
 
                 supportAMapFragment = com.amap.api.maps.SupportMapFragment.newInstance();
                 supportAMapFragment.onCreate(savedInstanceState);
@@ -601,7 +614,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         googleMap.setIndoorEnabled(true);
         googleMap.setBuildingsEnabled(true);
         googleMap.setTrafficEnabled(true);
-        com.google.android.gms.maps.UiSettings uiSettings = googleMap.getUiSettings();
+        UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setCompassEnabled(true);
         uiSettings.setMyLocationButtonEnabled(true);
@@ -609,24 +622,24 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         uiSettings.setIndoorLevelPickerEnabled(false);
 
         // put the original marker on
-        com.google.android.gms.maps.model.MarkerOptions markerOptions = new com.google.android.gms.maps.model.MarkerOptions();
+        MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.flat(false)
                 .draggable(true)
                 .title(getString(R.string.my_location));
         try {           // in case GPS is not available
-            markerOptions.position(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
+            markerOptions.position(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
             googleMapMarker = googleMap.addMarker(markerOptions);
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(new com.google.android.gms.maps.model.LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
         } catch (NullPointerException e) {
             Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
         }
 
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapClick(com.google.android.gms.maps.model.LatLng latLng) {
+            public void onMapClick(LatLng latLng) {
                 listener.onMapClick(latLng.latitude, latLng.longitude);
 
-                com.google.android.gms.maps.model.MarkerOptions markerOptions = new com.google.android.gms.maps.model.MarkerOptions();
+                MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.flat(false)
                         .draggable(true)
                         .title(getString(R.string.reminder_location))
@@ -660,7 +673,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         aMap.setMyLocationEnabled(true);
         aMap.setLocationSource(this);
         aMap.setTrafficEnabled(true);
-        UiSettings uiSettings = aMap.getUiSettings();
+        com.amap.api.maps.UiSettings uiSettings = aMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setCompassEnabled(true);
         uiSettings.setMyLocationButtonEnabled(true);
@@ -668,25 +681,27 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
         uiSettings.setZoomControlsEnabled(false);
 
         // put the original marker on
-        MarkerOptions markerOptions = new MarkerOptions();
+        com.amap.api.maps.model.MarkerOptions markerOptions = new com.amap.api.maps.model.MarkerOptions();
         markerOptions.setFlat(false)
                 .setGps(false)
                 .draggable(true)
                 .title(getString(R.string.my_location));
         try {           // in case GPS is not available
-            markerOptions.position(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
+            markerOptions.position(new com.amap.api.maps.model.LatLng(
+                    getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude()));
             aMap.addMarker(markerOptions);
-            aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newLatLng(new LatLng(getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
+            aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newLatLng(new com.amap.api.maps.model.LatLng(
+                    getLastKnownLocation().getLatitude(), getLastKnownLocation().getLongitude())));
         } catch (NullPointerException e) {
             Toast.makeText(getActivity(), getString(R.string.GPS_unavail), Toast.LENGTH_SHORT).show();
         }
 
         aMap.setOnMapClickListener(new AMap.OnMapClickListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
+            public void onMapClick(com.amap.api.maps.model.LatLng latLng) {
                 listener.onMapClick(latLng.latitude, latLng.longitude);
 
-                MarkerOptions markerOptions = new MarkerOptions();
+                com.amap.api.maps.model.MarkerOptions markerOptions = new com.amap.api.maps.model.MarkerOptions();
                 markerOptions.setFlat(false)
                         .setGps(false)
                         .draggable(true)
@@ -860,6 +875,25 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                 .apply();
 
         return isDraft;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case PLACE_PICKER_REQUEST_CODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    Place place = PlacePicker.getPlace(getActivity(), data);
+                    Toast.makeText(getActivity(), place.getName(), Toast.LENGTH_SHORT).show();
+                    if (useGoogleMap) {
+                        // TODO:
+                    } else {
+                        // TODO:
+                    }
+                }
+                return;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

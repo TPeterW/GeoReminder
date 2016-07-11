@@ -13,6 +13,7 @@
         android:background="@color/colorPrimary" />
 
     <LinearLayout
+        android:id="@+id/place_picker_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -25,15 +26,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:layout_gravity="center_vertical|end"
             android:src="@drawable/ic_google"
             android:clickable="false" />
+        <!--TODO: extract icon background-->
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="6"
             android:textSize="20sp"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:text="@string/place_picker"
             android:clickable="false" />
 

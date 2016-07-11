@@ -176,10 +176,6 @@
     <string name="title_activity_register_screen">Register</string>
     <string name="title_activity_test">Map</string>
 
-    <!--Parse keys-->
-    <string name="parse_user_identifier" translatable="false">identifier</string>
-    <string name="parse_user_userNameSet" translatable="false">userNameSet</string>
-
     <!--Service Availability Dialog-->
     <string name="svcs_unavail">One or more Google Service Components unavailable, you might not be able to use the geolocation for the reminders</string>
     <string name="svcs_cancel">Connection to Google Play Service is cancelled</string>

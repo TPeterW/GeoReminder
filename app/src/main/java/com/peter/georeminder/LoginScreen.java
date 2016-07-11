@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -39,14 +38,6 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.dd.processbutton.iml.ActionProcessButton;
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.parse.LogInCallback;
-import com.parse.ParseException;
-import com.parse.ParseFacebookUtils;
-import com.parse.ParseTwitterUtils;
-import com.parse.ParseUser;
 import com.peter.georeminder.utils.login.FBLoginButton;
 import com.peter.georeminder.utils.login.LoginAgent;
 import com.peter.georeminder.utils.login.LoginAgent.LoginListener;
@@ -64,7 +55,6 @@ import com.tencent.tauth.UiError;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -168,51 +158,11 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             }
         });
 
-        // TODO: so much todo
         facebookLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("Login Button", "Facebook");
-                ParseFacebookUtils.logInWithReadPermissionsInBackground(LoginScreen.this, Collections.singletonList("email"), new LogInCallback() {
-                    @Override
-                    public void done(ParseUser user, ParseException e) {
-                        if (user == null) {                 // cancelled
-                            Log.d("Facebook Login", "Cancelled");
-                        } else if (user.isNew()) {          // newly registered
-                            Log.d("Facebook Login", "New: " + user.getEmail());
-                            Log.d("Facebook Login", "New: " + user.getUsername());
-                            // TODO: set username
-                        } else {                            // normal login
-                            Log.d("Facebook Login", "Success: " + user.getEmail());
-                            Log.d("Facebook Login", "Success: " + user.getUsername());
-                            setResult(LOGIN_SUCCESS);
-                            swipeBackLayout.scrollToFinishActivity();
-                        }
-
-                        if (user != null) {
-                            // get Facebook user email
-                            GraphRequest request = GraphRequest.newMeRequest(
-                                    AccessToken.getCurrentAccessToken(),
-                                    new GraphRequest.GraphJSONObjectCallback() {
-                                        @Override
-                                        public void onCompleted(JSONObject object, GraphResponse response) {
-                                            try {
-                                                Log.d("Facebook Login", "Email: " + object.getString("email"));
-                                            } catch (Exception e) {
-                                                Toast.makeText(LoginScreen.this, getString(R.string.failed_fetch_email), Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                            Bundle parameters = new Bundle();
-                            parameters.putString("fields", "email");
-                            request.setParameters(parameters);
-                            request.executeAsync();
-                        }
-
-                        if (e != null)
-                            showErrorMessage(e);
-                    }
-                });
+                // TODO:
             }
         });
 
@@ -220,30 +170,7 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
             @Override
             public void onClick(View v) {
                 Log.i("Login Button", "Twitter");
-                ParseTwitterUtils.logIn(LoginScreen.this, new LogInCallback() {
-                    @Override
-                    public void done(ParseUser user, ParseException e) {
-                        if (user == null) {                 // cancelled
-                            Log.d("Twitter Login", "Cancelled");
-                        } else if (user.isNew()) {          // newly registered
-                            // TODO:
-                            Log.d("Twitter Login", "New: " + user.getEmail());
-                            Log.d("Twitter Login", "New: " + user.getUsername());
-                        } else {                            // normal login
-                            Log.d("Twitter Login", "Success: " + user.getEmail());
-                            Log.d("Twitter Login", "Success: " + user.getUsername());
-
-                            setResult(LOGIN_SUCCESS);
-                            swipeBackLayout.scrollToFinishActivity();
-                        }
-
-                        Log.d("Twitter Login", ParseTwitterUtils.getTwitter().getScreenName());
-                        Log.d("Twitter Login", ParseTwitterUtils.getTwitter().getAuthToken());
-
-                        if (e != null)
-                            showErrorMessage(e);
-                    }
-                });
+                // TODO:
             }
         });
 
@@ -456,28 +383,6 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
         return password.length() >= 6;
     }
 
-    private void showErrorMessage(ParseException e) {
-        switch (e.getCode()) {
-            case ParseException.CONNECTION_FAILED:
-                Toast.makeText(this, R.string.exception_connection_failed, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.INTERNAL_SERVER_ERROR:
-                Toast.makeText(this, R.string.exception_internal_server_error, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.TIMEOUT:
-                Toast.makeText(this, R.string.exception_timeout, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.VALIDATION_ERROR:
-                Toast.makeText(this, R.string.exception_validation_error, Toast.LENGTH_SHORT).show();
-                break;
-            case ParseException.INVALID_EMAIL_ADDRESS:
-                Toast.makeText(this, R.string.exception_invalid_email, Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                Toast.makeText(this, R.string.exception_invalid_login_param, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     @Override
     public void onLoginComplete() {
         Log.i("LoginScreen", "Login complete");
@@ -494,24 +399,8 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     }
 
     @Override
-    public void onLoginFail(ParseException e) {
-        Log.i("LoginScreen", "Login failed");
-        inputEmail.setEnabled(true);
-        inputPasswd.setEnabled(true);
-        isSigningIn = false;
+    public void onLoginFail(Exception e) {
 
-        progressGenerator.stop(btnLogIn);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                btnLogIn.setEnabled(true);
-                btnLogIn.setProgress(0);
-            }
-        }, 2000);           // change back to normal button in two seconds
-
-        e.printStackTrace();
-        showErrorMessage(e);
     }
 
     @Override
@@ -532,8 +421,8 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
     }
 
     @Override
-    public void onRegisterFail(ParseException e) {
-        // nothing here
+    public void onRegisterFail(Exception e) {
+
     }
 
     @Override
@@ -548,12 +437,6 @@ public class LoginScreen extends SwipeBackActivity implements LoaderCallbacks<Cu
                 }
                 break;
         }
-
-        // for Facebook integration
-        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
-
-        // for Twitter sdk integration
-//        twitterLoginButton.onActivityResult(requestCode, resultCode, data);
 
         Tencent.onActivityResultData(requestCode, resultCode, data, new IUiListener() {
             @Override
