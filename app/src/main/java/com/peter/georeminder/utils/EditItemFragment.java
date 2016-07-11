@@ -883,11 +883,31 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
             case PLACE_PICKER_REQUEST_CODE:
                 if (resultCode == Activity.RESULT_OK) {
                     Place place = PlacePicker.getPlace(getActivity(), data);
-                    Toast.makeText(getActivity(), place.getName(), Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "Place Picker: " + place.getName());
                     if (useGoogleMap) {
-                        // TODO:
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.flat(false)
+                                .draggable(true)
+                                .title(place.getName().toString());
+
+                        markerOptions.position(place.getLatLng());
+                        googleMap.clear();
+                        googleMapMarker = googleMap.addMarker(markerOptions);
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 16));
                     } else {
-                        // TODO:
+                        com.amap.api.maps.model.MarkerOptions markerOptions = new com.amap.api.maps.model.MarkerOptions();
+                        markerOptions.setFlat(false)
+                                .setGps(false)
+                                .draggable(true)
+                                .title(place.getName().toString());
+
+                        com.amap.api.maps.model.LatLng latLng = new com.amap.api.maps.model.LatLng(
+                                place.getLatLng().latitude,
+                                place.getLatLng().longitude);
+                        markerOptions.position(latLng);
+                        aMap.clear();
+                        aMapMarker = aMap.addMarker(markerOptions);
+                        aMap.animateCamera(com.amap.api.maps.CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     }
                 }
                 return;
