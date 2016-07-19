@@ -29,7 +29,6 @@
             android:layout_gravity="center_vertical|end"
             android:src="@drawable/ic_google"
             android:clickable="false" />
-        <!--TODO: extract icon background-->
 
         <TextView
             android:layout_width="0dp"
