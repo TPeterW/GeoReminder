@@ -34,7 +34,6 @@ import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
-import com.facebook.appevents.AppEventsLogger;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
