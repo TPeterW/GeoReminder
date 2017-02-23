@@ -149,7 +149,7 @@ public class MainScreen extends AppCompatActivity implements
 
         loadPref();             //using SharedPreferences
     }
-
+    gi
     private void showIntro() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainScreen.this);
         if (!sharedPreferences.getBoolean(getString(R.string.shared_pref_tutorial_shown), false)) {
