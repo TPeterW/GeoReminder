@@ -249,4 +249,14 @@ public class EditorScreen extends AppCompatActivity implements MapListener, Colo
         // make changes to reminder object
         currentFragment.onColorChange(selectedColor);
     }
+
+    @Override
+    public void onColorChooserDismissed(@NonNull ColorChooserDialog dialog) {
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
 }

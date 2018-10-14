@@ -23,7 +23,6 @@
     <!-- TODO: This could be a problem -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -46,7 +45,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:node="replace">
         <activity
             android:name=".SplashScreen"
             android:screenOrientation="portrait"
@@ -153,7 +153,6 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
-
     </application>
 
 </manifest>

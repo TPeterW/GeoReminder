@@ -503,7 +503,7 @@ public class EditItemFragment extends Fragment implements OnMapReadyCallback, Lo
                         .cancelButton(R.string.button_cancel)
                         .backButton(R.string.button_back)
                         .customButton(R.string.button_custom)
-                        .show();
+                        .show(getFragmentManager());
             }
         });
     }
